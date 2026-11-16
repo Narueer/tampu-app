@@ -1,0 +1,94 @@
+GUIA PARA REVISAR TAMPU (avance 50 %)
+Programación Web - NRC 39578 - Universidad Continental
+Equipo: Alvares Rodriguez Wernher, Juro Huillca César Augusto, Achahuanco Bayona David, Aedo Vargas Olenka Valeria
+
+
+1. COMO EJECUTARLO
+
+Requisitos: XAMPP con PHP 8.2 o superior. No hace falta instalar Composer, la carpeta vendor ya viene incluida.
+
+1) Descomprimir Tampu_Codigo.zip.
+2) Abrir XAMPP y encender Apache y MySQL.
+3) Entrar a http://localhost/phpmyadmin, ir a Importar y elegir el archivo
+   Tampu\database\sql\tampu.sql
+   Se crea la base "tampu" con datos de prueba.
+4) Abrir una terminal dentro de la carpeta Tampu (por ejemplo en VS Code: Terminal > Nueva terminal) y ejecutar:
+   C:\xampp\php\php.exe artisan serve
+5) Entrar en el navegador a http://127.0.0.1:8000
+
+Si aparece "could not find driver": en C:\xampp\php\php.ini quitar el ; de extension=pdo_mysql y de extension=fileinfo, guardar y volver a ejecutar.
+Si MySQL tiene contraseña: escribirla en el archivo .env, en DB_PASSWORD=
+
+
+2. USUARIOS DE PRUEBA
+
+Administrador
+admin@tampu.pe        admin123   Administrador TAMPU
+
+Arrendadores
+rosa@tampu.pe         123456     Rosa Huamán Quispe (verificada)
+julio@tampu.pe        123456     Julio Ccori Mamani (verificado)
+carmen@tampu.pe       123456     Carmen Mamani Huallpa (verificada)
+pedro@tampu.pe        123456     Pedro Ccahuana Rojas (pendiente de verificar)
+
+Empleadores
+wayra@tampu.pe        123456     Minimarket Wayra (verificado)
+andestech@tampu.pe    123456     Andes Tech SAC (verificado)
+intiraymi@tampu.pe    123456     Restaurante Inti Raymi (verificado)
+qhapaq@tampu.pe       123456     Qhapaq Tours (pendiente de verificar)
+
+Estudiantes
+luis@tampu.pe         123456     Luis Mamani Choque, de Sicuani (tiene horario de clases)
+ana@tampu.pe          123456     Ana Quispe Ccasa, de Abancay
+
+
+3. QUE REVISAR
+
+Sin iniciar sesión
+- Inicio: habitaciones y trabajos recientes.
+- Habitaciones: filtrar por distrito Wanchaq y precio máximo 400 (quedan 2). Entrar a "Ver detalle".
+- Trabajos: lista de ofertas con sus turnos.
+
+Como estudiante (luis@tampu.pe)
+- Mi panel: horario de clases marcado por día y turno; se puede cambiar y guardar.
+- Trabajos: marcar "Solo compatibles con mi horario" y filtrar. Desaparecen las ofertas que chocan con sus clases.
+- Abrir una habitación y solicitar una visita con fecha y mensaje. Queda pendiente en Mi panel.
+
+Como arrendador (rosa@tampu.pe)
+- Mis habitaciones: crear una nueva con foto, editarla y eliminarla.
+- Solicitudes: aceptar o rechazar la visita del estudiante.
+- Al aceptar, el estudiante recién ve el celular del arrendador en su panel.
+
+Como empleador (wayra@tampu.pe)
+- Mis ofertas: crear una oferta marcando los turnos de trabajo, editarla y eliminarla.
+
+Como administrador (admin@tampu.pe)
+- Panel: resumen con números y cuentas pendientes de verificación.
+- "Ver" abre el documento subido (son imágenes de prueba, no documentos reales).
+- "Verificar" o "Rechazar". Solo las cuentas verificadas pueden publicar.
+- Usuarios: lista de todas las cuentas con filtro por rol.
+
+Seguridad
+- Con la sesión de un estudiante, escribir 127.0.0.1:8000/admin. El sistema responde con error 403.
+- Con pedro@tampu.pe (no verificado) no aparece el botón para publicar; si se entra a la dirección a mano, error 403.
+- Registro: probar un DNI de menos de 8 números o un correo ya registrado; se muestran los errores.
+
+Celular
+- Achicar la ventana o usar el modo celular del navegador (F12). El menú pasa al botón ☰.
+
+
+4. PENDIENTE PARA LA ENTREGA FINAL
+
+Postulaciones a trabajos, reseñas, reportes de publicaciones sospechosas, favoritos, mapa de habitaciones y estadísticas con gráficos.
+
+
+5. DONDE ESTA EL CODIGO PRINCIPAL
+
+routes/web.php                      rutas y grupos por rol
+app/Http/Controllers                controladores
+app/Http/Middleware/RolMiddleware   control de acceso por rol
+app/Models                          modelos Eloquent
+database/migrations                 creación de las tablas
+database/seeders                    datos de prueba
+resources/views                     vistas Blade
+public/css y public/js              estilos y JavaScript

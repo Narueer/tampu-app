@@ -1,0 +1,11 @@
+vendor
+node_modules
+.env
+.git
+storage/logs/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/cache/data/*
+public/uploads/habitaciones/*
+public/uploads/perfiles/*
+database/sql
