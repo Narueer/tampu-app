@@ -1554,3 +1554,14 @@ nav a {
     border-radius: 50%;
     background-color: var(--error);
 }
+
+/* el chat no debe crecer con los mensajes: la caja de escribir queda siempre abajo */
+.chat {
+    grid-template-rows: minmax(0, 1fr);
+}
+
+.chat-lista,
+.chat-ventana,
+.chat-mensajes {
+    min-height: 0;
+}
