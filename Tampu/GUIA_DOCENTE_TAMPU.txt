@@ -1,0 +1,110 @@
+GUIA PARA REVISAR TAMPU (entrega final)
+Programación Web - NRC 39578 - Universidad Continental
+Equipo: Alvares Rodriguez Wernher, Juro Huillca César Augusto, Achahuanco Bayona David, Aedo Vargas Olenka Valeria
+
+
+1. COMO EJECUTARLO
+
+Requisitos: XAMPP con PHP 8.2 o superior y conexión a internet (el mapa, el calendario y los gráficos se cargan desde internet). No hace falta instalar Composer, la carpeta vendor ya viene incluida.
+
+1) Descomprimir Tampu_Codigo.zip.
+2) Abrir XAMPP y encender Apache y MySQL.
+3) Entrar a http://localhost/phpmyadmin, ir a Importar y elegir el archivo
+   Tampu\database\sql\tampu.sql
+   Se crea la base "tampu" con datos de prueba. Si ya tenía la base del avance del 50 %, se reemplaza.
+4) Abrir una terminal dentro de la carpeta Tampu (por ejemplo en VS Code: Terminal > Nueva terminal) y ejecutar:
+   C:\xampp\php\php.exe artisan serve
+5) Entrar en el navegador a http://127.0.0.1:8000
+
+Si aparece "could not find driver": en C:\xampp\php\php.ini quitar el ; de extension=pdo_mysql y de extension=fileinfo, guardar y volver a ejecutar.
+Si MySQL tiene contraseña: escribirla en el archivo .env, en DB_PASSWORD=
+
+
+2. USUARIOS DE PRUEBA (contraseña 123456, salvo el administrador)
+
+Administrador
+admin@tampu.pe        admin123   Administrador TAMPU
+
+Arrendadores
+rosa@tampu.pe         Rosa Huamán Quispe (verificada, tiene un chat con Ana)
+julio@tampu.pe        Julio Ccori Mamani (verificado)
+carmen@tampu.pe       Carmen Mamani Huallpa (verificada)
+pedro@tampu.pe        Pedro Ccahuana Rojas (pendiente de verificar)
+mario@tampu.pe        Mario Sullca Ttito (su habitación de S/ 150 tiene un reporte pendiente)
+
+Empleadores
+wayra@tampu.pe        Minimarket Wayra (verificado)
+andestech@tampu.pe    Andes Tech SAC (verificado)
+intiraymi@tampu.pe    Restaurante Inti Raymi (verificado)
+qhapaq@tampu.pe       Qhapaq Tours (pendiente de verificar)
+
+Estudiantes
+luis@tampu.pe         Luis Mamani Choque, de Sicuani (horario de clases y un trabajo aceptado)
+ana@tampu.pe          Ana Quispe Ccasa, de Abancay (puede dejar reseña en "Habitación amplia en el centro")
+rocio@tampu.pe        Rocío Apaza Layme, de Puno
+kevin@tampu.pe        Kevin Huamán Cusi, de Quillabamba
+
+
+3. QUE REVISAR
+
+Sin iniciar sesión
+- Habitaciones: mapa con la ubicación de cada cuarto; al tocar un punto sale el precio. Filtrar por Wanchaq y precio máximo 400.
+- Detalle de una habitación: mapa, reseñas con estrellas y promedio.
+- Botón redondo abajo a la derecha: asistente virtual. Probar "cuartos en santiago hasta 300", "¿cómo evito estafas?", "¿cómo me verifico?".
+
+Como estudiante (luis@tampu.pe)
+- Mi panel: horario de clases, solicitudes de visita y postulaciones. En las aceptadas se ve el celular y el botón "Constancia" (descarga un PDF).
+- Calendario: clases (verde oscuro), turnos del trabajo aceptado (naranja) y visitas.
+- Trabajos: marcar "Solo compatibles con mi horario". Tocar "Postular" en "Soporte técnico sábados".
+- Habitaciones: tocar el corazón de una tarjeta; aparece en Favoritos.
+- Campana: notificaciones. Globo de chat: mensajes con la empresa.
+- Mi perfil: subir foto y cambiar contraseña.
+- En el asistente escribir "trabajos compatibles": solo muestra las ofertas que no chocan con sus clases.
+
+Como empleador (andestech@tampu.pe)
+- Postulaciones: aceptar la de Luis. A Luis le llega una notificación y el turno aparece en su calendario.
+- Calendario: turnos de sus ofertas con los estudiantes aceptados.
+
+Como estudiante (ana@tampu.pe)
+- Abrir "Habitación amplia en el centro" y dejar una reseña (ya visitó esa habitación).
+- Mensajes: escribir a Rosa. Si en otro navegador está abierta la cuenta de rosa@tampu.pe, el mensaje aparece solo, sin recargar.
+- En cualquier habitación, "Reportar".
+
+Como arrendador (rosa@tampu.pe)
+- Mis habitaciones: al crear o editar se marca la ubicación con un clic en el mapa.
+- Solicitudes: aceptar o rechazar; botón de mensaje y constancia.
+- Calendario: visitas pendientes y aceptadas.
+
+Como administrador (admin@tampu.pe)
+- Panel: números y gráficos (habitaciones y precio promedio por distrito, solicitudes, usuarios por rol).
+- Reportes: el de la habitación de S/ 150. "Suspender cuenta" oculta sus publicaciones y mario@tampu.pe ya no puede entrar.
+- Usuarios: suspender o reactivar cuentas.
+- Verificar o rechazar a pedro@tampu.pe y qhapaq@tampu.pe (les llega una notificación).
+
+Seguridad
+- Con la sesión de un estudiante, escribir 127.0.0.1:8000/admin. Responde error 403.
+- Login: equivocarse 5 veces seguidas con el mismo correo. Se bloquea un minuto y al administrador le llega un aviso en la campana.
+- Admin > Seguridad: bitácora con los inicios de sesión, contraseñas incorrectas, bloqueos y accesos denegados (403), con fecha e IP. Se puede filtrar "Solo alertas".
+- Mi perfil > Actividad de tu cuenta: cada usuario ve sus últimos movimientos.
+- Registro o cambio de contraseña con "abcdefgh": la rechaza, pide mínimo 8 caracteres con letras y números (las cuentas de prueba siguen con 123456).
+- F12 > Red > cualquier página: respuesta con cabeceras X-Frame-Options, X-Content-Type-Options, Referrer-Policy y Permissions-Policy.
+- "¿Olvidaste tu contraseña?": como no hay servidor de correo, el enlace aparece en pantalla (modo local) y en storage\logs\laravel.log.
+- Con luis@tampu.pe entrar a 127.0.0.1:8000/mensajes/1 (chat de otras personas). Responde 403.
+- Una reseña solo se puede dejar si la visita fue aceptada y la fecha ya pasó.
+
+Celular
+- Achicar la ventana o usar el modo celular del navegador (F12). El menú pasa al botón ☰ y el calendario cambia a lista.
+
+
+4. DONDE ESTA EL CODIGO PRINCIPAL
+
+routes/web.php                      rutas y grupos por rol
+app/Http/Controllers                controladores (ChatbotController, CalendarioController, MensajeController, etc.)
+app/Http/Middleware                 RolMiddleware (roles), CuentaActiva (cuentas suspendidas) y CabecerasSeguridad
+app/Models/EventoSeguridad.php      bitácora de seguridad
+app/Models                          modelos Eloquent
+app/Notifications/Aviso.php         notificaciones
+database/migrations                 creación de las tablas
+database/seeders                    datos de prueba
+resources/views                     vistas Blade (pdf/constancia.blade.php es la constancia)
+public/css y public/js              estilos y JavaScript (mapa.js, chat.js, script.js)

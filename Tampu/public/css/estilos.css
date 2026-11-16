@@ -1565,3 +1565,57 @@ nav a {
 .chat-mensajes {
     min-height: 0;
 }
+
+
+/* seguridad */
+.ayuda {
+    display: block;
+    color: var(--texto-suave);
+    font-size: 0.85rem;
+    margin: 4px 0 12px;
+}
+
+.fila-alerta td,
+.actividad-fila.fila-alerta {
+    background-color: var(--error-fondo);
+}
+
+.fila-alerta .bi {
+    color: var(--error);
+}
+
+.actividad-fila {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.actividad-fila small {
+    color: var(--texto-suave);
+}
+
+.paginas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.barra-filtros input[type="search"] {
+    width: auto;
+    flex: 1;
+    min-width: 180px;
+    margin: 0;
+}
+
+.perfil .actividad {
+    grid-column: 1 / -1;
+}
+
+.titulo-pagina + .texto-suave {
+    margin-bottom: 15px;
+}

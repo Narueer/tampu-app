@@ -114,5 +114,6 @@ Route::middleware('auth')->group(function () {
         Route::patch('reportes/{reporte}', [AdminController::class, 'resolver'])->name('reportes.resolver');
         Route::get('contactos', [AdminController::class, 'contactos'])->name('contactos');
         Route::patch('contactos/{contacto}', [AdminController::class, 'leerContacto'])->name('contactos.leer');
+        Route::get('seguridad', [AdminController::class, 'seguridad'])->name('seguridad');
     });
 });

@@ -55,8 +55,8 @@ if (formRegistro) {
             error = "Escribe tu nombre completo.";
         } else if (!/^[0-9]{8}$/.test(dni)) {
             error = "El DNI debe tener 8 números.";
-        } else if (clave.length < 6) {
-            error = "La contraseña debe tener al menos 6 caracteres.";
+        } else if (clave.length < 8 || !/[a-zA-Z]/.test(clave) || !/[0-9]/.test(clave)) {
+            error = "La contraseña debe tener al menos 8 caracteres, con letras y números.";
         } else if (clave !== clave2) {
             error = "Las contraseñas no coinciden.";
         } else if (tipo.value !== "estudiante" && documento.files.length === 0) {
