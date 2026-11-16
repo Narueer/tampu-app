@@ -1514,3 +1514,43 @@ nav a {
     background-color: white;
     color: var(--verde-andino);
 }
+
+/* aviso de notificacion nueva */
+.aviso-nuevo {
+    position: fixed;
+    left: 50%;
+    top: 84px;
+    transform: translateX(-50%);
+    background-color: var(--verde-andino);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    z-index: 1200;
+    max-width: 90%;
+    font-size: 14px;
+}
+
+.aviso-nuevo i {
+    color: #f5c27a;
+    margin-right: 6px;
+}
+
+.aviso-nuevo.oculto {
+    display: none;
+}
+
+#btnMenu {
+    position: relative;
+}
+
+#btnMenu.con-aviso::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--error);
+}

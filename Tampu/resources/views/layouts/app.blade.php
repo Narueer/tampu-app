@@ -38,11 +38,11 @@
                 @auth
                     @php($sinLeer = auth()->user()->unreadNotifications()->count())
                     @php($chats = auth()->user()->mensajesSinLeer())
-                    <a href="{{ route('notificaciones') }}" class="icono-menu {{ request()->routeIs('notificaciones') ? 'activo' : '' }}" title="Notificaciones">
+                    <a href="{{ route('notificaciones') }}" id="iconoAvisos" class="icono-menu {{ request()->routeIs('notificaciones') ? 'activo' : '' }}" title="Notificaciones">
                         <i class="bi bi-bell"></i><span class="solo-celular"> Notificaciones</span>
                         @if ($sinLeer)<span class="globo">{{ $sinLeer }}</span>@endif
                     </a>
-                    <a href="{{ route('mensajes') }}" class="icono-menu {{ request()->routeIs('mensajes*') ? 'activo' : '' }}" title="Mensajes">
+                    <a href="{{ route('mensajes') }}" id="iconoChats" class="icono-menu {{ request()->routeIs('mensajes*') ? 'activo' : '' }}" title="Mensajes">
                         <i class="bi bi-chat-dots"></i><span class="solo-celular"> Mensajes</span>
                         @if ($chats)<span class="globo">{{ $chats }}</span>@endif
                     </a>
@@ -93,6 +93,12 @@
     </footer>
 
     @include('partials.asistente')
+
+    @auth
+        <a href="{{ route('notificaciones') }}" id="avisoNuevo" class="aviso-nuevo oculto" data-estado="{{ route('estado') }}">
+            <i class="bi bi-bell"></i> <span></span>
+        </a>
+    @endauth
 
     <script src="{{ asset('js/script.js') }}"></script>
     @stack('scripts')

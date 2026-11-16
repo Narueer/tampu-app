@@ -205,3 +205,54 @@ if (btnInstalar) {
         }
     });
 }
+
+// campana y mensajes en vivo: cada 10 segundos pregunta si hay algo nuevo
+const avisoNuevo = document.getElementById("avisoNuevo");
+
+if (avisoNuevo) {
+    let antes = null;
+
+    function ponerGlobo(id, cantidad) {
+        const icono = document.getElementById(id);
+        if (!icono) {
+            return;
+        }
+        let globo = icono.querySelector(".globo");
+        if (cantidad > 0) {
+            if (!globo) {
+                globo = document.createElement("span");
+                globo.className = "globo";
+                icono.appendChild(globo);
+            }
+            globo.textContent = cantidad;
+        } else if (globo) {
+            globo.remove();
+        }
+    }
+
+    function revisarEstado() {
+        fetch(avisoNuevo.dataset.estado, { headers: { "Accept": "application/json" } })
+            .then(r => r.json())
+            .then(datos => {
+                ponerGlobo("iconoAvisos", datos.notificaciones);
+                ponerGlobo("iconoChats", datos.mensajes);
+
+                // en el celular el menu esta escondido, asi que el boton muestra un punto rojo
+                if (btnMenu) {
+                    btnMenu.classList.toggle("con-aviso", datos.notificaciones + datos.mensajes > 0);
+                }
+
+                // si llego una notificacion nueva, se muestra un aviso abajo
+                if (antes !== null && datos.notificaciones > antes && datos.ultima) {
+                    avisoNuevo.querySelector("span").textContent = datos.ultima;
+                    avisoNuevo.classList.remove("oculto");
+                    setTimeout(() => avisoNuevo.classList.add("oculto"), 8000);
+                }
+                antes = datos.notificaciones;
+            })
+            .catch(() => {});
+    }
+
+    revisarEstado();
+    setInterval(revisarEstado, 10000);
+}
