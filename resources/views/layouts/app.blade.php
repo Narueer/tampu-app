@@ -8,16 +8,19 @@
     <link rel="icon" href="{{ asset('img/favicon.png') }}">
     <!-- para instalarla como app en el celular -->
     <link rel="manifest" href="{{ asset('manifest.json') }}">
-    <meta name="theme-color" content="#b4532a">
+    <meta name="theme-color" content="#17352f">
     <link rel="apple-touch-icon" href="{{ asset('img/apple-touch-icon.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="TAMPU">
-    <!-- fuente Poppins, Bootstrap 5 y Bootstrap Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+    <!-- fuentes Fraunces y Plus Jakarta Sans, Bootstrap 5 y Bootstrap Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ filemtime(public_path('css/estilos.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/tema.css') }}?v={{ filemtime(public_path('css/tema.css')) }}">
     <script>document.documentElement.classList.add('con-js');</script>
     @stack('estilos')
 </head>
@@ -28,7 +31,7 @@
         <div class="contenedor">
             <a href="{{ route('inicio') }}" class="logo">
                 <img src="{{ asset('img/logo-160.png') }}" alt="Logo de Tampu">
-                TAMPU
+                <span>Tampu<small>Cusco · estudiantes</small></span>
             </a>
             <button id="btnMenu" aria-label="Abrir menú">☰</button>
             <nav id="menu">
@@ -61,7 +64,7 @@
                         <button type="submit" class="btn btn-borde btn-chico">Salir</button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="{{ request()->routeIs('login', 'registro') ? 'activo' : '' }}">Iniciar sesión</a>
+                    <a href="{{ route('login') }}" class="menu-cta {{ request()->routeIs('login', 'registro') ? 'activo' : '' }}">Iniciar sesión</a>
                 @endauth
             </nav>
         </div>
@@ -81,12 +84,14 @@
     @yield('contenido')
 
     <!-- footer -->
+    <div class="banda-andina" aria-hidden="true"></div>
     <footer class="pie">
         <div class="contenedor">
+            <p class="pie-lema">Tu casa de paso <em>en el camino</em><br>hacia la universidad.</p>
             <div class="row g-4 pie-columnas">
                 <div class="col-lg-4 col-md-6">
                     <a href="{{ route('inicio') }}" class="logo logo-pie">
-                        <img src="{{ asset('img/logo-160.png') }}" alt="Logo de Tampu"> TAMPU
+                        <img src="{{ asset('img/logo-160.png') }}" alt="Logo de Tampu"> Tampu
                     </a>
                     <p class="pie-texto">Habitaciones seguras y trabajos que encajan con tus clases, para estudiantes que llegan a Cusco.</p>
                     <button type="button" id="btnInstalar" class="btn-instalar oculto"><i class="bi bi-phone"></i> Instalar la app</button>

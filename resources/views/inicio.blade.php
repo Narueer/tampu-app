@@ -123,7 +123,7 @@
             <div class="contenedor">
                 <div class="encabezado-seccion revelar">
                     <span class="sobretitulo">En tres pasos</span>
-                    <h2>¿Cómo funciona?</h2>
+                    <h2>¿Cómo <em>funciona</em>?</h2>
                 </div>
                 <div class="row g-4 pasos">
                     <div class="col-md-4 revelar">
@@ -176,7 +176,7 @@
                     </div>
                     <div class="col-lg-6 revelar">
                         <span class="sobretitulo">Por qué TAMPU</span>
-                        <h2 class="titulo-grande">Un lugar seguro para empezar en Cusco</h2>
+                        <h2 class="titulo-grande">Un lugar seguro para <em>empezar</em> en Cusco</h2>
                         <p class="texto-suave">En la época inca los tampus eran casas de descanso en el Qhapaq Ñan. Nosotros queremos ser eso para quien llega de provincia.</p>
                         <ul class="lista-ventajas">
                             <li><i class="bi bi-shield-check"></i><div><b>Cuentas verificadas</b><span>El administrador revisa el DNI o RUC antes de que alguien publique.</span></div></li>
@@ -194,7 +194,7 @@
             <div class="contenedor">
                 <div class="encabezado-seccion revelar">
                     <span class="sobretitulo">Elige por dónde estudias</span>
-                    <h2>Cuartos cerca de tu universidad</h2>
+                    <h2>Cuartos cerca de <em>tu universidad</em></h2>
                 </div>
                 <div class="row g-3">
                     @foreach ($universidades as $u)
@@ -217,7 +217,7 @@
                 <div class="row g-4 align-items-center">
                     <div class="col-lg-4 revelar">
                         <span class="sobretitulo">Mira dónde quedan</span>
-                        <h2 class="titulo-grande">Todos los cuartos en un mapa</h2>
+                        <h2 class="titulo-grande">Todos los cuartos <em>en un mapa</em></h2>
                         <p class="texto-suave">Cada marcador muestra el precio. Los íconos de birrete son las universidades, para que veas qué tan cerca estarías.</p>
                         <div class="distritos-lista">
                             @foreach ($distritos as $d)
@@ -243,7 +243,7 @@
                 <div class="encabezado-seccion con-flechas revelar">
                     <div>
                         <span class="sobretitulo">Recién publicadas</span>
-                        <h2>Habitaciones recientes</h2>
+                        <h2>Habitaciones <em>recientes</em></h2>
                     </div>
                     <div class="flechas">
                         <button type="button" class="flecha" data-carril="#carrilCuartos" data-dir="-1" aria-label="Anteriores"><i class="bi bi-chevron-left"></i></button>
@@ -266,7 +266,7 @@
             <div class="contenedor">
                 <div class="encabezado-seccion revelar">
                     <span class="sobretitulo">Para tus horas libres</span>
-                    <h2>Trabajos recientes</h2>
+                    <h2>Trabajos <em>recientes</em></h2>
                 </div>
                 <div class="row g-4">
                     @foreach ($trabajos as $t)
@@ -285,7 +285,7 @@
                 <div class="contenedor">
                     <div class="encabezado-seccion revelar">
                         <span class="sobretitulo">Después de la visita</span>
-                        <h2>Lo que dicen los estudiantes</h2>
+                        <h2>Lo que dicen <em>los estudiantes</em></h2>
                     </div>
                     <div id="opiniones" class="carousel slide revelar" data-bs-ride="carousel" data-bs-interval="7000">
                         <div class="carousel-inner">
@@ -313,10 +313,44 @@
             </section>
         @endif
 
+        <!-- vivir en cusco: fotos en mosaico y consejos para quien llega -->
+        <section class="seccion fondo-blanco">
+            <div class="contenedor">
+                <div class="row g-4 g-lg-5 align-items-center">
+                    <div class="col-lg-5 revelar">
+                        <span class="sobretitulo">Tu nueva ciudad</span>
+                        <h2 class="titulo-grande">Cusco te recibe, <em>nosotros te orientamos</em></h2>
+                        <p class="texto-suave">Llegar de provincia a una ciudad nueva es más fácil cuando alguien te cuenta lo básico. Esto es lo que les decimos a todos los que recién llegan.</p>
+                        <ol class="consejos">
+                            <li><b>La altura</b><span>Cusco está a unos 3 400 m. Los primeros días camina despacio, come ligero y toma bastante agua.</span></li>
+                            <li><b>El frío de la noche</b><span>De día hace sol, pero las noches son frías casi todo el año. Pregunta si el cuarto tiene agua caliente.</span></li>
+                            <li><b>Visita antes de pagar</b><span>Nunca mandes un adelanto por un cuarto que no viste. En TAMPU la visita se pide desde la página.</span></li>
+                        </ol>
+                    </div>
+                    <div class="col-lg-7 revelar">
+                        <div class="mosaico">
+                            <figure class="mosaico-alto">
+                                <img src="{{ asset('img/cusco/plaza.jpg') }}" alt="Plaza de Armas del Cusco" loading="lazy">
+                                <figcaption>Plaza de Armas</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="{{ asset('img/cusco/san-blas.jpg') }}" alt="Barrio de San Blas" loading="lazy">
+                                <figcaption>San Blas</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="{{ asset('img/cusco/cuesta-san-blas.jpg') }}" alt="Cuesta de San Blas" loading="lazy">
+                                <figcaption>Cuesta de San Blas</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- llamado para arrendadores y empresas -->
         <section class="banda-cta" style="--fondo-img: url('{{ asset('img/cusco/catedral.jpg') }}')">
             <div class="contenedor revelar">
-                <h2>¿Tienes un cuarto o un trabajo para estudiantes?</h2>
+                <h2>¿Tienes un cuarto o un trabajo <em>para estudiantes?</em></h2>
                 <p>Publica gratis. Verificamos tu cuenta y los estudiantes te escriben directamente.</p>
                 <a href="{{ route('registro') }}" class="btn btn-grande btn-claro">Publicar gratis</a>
             </div>
