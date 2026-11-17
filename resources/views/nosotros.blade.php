@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('titulo', 'Nosotros')
+@section('descripcion', 'Conoce TAMPU, el proyecto de estudiantes de la Universidad Continental que ayuda a quienes llegan a Cusco a encontrar cuarto seguro y trabajo.')
 
 @section('contenido')
     @include('partials.banner', ['titulo' => 'Sobre TAMPU', 'texto' => 'Un lugar de descanso en el camino, como los tampus del Qhapaq Ñan.', 'imagen' => 'img/cusco/catedral.jpg'])

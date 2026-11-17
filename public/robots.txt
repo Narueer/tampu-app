@@ -1,2 +1,13 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /panel
+Disallow: /perfil
+Disallow: /mensajes
+Disallow: /notificaciones
+Disallow: /estudiante
+Disallow: /arrendador
+Disallow: /empleador
+Disallow: /calendario
+Disallow: /constancia
+
+Sitemap: https://tampu-app.onrender.com/sitemap.xml

@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 // paginas publicas
 Route::get('/', [InicioController::class, 'inicio'])->name('inicio');
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 Route::get('/nosotros', [InicioController::class, 'nosotros'])->name('nosotros');
 Route::get('/habitaciones', [HabitacionController::class, 'index'])->name('habitaciones.index');
 Route::get('/habitaciones/{habitacion}', [HabitacionController::class, 'show'])->name('habitaciones.show');

@@ -1,6 +1,20 @@
 @extends('layouts.app')
 
-@section('titulo', 'Inicio')
+@section('titulo', 'Cuartos y trabajos para estudiantes en Cusco')
+@section('descripcion', 'Encuentra habitaciones verificadas cerca de la UNSAAC, la U. Andina y la U. Continental, y trabajos de medio tiempo que respetan tu horario de clases en Cusco.')
+
+@push('meta')
+    <script type="application/ld+json">
+        {!! json_encode([
+            "\x40context" => 'https://schema.org',
+            "\x40type" => 'WebSite',
+            'name' => 'TAMPU',
+            'url' => route('inicio'),
+            'description' => 'Habitaciones verificadas y trabajos de medio tiempo para estudiantes en Cusco.',
+            'inLanguage' => 'es-PE',
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+    </script>
+@endpush
 
 @push('estilos')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">

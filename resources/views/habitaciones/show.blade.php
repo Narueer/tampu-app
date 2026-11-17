@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
-@section('titulo', $habitacion->titulo)
+@section('titulo', $habitacion->titulo . ' - S/ ' . number_format($habitacion->precio, 0) . ' en ' . $habitacion->distrito)
+@section('descripcion', \Illuminate\Support\Str::limit($habitacion->descripcion, 155))
+@section('imagen', $habitacion->fotoUrl())
 
 @push('estilos')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">

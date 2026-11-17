@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('titulo', $trabajo->titulo)
+@section('titulo', $trabajo->titulo . ' en ' . $trabajo->empresa . ' - Cusco')
+@section('descripcion', \Illuminate\Support\Str::limit($trabajo->descripcion, 155))
 
 @push('estilos')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">

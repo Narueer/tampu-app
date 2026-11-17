@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('titulo', 'Habitaciones')
+@section('titulo', request('distrito') ? 'Habitaciones en ' . request('distrito') . ', Cusco' : 'Habitaciones para estudiantes en Cusco')
+@section('descripcion', 'Cuartos, habitaciones compartidas y minidepartamentos para estudiantes en ' . (request('distrito') ?: 'Cusco') . '. Arrendadores verificados, precios y mapa con la distancia a tu universidad.')
 
 @push('estilos')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">

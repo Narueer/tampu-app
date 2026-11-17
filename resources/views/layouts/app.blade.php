@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('titulo', 'Inicio') - TAMPU</title>
+    <!-- datos para Google y para cuando se comparte el enlace -->
+    @php($descripcion = trim($__env->yieldContent('descripcion')) ?: 'TAMPU: habitaciones verificadas y trabajos de medio tiempo para estudiantes universitarios en Cusco. Busca cuartos cerca de tu universidad y visita antes de pagar.')
+    @php($imagenCompartir = trim($__env->yieldContent('imagen')) ?: asset('img/cusco/plaza.jpg'))
+    <meta name="description" content="{{ $descripcion }}">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TAMPU">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="@yield('titulo', 'Inicio') - TAMPU">
+    <meta property="og:description" content="{{ $descripcion }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="{{ $imagenCompartir }}">
+    <meta name="twitter:card" content="summary_large_image">
+    @stack('meta')
     <link rel="icon" href="{{ asset('img/favicon.png') }}">
     <!-- para instalarla como app en el celular -->
     <link rel="manifest" href="{{ asset('manifest.json') }}">

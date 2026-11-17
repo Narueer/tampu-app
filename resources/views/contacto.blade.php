@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('titulo', 'Contacto')
+@section('descripcion', 'Escríbenos si tienes una duda, un problema con tu cuenta o quieres avisarnos de una estafa en TAMPU Cusco.')
 
 @section('contenido')
     @include('partials.banner', ['titulo' => 'Contacto', 'texto' => 'Escríbenos si tienes una duda, un problema con tu cuenta o quieres avisarnos de una estafa.', 'imagen' => 'img/cusco/cuesta-san-blas.jpg'])

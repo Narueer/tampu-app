@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('titulo', 'Trabajos')
+@section('titulo', 'Trabajos para estudiantes en Cusco')
+@section('descripcion', 'Ofertas de trabajo de medio tiempo, por horas y prácticas en Cusco, filtradas para que no choquen con tu horario de clases.')
 
 @push('estilos')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
