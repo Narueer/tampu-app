@@ -45,8 +45,10 @@ if (formRegistro) {
     formRegistro.addEventListener("submit", function (evento) {
         const nombre = document.getElementById("nombre").value.trim();
         const dni = document.getElementById("dni").value;
-        const clave = document.getElementById("clave").value;
-        const clave2 = document.getElementById("clave2").value;
+        // si entro con Google o Microsoft no hay campos de contraseña
+        const conClave = document.getElementById("clave") !== null;
+        const clave = conClave ? document.getElementById("clave").value : "";
+        const clave2 = conClave ? document.getElementById("clave2").value : "";
         const documento = document.getElementById("documento");
         const mensaje = document.getElementById("mensajeRegistro");
         let error = "";
@@ -55,9 +57,9 @@ if (formRegistro) {
             error = "Escribe tu nombre completo.";
         } else if (!/^[0-9]{8}$/.test(dni)) {
             error = "El DNI debe tener 8 números.";
-        } else if (clave.length < 8 || !/[a-zA-Z]/.test(clave) || !/[0-9]/.test(clave)) {
+        } else if (conClave && (clave.length < 8 || !/[a-zA-Z]/.test(clave) || !/[0-9]/.test(clave))) {
             error = "La contraseña debe tener al menos 8 caracteres, con letras y números.";
-        } else if (clave !== clave2) {
+        } else if (conClave && clave !== clave2) {
             error = "Las contraseñas no coinciden.";
         } else if (tipo.value !== "estudiante" && documento.files.length === 0) {
             error = "Sube la foto de tu DNI o RUC.";
@@ -255,4 +257,92 @@ if (avisoNuevo) {
 
     revisarEstado();
     setInterval(revisarEstado, 10000);
+}
+
+// sombra del menu al bajar
+const cabecera = document.getElementById("cabecera");
+if (cabecera) {
+    const sombra = () => cabecera.classList.toggle("con-sombra", window.scrollY > 10);
+    window.addEventListener("scroll", sombra, { passive: true });
+    sombra();
+}
+
+// los bloques .revelar aparecen cuando entran en pantalla
+const revelables = document.querySelectorAll(".revelar");
+if ("IntersectionObserver" in window) {
+    const observador = new IntersectionObserver(function (entradas) {
+        entradas.forEach(function (e) {
+            if (e.isIntersecting) {
+                e.target.classList.add("visto");
+                observador.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    revelables.forEach(el => observador.observe(el));
+} else {
+    revelables.forEach(el => el.classList.add("visto"));
+}
+
+// numeros que cuentan desde cero (si la persona no pidio menos movimiento)
+const sinMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+document.querySelectorAll(sinMovimiento ? ".nada" : ".contador").forEach(function (el) {
+    const hasta = parseInt(el.dataset.hasta, 10) || 0;
+    const obs = new IntersectionObserver(function (entradas) {
+        if (!entradas[0].isIntersecting) return;
+        obs.disconnect();
+        const inicio = performance.now();
+        function paso(ahora) {
+            const avance = Math.min((ahora - inicio) / 1200, 1);
+            el.textContent = Math.round(hasta * (1 - Math.pow(1 - avance, 3)));
+            if (avance < 1) requestAnimationFrame(paso);
+        }
+        requestAnimationFrame(paso);
+    });
+    obs.observe(el);
+});
+
+// flechas de los carriles de tarjetas
+document.querySelectorAll(".flecha").forEach(function (boton) {
+    boton.addEventListener("click", function () {
+        const carril = document.querySelector(boton.dataset.carril);
+        const item = carril.querySelector(".carril-item");
+        carril.scrollBy({ left: (item.offsetWidth + 22) * boton.dataset.dir, behavior: "smooth" });
+    });
+});
+
+// boton para volver arriba
+document.querySelectorAll(".subir").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+});
+
+// galeria del detalle: el modal abre en la foto que se toco y las miniaturas siguen al carrusel
+const modalFotos = document.getElementById("fotoGrande");
+const carruselFotos = document.getElementById("carruselFotos");
+if (modalFotos && carruselFotos && window.bootstrap) {
+    const carrusel = bootstrap.Carousel.getOrCreateInstance(carruselFotos, { interval: false, ride: false });
+    const miniaturas = modalFotos.querySelectorAll(".miniaturas button");
+    modalFotos.addEventListener("show.bs.modal", function (e) {
+        const n = e.relatedTarget ? parseInt(e.relatedTarget.dataset.foto || "0", 10) : 0;
+        carrusel.to(n);
+    });
+    carruselFotos.addEventListener("slide.bs.carousel", function (e) {
+        miniaturas.forEach((b, i) => b.classList.toggle("active", i === e.to));
+    });
+}
+
+// compartir una publicacion (en el celular abre el menu de compartir)
+const btnCompartir = document.getElementById("btnCompartir");
+if (btnCompartir) {
+    btnCompartir.addEventListener("click", async function () {
+        const datos = { title: btnCompartir.dataset.titulo, url: btnCompartir.dataset.url };
+        if (navigator.share) {
+            try { await navigator.share(datos); } catch (e) { /* lo cerro */ }
+        } else if (navigator.clipboard) {
+            await navigator.clipboard.writeText(datos.url);
+            btnCompartir.innerHTML = '<i class="bi bi-check2"></i> Enlace copiado';
+        }
+    });
 }

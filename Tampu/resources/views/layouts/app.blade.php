@@ -13,16 +13,18 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="TAMPU">
-    <!-- fuente Poppins y Bootstrap Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
+    <!-- fuente Poppins, Bootstrap 5 y Bootstrap Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <script>document.documentElement.classList.add('con-js');</script>
     @stack('estilos')
 </head>
 <body class="{{ request()->routeIs('mensajes.ver') ? 'en-chat' : '' }}">
 
     <!-- menu -->
-    <header>
+    <header id="cabecera">
         <div class="contenedor">
             <a href="{{ route('inicio') }}" class="logo">
                 <img src="{{ asset('img/logo-160.png') }}" alt="Logo de Tampu">
@@ -79,17 +81,48 @@
     @yield('contenido')
 
     <!-- footer -->
-    <footer>
-        <p>
-            <a href="{{ route('inicio') }}">Inicio</a>
-            <a href="{{ route('habitaciones.index') }}">Habitaciones</a>
-            <a href="{{ route('trabajos.index') }}">Trabajos</a>
-            <a href="{{ route('nosotros') }}">Nosotros</a>
-            <a href="{{ route('contacto') }}">Contacto</a>
-        </p>
-        <p><i class="bi bi-envelope"></i> <a href="mailto:{{ config('tampu.correo') }}">{{ config('tampu.correo') }}</a></p>
-        <p><button type="button" id="btnInstalar" class="btn-instalar oculto"><i class="bi bi-phone"></i> Instalar la app</button></p>
-        <p>© 2026 TAMPU - Proyecto del curso Programación Web - Universidad Continental</p>
+    <footer class="pie">
+        <div class="contenedor">
+            <div class="row g-4 pie-columnas">
+                <div class="col-lg-4 col-md-6">
+                    <a href="{{ route('inicio') }}" class="logo logo-pie">
+                        <img src="{{ asset('img/logo-160.png') }}" alt="Logo de Tampu"> TAMPU
+                    </a>
+                    <p class="pie-texto">Habitaciones seguras y trabajos que encajan con tus clases, para estudiantes que llegan a Cusco.</p>
+                    <button type="button" id="btnInstalar" class="btn-instalar oculto"><i class="bi bi-phone"></i> Instalar la app</button>
+                </div>
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h4>Explora</h4>
+                    <a href="{{ route('habitaciones.index') }}">Habitaciones</a>
+                    <a href="{{ route('trabajos.index') }}">Trabajos</a>
+                    <a href="{{ route('nosotros') }}">Nosotros</a>
+                    <a href="{{ route('contacto') }}">Contacto</a>
+                </div>
+                <div class="col-lg-3 col-md-6 col-6">
+                    <h4>Tu cuenta</h4>
+                    @auth
+                        <a href="{{ route('panel') }}">Mi panel</a>
+                        <a href="{{ route('perfil') }}">Mi perfil</a>
+                        <a href="{{ route('mensajes') }}">Mensajes</a>
+                    @else
+                        <a href="{{ route('registro') }}">Soy estudiante</a>
+                        <a href="{{ route('registro') }}">Alquilo un cuarto</a>
+                        <a href="{{ route('registro') }}">Ofrezco trabajo</a>
+                        <a href="{{ route('login') }}">Iniciar sesión</a>
+                    @endauth
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4>Contacto</h4>
+                    <p><i class="bi bi-envelope"></i> <a href="mailto:{{ config('tampu.correo') }}">{{ config('tampu.correo') }}</a></p>
+                    <p><i class="bi bi-geo-alt"></i> Cusco, Perú</p>
+                    <p class="pie-aviso"><i class="bi bi-shield-check"></i> Nunca pagues un adelanto sin visitar el cuarto.</p>
+                </div>
+            </div>
+            <div class="pie-final">
+                <span>© 2026 TAMPU · Proyecto del curso Programación Web · Universidad Continental</span>
+                <a href="#" class="subir" aria-label="Volver arriba"><i class="bi bi-arrow-up"></i></a>
+            </div>
+        </div>
     </footer>
 
     @include('partials.asistente')
@@ -100,6 +133,7 @@
         </a>
     @endauth
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/script.js') }}"></script>
     @stack('scripts')
 </body>

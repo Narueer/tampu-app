@@ -45,7 +45,11 @@ class AdminController extends Controller
                 ->groupBy('rol')->pluck('total', 'rol'),
         ];
 
-        return view('admin.panel', compact('datos', 'pendientes', 'graficos'));
+        // lo ultimo que paso, para el costado del panel
+        $actividad = EventoSeguridad::with('usuario')->latest('created_at')->latest('id')->take(7)->get();
+        $nuevos = Usuario::where('rol', '!=', 'admin')->latest()->latest('id')->take(5)->get();
+
+        return view('admin.panel', compact('datos', 'pendientes', 'graficos', 'actividad', 'nuevos'));
     }
 
     public function usuarios(Request $request)

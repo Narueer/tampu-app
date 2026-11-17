@@ -56,7 +56,7 @@
                     @endif
                 </div>
 
-                <p class="texto-suave">Cuenta de {{ $usuario->rol }} · @include('partials.estado', ['estado' => $usuario->verificacion])</p>
+                <p class="texto-suave">Cuenta de {{ $usuario->rol }} · @include('partials.estado', ['estado' => $usuario->verificacion]) @include('partials.insignia-uni')</p>
                 <button type="submit" class="btn">Guardar cambios</button>
             </form>
 
@@ -73,6 +73,80 @@
                 <input type="password" id="nueva2" name="password_confirmation" minlength="8" required>
                 <button type="submit" class="btn">Cambiar contraseña</button>
             </form>
+
+            <div class="caja actividad">
+                <h2><i class="bi bi-person-check"></i> Seguridad de la cuenta</h2>
+
+                @if (session('respaldo'))
+                    <div class="alerta alerta-aviso respaldo">
+                        <b>Guarda estos códigos de respaldo</b> (anótalos o toma captura). Cada uno sirve una sola vez si pierdes el celular. No los volveremos a mostrar.
+                        <ul>@foreach (session('respaldo') as $c)<li><code>{{ $c }}</code></li>@endforeach</ul>
+                    </div>
+                @endif
+
+                <div class="seguridad-fila">
+                    <div>
+                        <b><i class="bi bi-envelope-check"></i> Correo</b>
+                        <span class="texto-suave">{{ $usuario->email }}</span>
+                    </div>
+                    @if ($usuario->correoConfirmado())
+                        <span class="estado est-ok">Confirmado</span>
+                    @elseif (config('tampu.verificar_correo'))
+                        <a href="{{ route('correo.verificar') }}" class="btn btn-borde">Confirmar</a>
+                    @else
+                        <span class="estado est-gris">Sin confirmar</span>
+                    @endif
+                </div>
+
+                @if ($usuario->rol === 'estudiante')
+                    <div class="seguridad-fila">
+                        <div>
+                            <b><i class="bi bi-mortarboard"></i> Correo de la universidad</b>
+                            <span class="texto-suave">
+                                @if ($usuario->correo_institucional)
+                                    {{ $usuario->correo_institucional }}. Arrendadores y empresas te ven como estudiante verificado.
+                                @else
+                                    Vincula tu correo {{ '@' . config('tampu.dominio_institucional') }} para aparecer como estudiante verificado.
+                                @endif
+                            </span>
+                        </div>
+                        @if ($usuario->correo_institucional)
+                            @include('partials.insignia-uni')
+                        @else
+                            <div class="botones-fila">
+                                @forelse (collect(config('tampu.oauth'))->filter(fn ($p) => $p['id']) as $clave => $p)
+                                    <a href="{{ route('externo.ir', $clave) }}" class="btn-externo"><i class="bi bi-{{ $clave }}"></i> {{ $p['nombre'] }}</a>
+                                @empty
+                                    <span class="texto-suave">Disponible cuando se configure Google o Microsoft.</span>
+                                @endforelse
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                <div class="seguridad-fila">
+                    <div>
+                        <b><i class="bi bi-phone"></i> Verificación en dos pasos</b>
+                        <span class="texto-suave">
+                            @if ($usuario->dos_pasos_activo)
+                                Activa. Al entrar te pedimos el código de tu app autenticadora. Te quedan {{ count($usuario->dos_pasos_codigos ?? []) }} códigos de respaldo.
+                            @else
+                                Además de la contraseña, pide un código de tu celular.{{ $usuario->rol === 'admin' ? ' Recomendada para el administrador.' : '' }}
+                            @endif
+                        </span>
+                    </div>
+                    @if ($usuario->dos_pasos_activo)
+                        <form action="{{ route('dos-pasos.desactivar') }}" method="POST" class="form-desactivar">
+                            @csrf
+                            @method('DELETE')
+                            <input type="password" name="clave" placeholder="Tu contraseña" aria-label="Tu contraseña" required>
+                            <button class="btn btn-borde">Desactivar</button>
+                        </form>
+                    @else
+                        <a href="{{ route('dos-pasos.activar') }}" class="btn">Activar</a>
+                    @endif
+                </div>
+            </div>
 
             <div class="caja actividad">
                 <h2><i class="bi bi-shield-check"></i> Actividad de tu cuenta</h2>

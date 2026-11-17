@@ -28,6 +28,14 @@ class EventoSeguridad extends Model
         'reactivacion' => ['Cuenta reactivada', false],
         'verificacion' => ['Verificación de documento', false],
         'acceso_denegado' => ['Acceso denegado (403)', true],
+        'correo_confirmado' => ['Correo confirmado', false],
+        'codigo_fallido' => ['Código de correo incorrecto', true],
+        'institucional' => ['Correo institucional vinculado', false],
+        'externo_rechazado' => ['Ingreso con Google/Microsoft rechazado', true],
+        'dos_pasos_activado' => ['Activó la verificación en dos pasos', false],
+        'dos_pasos_desactivado' => ['Desactivó la verificación en dos pasos', true],
+        'dos_pasos_fallido' => ['Código de dos pasos incorrecto', true],
+        'codigo_respaldo' => ['Entró con un código de respaldo', true],
     ];
 
     public function usuario()

@@ -3,8 +3,9 @@
 @section('titulo', 'Contacto')
 
 @section('contenido')
+    @include('partials.banner', ['titulo' => 'Contacto', 'texto' => 'Escríbenos si tienes una duda, un problema con tu cuenta o quieres avisarnos de una estafa.', 'imagen' => 'img/cusco/cuesta-san-blas.jpg'])
+
     <main class="contenedor">
-        <h1 class="titulo-pagina">Contacto</h1>
 
         <div class="contacto">
             <form class="caja" action="{{ route('contacto') }}" method="POST">

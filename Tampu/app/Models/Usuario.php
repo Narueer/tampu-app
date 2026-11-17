@@ -1,0 +1,101 @@
+<?php
+
+namespace App\Models;
+
+use App\Support\Archivos;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class Usuario extends Authenticatable
+{
+    use Notifiable;
+
+    protected $table = 'usuarios';
+
+    protected $fillable = [
+        'nombre', 'email', 'dni', 'celular', 'procedencia', 'foto',
+        'rol', 'verificacion', 'suspendido', 'documento', 'password',
+        'email_verificado_at', 'correo_institucional',
+    ];
+
+    protected $hidden = ['password', 'remember_token', 'codigo_correo', 'dos_pasos_secreto', 'dos_pasos_codigos'];
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'suspendido' => 'boolean',
+            'email_verificado_at' => 'datetime',
+            'codigo_correo_vence' => 'datetime',
+            'dos_pasos_activo' => 'boolean',
+            // el secreto va cifrado con la APP_KEY y los codigos de respaldo solo como hash
+            'dos_pasos_secreto' => 'encrypted',
+            'dos_pasos_codigos' => 'array',
+        ];
+    }
+
+    public function correoConfirmado(): bool
+    {
+        return $this->email_verificado_at !== null;
+    }
+
+    public function esEstudianteVerificado(): bool
+    {
+        return $this->rol === 'estudiante' && $this->correo_institucional !== null;
+    }
+
+    public function habitaciones()
+    {
+        return $this->hasMany(Habitacion::class);
+    }
+
+    public function trabajos()
+    {
+        return $this->hasMany(Trabajo::class);
+    }
+
+    public function horarios()
+    {
+        return $this->hasMany(Horario::class);
+    }
+
+    public function solicitudes()
+    {
+        return $this->hasMany(Solicitud::class);
+    }
+
+    public function postulaciones()
+    {
+        return $this->hasMany(Postulacion::class);
+    }
+
+    public function favoritos()
+    {
+        return $this->belongsToMany(Habitacion::class, 'favoritos')->withTimestamps();
+    }
+
+    public function esVerificado(): bool
+    {
+        return $this->verificacion === 'verificado' && ! $this->suspendido;
+    }
+
+    public function fotoUrl(): string
+    {
+        return Archivos::urlFoto($this->foto);
+    }
+
+    public function iniciales(): string
+    {
+        $partes = explode(' ', trim($this->nombre));
+
+        return mb_strtoupper(mb_substr($partes[0], 0, 1) . mb_substr($partes[1] ?? '', 0, 1));
+    }
+
+    public function mensajesSinLeer(): int
+    {
+        return Mensaje::where('usuario_id', '!=', $this->id)
+            ->where('leido', false)
+            ->whereHas('conversacion', fn ($q) => $q->where('usuario_a_id', $this->id)->orWhere('usuario_b_id', $this->id))
+            ->count();
+    }
+}

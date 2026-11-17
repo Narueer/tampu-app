@@ -31,24 +31,29 @@ julio@tampu.pe        Julio Ccori Mamani (verificado)
 carmen@tampu.pe       Carmen Mamani Huallpa (verificada)
 pedro@tampu.pe        Pedro Ccahuana Rojas (pendiente de verificar)
 mario@tampu.pe        Mario Sullca Ttito (su habitación de S/ 150 tiene un reporte pendiente)
+hilda@tampu.pe, fredy@tampu.pe, norma@tampu.pe   más arrendadores (Fredy tiene cuartos al lado de la U. Continental)
 
 Empleadores
 wayra@tampu.pe        Minimarket Wayra (verificado)
 andestech@tampu.pe    Andes Tech SAC (verificado)
 intiraymi@tampu.pe    Restaurante Inti Raymi (verificado)
 qhapaq@tampu.pe       Qhapaq Tours (pendiente de verificar)
+kuntur@tampu.pe, nustawasi@tampu.pe, saqsay@tampu.pe   Café Kuntur, Hostal Ñusta Wasi y Academia Saqsay
 
 Estudiantes
 luis@tampu.pe         Luis Mamani Choque, de Sicuani (horario de clases y un trabajo aceptado)
 ana@tampu.pe          Ana Quispe Ccasa, de Abancay (puede dejar reseña en "Habitación amplia en el centro")
 rocio@tampu.pe        Rocío Apaza Layme, de Puno
 kevin@tampu.pe        Kevin Huamán Cusi, de Quillabamba
+yhon@tampu.pe, milagros@tampu.pe, brayan@tampu.pe   más estudiantes con visitas y reseñas
 
 
 3. QUE REVISAR
 
 Sin iniciar sesión
-- Habitaciones: mapa con la ubicación de cada cuarto; al tocar un punto sale el precio. Filtrar por Wanchaq y precio máximo 400.
+- Habitaciones: mapa con la ubicación de cada cuarto; al tocar un punto sale el precio. Filtrar por Wanchaq y precio máximo 400 (quedan 3).
+- Detalle de una habitación: galería (tocar una foto abre todas en un carrusel), m², piso, baño, garantía y la distancia a cada universidad.
+- Trabajos: buscador, mapa y "Ver detalle y requisitos" con el horario en una tabla.
 - Detalle de una habitación: mapa, reseñas con estrellas y promedio.
 - Botón redondo abajo a la derecha: asistente virtual. Probar "cuartos en santiago hasta 300", "¿cómo evito estafas?", "¿cómo me verifico?".
 
@@ -88,6 +93,11 @@ Seguridad
 - Mi perfil > Actividad de tu cuenta: cada usuario ve sus últimos movimientos.
 - Registro o cambio de contraseña con "abcdefgh": la rechaza, pide mínimo 8 caracteres con letras y números (las cuentas de prueba siguen con 123456).
 - F12 > Red > cualquier página: respuesta con cabeceras X-Frame-Options, X-Content-Type-Options, Referrer-Policy y Permissions-Policy.
+
+Identidad
+- Mi perfil > Seguridad de la cuenta > Verificación en dos pasos > Activar. Escanear el QR con Google Authenticator o Microsoft Authenticator y escribir el código. Salen 8 códigos de respaldo. Al volver a entrar pide el código del celular. Para dejarlo como estaba: Desactivar con la contraseña.
+- Registro de una cuenta nueva con contraseña: pide confirmar el correo con un código de 6 números. En la PC (sin servidor de correo) el código aparece en pantalla. Sin confirmar, no deja postular, pedir visitas, publicar ni escribir.
+- Botones "Entrar con Google" y "Entrar con Microsoft": aparecen cuando se configuran las claves (ver DESPLIEGUE.md). Un estudiante que entra o vincula su correo @continental.edu.pe aparece como "Estudiante verificado" para arrendadores y empresas.
 - "¿Olvidaste tu contraseña?": como no hay servidor de correo, el enlace aparece en pantalla (modo local) y en storage\logs\laravel.log.
 - Con luis@tampu.pe entrar a 127.0.0.1:8000/mensajes/1 (chat de otras personas). Responde 403.
 - Una reseña solo se puede dejar si la visita fue aceptada y la fecha ya pasó.
@@ -102,6 +112,8 @@ routes/web.php                      rutas y grupos por rol
 app/Http/Controllers                controladores (ChatbotController, CalendarioController, MensajeController, etc.)
 app/Http/Middleware                 RolMiddleware (roles), CuentaActiva (cuentas suspendidas) y CabecerasSeguridad
 app/Models/EventoSeguridad.php      bitácora de seguridad
+app/Support/Totp.php                códigos de la verificación en dos pasos
+app/Http/Controllers/ExternoController.php   entrar con Google o Microsoft
 app/Models                          modelos Eloquent
 app/Notifications/Aviso.php         notificaciones
 database/migrations                 creación de las tablas
