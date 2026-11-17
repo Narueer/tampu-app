@@ -58,5 +58,5 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/chat.js') }}"></script>
+    <script src="{{ asset('js/chat.js') }}?v={{ filemtime(public_path('js/chat.js')) }}"></script>
 @endpush

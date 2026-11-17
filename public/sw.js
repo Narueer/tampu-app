@@ -1,6 +1,6 @@
 // service worker: permite instalar TAMPU en el celular
 // guarda los archivos fijos y muestra una pagina si no hay internet
-const VERSION = 'tampu-v7';
+const VERSION = 'tampu-v8';
 const FIJOS = ['/offline.html', '/css/estilos.css', '/js/script.js', '/img/logo-160.png', '/img/icono-192.png'];
 
 self.addEventListener('install', e => {

@@ -187,5 +187,5 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="{{ asset('js/mapa.js') }}"></script>
+    <script src="{{ asset('js/mapa.js') }}?v={{ filemtime(public_path('js/mapa.js')) }}"></script>
 @endpush
