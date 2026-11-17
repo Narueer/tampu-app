@@ -7,12 +7,12 @@ use Illuminate\Http\Request;
 
 class HabitacionController extends Controller
 {
-    const DISTRITOS = ['Cusco', 'Wanchaq', 'Santiago', 'San Sebastián', 'San Jerónimo'];
+    const DISTRITOS = ['Cusco', 'Wanchaq', 'Santiago', 'San Sebastián', 'San Jerónimo', 'Saylla'];
 
     // filtros
     public function index(Request $request)
     {
-        $consulta = Habitacion::publicadas()->with('arrendador')->withAvg('resenas', 'estrellas')->withCount('resenas');
+        $consulta = Habitacion::publicadas()->with('arrendador')->withAvg('resenas', 'estrellas')->withCount('fotos')->withCount('resenas');
 
         if ($request->filled('distrito')) {
             $consulta->where('distrito', $request->distrito);
@@ -51,7 +51,7 @@ class HabitacionController extends Controller
     {
         abort_unless($habitacion->arrendador->esVerificado(), 404);
 
-        $habitacion->load('resenas.estudiante');
+        $habitacion->load('resenas.estudiante', 'fotos');
         $usuario = auth()->user();
         $yaSolicito = false;
         $puedeResenar = false;
@@ -70,9 +70,17 @@ class HabitacionController extends Controller
             $miResena = $habitacion->resenas->firstWhere('usuario_id', $usuario->id);
         }
 
-        $esFavorito = in_array($habitacion->id, $this->idsFavoritos());
+        $idsFavoritos = $this->idsFavoritos();
+        $esFavorito = in_array($habitacion->id, $idsFavoritos);
 
-        return view('habitaciones.show', compact('habitacion', 'yaSolicito', 'puedeResenar', 'miResena', 'esFavorito'));
+        // primero las del mismo distrito, luego las de precio parecido
+        $similares = Habitacion::publicadas()->withAvg('resenas', 'estrellas')->withCount('fotos')
+            ->where('id', '!=', $habitacion->id)
+            ->orderByRaw('case when distrito = ? then 0 else 1 end', [$habitacion->distrito])
+            ->orderByRaw('abs(precio - ?)', [$habitacion->precio])
+            ->take(6)->get();
+
+        return view('habitaciones.show', compact('habitacion', 'yaSolicito', 'puedeResenar', 'miResena', 'esFavorito', 'similares', 'idsFavoritos'));
     }
 
     private function idsFavoritos(): array

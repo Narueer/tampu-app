@@ -57,6 +57,6 @@ class Conversacion extends Model
 
     public function tema(): string
     {
-        return $this->habitacion?->titulo ?? $this->trabajo?->titulo ?? 'Consulta';
+        return $this->habitacion?->titulo ?? $this->trabajo?->titulo ?? 'Asesoría TAMPU';
     }
 }

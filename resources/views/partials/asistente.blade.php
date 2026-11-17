@@ -12,6 +12,7 @@
             <button type="button">Cuartos en Wanchaq hasta 400</button>
             <button type="button">Trabajos compatibles</button>
             <button type="button">¿Cómo evito estafas?</button>
+            <button type="button">Hablar con un asesor</button>
         </div>
     </div>
     <form id="asistenteForm" class="asistente-form">

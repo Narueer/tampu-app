@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 // asistente por palabras clave, no usa ninguna API externa
 class ChatbotController extends Controller
 {
-    const SUGERENCIAS = ['Cuartos en Wanchaq hasta 400', 'Trabajos compatibles', '¿Cómo evito estafas?', '¿Cómo me verifico?'];
+    const SUGERENCIAS = ['Cuartos en Wanchaq hasta 400', 'Trabajos compatibles', '¿Cómo evito estafas?', 'Hablar con un asesor'];
 
     const PREGUNTAS = [
         [['estafa', 'seguro', 'adelanto', 'confiar', 'enganar'],
@@ -51,6 +51,10 @@ class ChatbotController extends Controller
                 . 'mostrarte trabajos o resolver dudas.';
 
             return $this->respuesta($saludo, [], self::SUGERENCIAS);
+        }
+
+        if ($this->tiene($texto, ['asesor', 'hablar con alguien', 'hablar con una persona', 'persona real', 'soporte', 'atencion al cliente', 'ayuda humana'])) {
+            return $this->pedirAsesor($request);
         }
 
         if ($this->tiene($texto, ['gracias', 'chau', 'adios'])) {
@@ -150,6 +154,24 @@ class ChatbotController extends Controller
             : 'Estas son algunas ofertas. Si inicias sesión como estudiante y registras tu horario, te muestro solo las compatibles.';
 
         return $this->respuesta($intro, $enlaces);
+    }
+
+    private function pedirAsesor(Request $request)
+    {
+        if (! $request->user()) {
+            return $this->respuesta('Para hablar con un asesor primero inicia sesión. Si no tienes cuenta, puedes escribirnos desde Contacto.', [
+                ['texto' => 'Iniciar sesión', 'url' => route('login')],
+                ['texto' => 'Ir a Contacto', 'url' => route('contacto')],
+            ]);
+        }
+
+        if ($request->user()->rol === 'admin') {
+            return $this->respuesta('Tú eres el asesor. Las consultas te llegan en Mensajes.', [['texto' => 'Ver mensajes', 'url' => route('mensajes')]]);
+        }
+
+        return $this->respuesta('Te conecto con un asesor de TAMPU. Te responderá por el chat de Mensajes.', [
+            ['texto' => 'Abrir chat con un asesor', 'url' => route('asesor')],
+        ]);
     }
 
     private function buscarPregunta(string $texto): ?string

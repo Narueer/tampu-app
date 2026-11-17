@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Conversacion;
 use App\Models\Habitacion;
 use App\Models\Trabajo;
+use App\Models\Usuario;
 use App\Notifications\Aviso;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,7 @@ class MensajeController extends Controller
         abort_unless($conversacion->participa($request->user()), 403);
 
         $conversacion->mensajes()->where('usuario_id', '!=', $request->user()->id)->update(['leido' => true]);
+        $this->leerAvisos($request->user(), $conversacion);
 
         return $this->vista($request, $conversacion);
     }
@@ -66,6 +68,34 @@ class MensajeController extends Controller
         return redirect()->route('mensajes.ver', $conversacion);
     }
 
+    // chat con el administrador, que hace de asesor
+    public function asesor(Request $request)
+    {
+        $yo = $request->user();
+        $admin = Usuario::where('rol', 'admin')->where('suspendido', false)->orderBy('id')->first();
+
+        if ($yo->rol === 'admin' || ! $admin) {
+            return redirect()->route('mensajes');
+        }
+
+        $conversacion = Conversacion::de($yo)
+            ->where(fn ($q) => $q->where('usuario_a_id', $admin->id)->orWhere('usuario_b_id', $admin->id))
+            ->whereNull('habitacion_id')->whereNull('trabajo_id')
+            ->first();
+
+        if (! $conversacion) {
+            $conversacion = Conversacion::create(['usuario_a_id' => $yo->id, 'usuario_b_id' => $admin->id]);
+            $conversacion->mensajes()->create([
+                'usuario_id' => $admin->id,
+                'texto' => 'Hola, ' . explode(' ', $yo->nombre)[0] . '. Soy el asesor de TAMPU. Cuéntame en qué te puedo ayudar.',
+            ]);
+        }
+
+        $admin->notify(new Aviso($yo->nombre . ' pidió hablar con un asesor', route('mensajes.ver', $conversacion), 'headset'));
+
+        return redirect()->route('mensajes.ver', $conversacion);
+    }
+
     public function enviar(Request $request, Conversacion $conversacion)
     {
         $yo = $request->user();
@@ -98,8 +128,16 @@ class MensajeController extends Controller
 
         $mensajes = $conversacion->mensajes()->where('id', '>', (int) $request->desde)->oldest('id')->get();
         $conversacion->mensajes()->where('usuario_id', '!=', $yo->id)->where('leido', false)->update(['leido' => true]);
+        $this->leerAvisos($yo, $conversacion);
 
         return response()->json($mensajes->map(fn ($m) => $this->formato($m, $yo->id)));
+    }
+
+    // si ya esta viendo el chat, sus avisos de ese chat quedan leidos
+    private function leerAvisos($usuario, Conversacion $conversacion): void
+    {
+        $url = route('mensajes.ver', $conversacion);
+        $usuario->unreadNotifications->filter(fn ($n) => ($n->data['url'] ?? '') === $url)->each->markAsRead();
     }
 
     private function vista(Request $request, ?Conversacion $actual)

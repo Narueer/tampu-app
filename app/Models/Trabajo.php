@@ -11,7 +11,26 @@ class Trabajo extends Model
     protected $fillable = [
         'titulo', 'empresa', 'descripcion', 'distrito',
         'modalidad', 'pago', 'pago_por', 'estado',
+        'direccion', 'lat', 'lng', 'requisitos', 'vacantes',
     ];
+
+    public function listaRequisitos(): array
+    {
+        return $this->requisitos ? array_values(array_filter(array_map('trim', explode("\n", $this->requisitos)))) : [];
+    }
+
+    // iniciales de la empresa para su logo
+    public function inicialesEmpresa(): string
+    {
+        $palabras = preg_split('/\s+/', trim($this->empresa));
+
+        return mb_strtoupper(mb_substr($palabras[0], 0, 1) . mb_substr($palabras[1] ?? '', 0, 1));
+    }
+
+    public function pagoTexto(): string
+    {
+        return 'S/ ' . number_format($this->pago, 0) . ' por ' . ($this->pago_por === 'dia' ? 'día' : $this->pago_por);
+    }
 
     public function empleador()
     {

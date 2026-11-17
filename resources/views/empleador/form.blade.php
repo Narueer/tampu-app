@@ -2,6 +2,10 @@
 
 @section('titulo', $trabajo->exists ? 'Editar oferta' : 'Nueva oferta')
 
+@push('estilos')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+@endpush
+
 @section('contenido')
     <main class="contenedor">
         <form class="formulario formulario-ancho" method="POST"
@@ -71,8 +75,32 @@
             <label>Turnos de trabajo</label>
             @include('partials.horario', ['marcados' => $marcados])
 
+            <div class="fila">
+                <div>
+                    <label for="direccion">Dirección del local</label>
+                    <input type="text" id="direccion" name="direccion" value="{{ old('direccion', $trabajo->direccion) }}" maxlength="150" placeholder="Ej: Av. El Sol 520">
+                </div>
+                <div>
+                    <label for="vacantes">Vacantes</label>
+                    <input type="number" id="vacantes" name="vacantes" value="{{ old('vacantes', $trabajo->vacantes ?? 1) }}" min="1" max="50">
+                </div>
+            </div>
+
+            <label for="requisitos">Requisitos <span class="texto-suave">(uno por línea)</span></label>
+            <textarea id="requisitos" name="requisitos" rows="3" maxlength="800" placeholder="Ej: Inglés básico">{{ old('requisitos', $trabajo->requisitos) }}</textarea>
+
+            <label>Ubicación en el mapa <span class="texto-suave">(haz clic donde está el local)</span></label>
+            <div id="mapaElegir" class="mapa mapa-chico"></div>
+            <input type="hidden" id="lat" name="lat" value="{{ old('lat', $trabajo->lat) }}">
+            <input type="hidden" id="lng" name="lng" value="{{ old('lng', $trabajo->lng) }}">
+
             <button type="submit" class="btn">Guardar</button>
             <p><a href="{{ route('empleador.trabajos.index') }}">Cancelar</a></p>
         </form>
     </main>
 @endsection
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ asset('js/mapa.js') }}"></script>
+@endpush

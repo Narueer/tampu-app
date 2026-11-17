@@ -7,8 +7,9 @@
 @endpush
 
 @section('contenido')
+    @include('partials.banner', ['titulo' => 'Habitaciones para estudiantes', 'texto' => 'Cuartos verificados cerca de tu universidad. Filtra por distrito y precio, y mira dónde quedan en el mapa.', 'imagen' => 'img/cusco/plaza.jpg'])
+
     <main class="contenedor">
-        <h1 class="titulo-pagina">Habitaciones para estudiantes</h1>
 
         <div class="con-filtros">
             <!-- filtros -->
@@ -34,7 +35,12 @@
                 </select>
 
                 <label for="cerca">Cerca de</label>
-                <input type="text" id="cerca" name="cerca_de" value="{{ request('cerca_de') }}" placeholder="Ej: UNSAAC">
+                <input type="text" id="cerca" name="cerca_de" value="{{ request('cerca_de') }}" placeholder="Ej: UNSAAC" list="listaUniversidades">
+                <datalist id="listaUniversidades">
+                    @foreach (array_keys(\App\Support\Lugares::UNIVERSIDADES) as $u)
+                        <option value="{{ $u }}">
+                    @endforeach
+                </datalist>
 
                 <label for="orden">Ordenar por precio</label>
                 <select id="orden" name="orden">

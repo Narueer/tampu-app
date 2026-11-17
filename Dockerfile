@@ -6,6 +6,9 @@ RUN apt-get update \
     && docker-php-ext-install pdo_pgsql pdo_mysql zip \
     && a2enmod rewrite \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
+    && echo "ServerTokens Prod" >> /etc/apache2/apache2.conf \
+    && echo "ServerSignature Off" >> /etc/apache2/apache2.conf \
+    && echo "expose_php = Off" > /usr/local/etc/php/conf.d/seguridad.ini \
     && rm -rf /var/lib/apt/lists/*
 
 # apache apunta a la carpeta public de laravel

@@ -175,6 +175,12 @@ class DatabaseSeeder extends Seeder
         // algunas notificaciones de ejemplo
         $luis->notify(new Aviso('Minimarket Wayra aceptó tu postulación a "Repartidor en bicicleta"', route('estudiante.panel', [], false), 'briefcase'));
         $julio->notify(new Aviso('Ana Quispe Ccasa quiere visitar "Habitación compartida en Wanchaq"', route('arrendador.solicitudes', [], false), 'house-door'));
+
+        // las cuentas de prueba ya tienen el correo confirmado
+        Usuario::query()->update(['email_verificado_at' => now()]);
+
+        // mas habitaciones con galeria, mas trabajos y ubicaciones revisadas
+        $this->call(AmpliarDatosSeeder::class);
     }
 
     private function visita($habitacion, $estudiante, $dias, $mensaje)

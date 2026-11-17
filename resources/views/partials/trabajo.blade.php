@@ -1,10 +1,13 @@
 <div class="trabajo" id="trabajo-{{ $t->id }}">
-    <div>
+    <span class="logo-empresa">{{ $t->inicialesEmpresa() }}</span>
+    <div class="trabajo-info">
         <span class="etiqueta verificado">✔ Verificado</span> <span class="etiqueta">{{ ucfirst($t->modalidad) }}</span>
-        <h3>{{ $t->titulo }}</h3>
-        <p>{{ $t->empresa }} - <i class="bi bi-geo-alt"></i> {{ $t->distrito }}</p>
+        @if ($t->vacantes > 1)<span class="etiqueta etiqueta-vacantes">{{ $t->vacantes }} vacantes</span>@endif
+        <h3><a href="{{ route('trabajos.show', $t) }}">{{ $t->titulo }}</a></h3>
+        <p>{{ $t->empresa }} · <i class="bi bi-geo-alt"></i> {{ $t->direccion ? $t->direccion . ', ' : '' }}{{ $t->distrito }}</p>
         <p class="texto-suave">{{ $t->descripcion }}</p>
         <p><i class="bi bi-clock"></i> {{ $t->horarioTexto() }}</p>
+        <a href="{{ route('trabajos.show', $t) }}" class="ver-mas">Ver detalle y requisitos <i class="bi bi-arrow-right"></i></a>
     </div>
     <div class="trabajo-pago">
         <p class="precio">S/ {{ number_format($t->pago, 0) }} <small>por {{ $t->pago_por === 'dia' ? 'día' : $t->pago_por }}</small></p>

@@ -127,7 +127,7 @@ class EstudianteController extends Controller
 
     public function favoritos(Request $request)
     {
-        $habitaciones = $request->user()->favoritos()->publicadas()->withAvg('resenas', 'estrellas')->get();
+        $habitaciones = $request->user()->favoritos()->publicadas()->withAvg('resenas', 'estrellas')->withCount('fotos')->get();
 
         return view('estudiante.favoritos', compact('habitaciones'));
     }

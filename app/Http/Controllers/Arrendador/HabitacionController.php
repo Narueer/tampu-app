@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 
 class HabitacionController extends Controller
 {
+    const MAX_GALERIA = 6;
+
     public function index(Request $request)
     {
         $habitaciones = $request->user()->habitaciones()->withCount('solicitudes')->withAvg('resenas', 'estrellas')->latest()->get();
@@ -32,7 +34,8 @@ class HabitacionController extends Controller
         $datos = $this->validar($request);
         $datos['foto'] = $this->subirFoto($request);
 
-        $request->user()->habitaciones()->create($datos);
+        $habitacion = $request->user()->habitaciones()->create($datos);
+        $this->guardarGaleria($request, $habitacion);
 
         return redirect()->route('arrendador.habitaciones.index')->with('ok', 'Habitación publicada.');
     }
@@ -55,6 +58,7 @@ class HabitacionController extends Controller
         }
 
         $habitacion->update($datos);
+        $this->guardarGaleria($request, $habitacion);
 
         return redirect()->route('arrendador.habitaciones.index')->with('ok', 'Habitación actualizada.');
     }
@@ -63,6 +67,9 @@ class HabitacionController extends Controller
     {
         $this->esSuya($request, $habitacion);
         $this->borrarFoto($habitacion);
+        foreach ($habitacion->fotos as $f) {
+            Archivos::borrarFoto($f->ruta);
+        }
         $habitacion->delete();
 
         return back()->with('ok', 'Habitación eliminada.');
@@ -108,12 +115,40 @@ class HabitacionController extends Controller
             'servicios' => 'nullable|array',
             'estado' => 'required|in:disponible,ocupada',
             'foto' => ($editando ? 'nullable' : 'required') . '|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'metros' => 'nullable|integer|min:4|max:200',
+            'piso' => 'nullable|integer|min:1|max:20',
+            'bano' => 'nullable|in:propio,compartido',
+            'garantia' => 'nullable|numeric|min:0|max:5000',
+            'galeria' => 'nullable|array|max:' . self::MAX_GALERIA,
+            'galeria.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'quitar' => 'nullable|array',
+        ], [
+            'galeria.max' => 'Puedes subir hasta ' . self::MAX_GALERIA . ' fotos más.',
         ]);
 
         $datos['servicios'] = implode(', ', $request->input('servicios', []));
-        unset($datos['foto']);
+        unset($datos['foto'], $datos['galeria'], $datos['quitar']);
 
         return $datos;
+    }
+
+    // fotos extra: primero se quitan las marcadas y luego se suben las nuevas, sin pasar el maximo
+    private function guardarGaleria(Request $request, Habitacion $habitacion): void
+    {
+        $quitar = $habitacion->fotos()->whereIn('id', $request->input('quitar', []))->get();
+        foreach ($quitar as $f) {
+            Archivos::borrarFoto($f->ruta);
+            $f->delete();
+        }
+
+        $libres = self::MAX_GALERIA - $habitacion->fotos()->count();
+        $orden = (int) $habitacion->fotos()->max('orden');
+        foreach (array_slice($request->file('galeria', []), 0, max(0, $libres)) as $archivo) {
+            $habitacion->fotos()->create([
+                'ruta' => Archivos::guardarFoto($archivo, 'habitaciones'),
+                'orden' => ++$orden,
+            ]);
+        }
     }
 
     // nombre aleatorio para la foto

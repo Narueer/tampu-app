@@ -58,3 +58,9 @@ services:
         value: documentos
       - key: CONTACTO_CORREO
         sync: false
+      - key: INSTITUCION_DOMINIO
+        value: continental.edu.pe
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false

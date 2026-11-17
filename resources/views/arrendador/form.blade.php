@@ -57,6 +57,29 @@
                 </div>
             </div>
 
+            <div class="fila">
+                <div>
+                    <label for="metros">Tamaño (m²)</label>
+                    <input type="number" id="metros" name="metros" value="{{ old('metros', $habitacion->metros) }}" min="4" max="200" placeholder="Ej: 14">
+                </div>
+                <div>
+                    <label for="piso">Piso</label>
+                    <input type="number" id="piso" name="piso" value="{{ old('piso', $habitacion->piso) }}" min="1" max="20" placeholder="Ej: 2">
+                </div>
+                <div>
+                    <label for="bano">Baño</label>
+                    <select id="bano" name="bano">
+                        <option value="">Sin indicar</option>
+                        <option value="propio" @selected(old('bano', $habitacion->bano) === 'propio')>Propio</option>
+                        <option value="compartido" @selected(old('bano', $habitacion->bano) === 'compartido')>Compartido</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="garantia">Garantía (S/)</label>
+                    <input type="number" id="garantia" name="garantia" value="{{ old('garantia', $habitacion->garantia ? (int) $habitacion->garantia : '') }}" min="0" max="5000" placeholder="Ej: 300">
+                </div>
+            </div>
+
             <label>Ubicación en el mapa <span class="texto-suave">(haz clic donde está la habitación)</span></label>
             <div id="mapaElegir" class="mapa mapa-chico"></div>
             <input type="hidden" id="lat" name="lat" value="{{ old('lat', $habitacion->lat) }}">
@@ -65,7 +88,7 @@
             <label>Servicios</label>
             @php($actuales = old('servicios', $habitacion->listaServicios()))
             <div class="casillas">
-                @foreach (['Agua y luz', 'Wifi', 'Baño propio', 'Amoblado', 'Cocina', 'Lavandería', 'Agua caliente'] as $s)
+                @foreach (['Agua y luz', 'Wifi', 'Baño propio', 'Amoblado', 'Cocina', 'Lavandería', 'Agua caliente', 'Escritorio', 'Cochera', 'Cable'] as $s)
                     <label class="checkbox"><input type="checkbox" name="servicios[]" value="{{ $s }}" @checked(in_array($s, $actuales))> {{ $s }}</label>
                 @endforeach
             </div>
@@ -87,6 +110,20 @@
                 <img src="{{ $habitacion->fotoUrl() }}" alt="Foto actual" class="foto-actual" id="vistaPrevia">
             @else
                 <img src="" alt="Vista previa" class="foto-actual oculto" id="vistaPrevia">
+            @endif
+
+            <!-- galeria -->
+            <label for="galeria">Más fotos <span class="texto-suave">(baño, cocina, escritorio, fachada; hasta {{ \App\Http\Controllers\Arrendador\HabitacionController::MAX_GALERIA }} en total)</span></label>
+            <input type="file" id="galeria" name="galeria[]" accept="image/*" multiple>
+            @if ($habitacion->exists && $habitacion->fotos->isNotEmpty())
+                <div class="galeria-editar">
+                    @foreach ($habitacion->fotos as $f)
+                        <label class="galeria-editar-foto">
+                            <img src="{{ $f->url() }}" alt="{{ $f->descripcion }}">
+                            <span><input type="checkbox" name="quitar[]" value="{{ $f->id }}"> Quitar</span>
+                        </label>
+                    @endforeach
+                </div>
             @endif
 
             <button type="submit" class="btn">Guardar</button>

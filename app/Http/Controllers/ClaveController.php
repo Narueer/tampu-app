@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EventoSeguridad;
 use App\Models\Usuario;
 use App\Notifications\RestablecerClave;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rules\Password as ReglaClave;
 
 // recuperar contraseña
 class ClaveController extends Controller
@@ -26,6 +28,7 @@ class ClaveController extends Controller
         if ($usuario) {
             $token = Password::broker()->createToken($usuario);
             $enlace = route('clave.reset', ['token' => $token, 'email' => $usuario->email]);
+            EventoSeguridad::registrar('clave_enlace', null, $usuario);
 
             // si no hay correo configurado (MAIL_MAILER=log) el mensaje queda en storage/logs/laravel.log
             try {
@@ -55,13 +58,14 @@ class ClaveController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:6|confirmed',
+            'password' => ['required', 'confirmed', ReglaClave::min(8)->letters()->numbers()],
         ]);
 
         $estado = Password::broker()->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (Usuario $usuario, string $clave) {
                 $usuario->update(['password' => $clave]);
+                EventoSeguridad::registrar('clave_recuperada', null, $usuario);
             }
         );
 

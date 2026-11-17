@@ -14,5 +14,7 @@ php artisan view:cache
 # crea o actualiza las tablas y carga los datos de prueba solo la primera vez
 php artisan migrate --force
 php artisan db:seed --force
+# datos extra (galerias, mas cuartos y trabajos); si ya estan, no hace nada
+php artisan db:seed --class=AmpliarDatosSeeder --force || echo "No se pudieron cargar los datos extra; la app sigue funcionando"
 
 exec apache2-foreground

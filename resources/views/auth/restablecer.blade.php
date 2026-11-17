@@ -15,10 +15,11 @@
             <input type="email" id="correo" name="email" value="{{ old('email', $email) }}" required>
 
             <label for="clave">Nueva contraseña</label>
-            <input type="password" id="clave" name="password" minlength="6" required>
+            <input type="password" id="clave" name="password" minlength="8" required>
+            <small class="ayuda">Mínimo 8 caracteres, con letras y números.</small>
 
             <label for="clave2">Repite la contraseña</label>
-            <input type="password" id="clave2" name="password_confirmation" minlength="6" required>
+            <input type="password" id="clave2" name="password_confirmation" minlength="8" required>
 
             <button type="submit" class="btn">Guardar contraseña</button>
         </form>

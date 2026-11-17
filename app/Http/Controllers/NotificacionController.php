@@ -22,6 +22,19 @@ class NotificacionController extends Controller
         return redirect($notificacion->data['url'] ?? route('panel'));
     }
 
+    // la campana pregunta cada 10 segundos si hay algo nuevo
+    public function estado(Request $request)
+    {
+        $yo = $request->user();
+        $ultima = $yo->unreadNotifications()->first();
+
+        return response()->json([
+            'notificaciones' => $yo->unreadNotifications()->count(),
+            'mensajes' => $yo->mensajesSinLeer(),
+            'ultima' => $ultima ? $ultima->data['texto'] : null,
+        ]);
+    }
+
     public function leerTodas(Request $request)
     {
         $request->user()->unreadNotifications->markAsRead();

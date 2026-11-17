@@ -24,7 +24,7 @@
                     @foreach ($postulaciones as $p)
                         <tr>
                             <td>
-                                <b>{{ $p->estudiante->nombre }}</b><br>
+                                <b>{{ $p->estudiante->nombre }}</b> @include('partials.insignia-uni', ['usuario' => $p->estudiante])<br>
                                 <span class="texto-suave">De {{ $p->estudiante->procedencia ?: '—' }}</span>
                                 @if ($p->estado === 'aceptada')
                                     <br><i class="bi bi-telephone"></i> {{ $p->estudiante->celular }}

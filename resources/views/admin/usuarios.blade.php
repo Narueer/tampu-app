@@ -32,7 +32,12 @@
                 </tr>
                 @foreach ($usuarios as $u)
                     <tr>
-                        <td><b>{{ $u->nombre }}</b><br><span class="texto-suave">{{ $u->email }}</span></td>
+                        <td>
+                            <b>{{ $u->nombre }}</b> @include('partials.insignia-uni', ['usuario' => $u])<br>
+                            <span class="texto-suave">{{ $u->email }}</span>
+                            @if (! $u->correoConfirmado())<span class="texto-suave" title="Correo sin confirmar"><i class="bi bi-envelope-exclamation"></i></span>@endif
+                            @if ($u->dos_pasos_activo)<span class="texto-suave" title="Verificación en dos pasos activa"><i class="bi bi-phone"></i></span>@endif
+                        </td>
                         <td>{{ ucfirst($u->rol) }}</td>
                         <td>{{ $u->procedencia ?: '—' }}</td>
                         <td>{{ $u->habitaciones_count + $u->trabajos_count }}</td>

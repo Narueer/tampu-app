@@ -6,12 +6,21 @@
     <main class="contenedor">
         @include('partials.subnav')
 
-        <div class="cabecera-panel">
-            <h1 class="titulo-pagina">Mis ofertas de trabajo</h1>
-            @if (auth()->user()->esVerificado())
-                <a href="{{ route('empleador.trabajos.create') }}" class="btn"><i class="bi bi-plus-lg"></i> Nueva oferta</a>
-            @endif
-        </div>
+        @include('partials.bienvenida', [
+            'subtitulo' => 'Publica ofertas que encajen con el horario de los estudiantes.',
+            'acciones' => auth()->user()->esVerificado()
+                ? [[route('empleador.trabajos.create'), 'plus-lg', 'Nueva oferta'], [route('empleador.postulaciones'), 'people', 'Ver postulaciones']]
+                : [],
+        ])
+
+        @include('partials.kpis', ['kpis' => [
+            ['briefcase', $trabajos->count(), 'Ofertas publicadas', 'terracota'],
+            ['broadcast', $trabajos->where('estado', 'activa')->count(), 'Ofertas activas', 'verde'],
+            ['people', (int) $trabajos->sum('postulaciones_count'), 'Postulaciones recibidas', 'azul', route('empleador.postulaciones')],
+            ['chat-dots', auth()->user()->mensajesSinLeer(), 'Mensajes sin leer', 'amarillo', route('mensajes')],
+        ]])
+
+        <h2 class="titulo-bloque">Mis ofertas de trabajo</h2>
 
         @include('partials.aviso-verificacion')
 

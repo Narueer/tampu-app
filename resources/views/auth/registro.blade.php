@@ -3,12 +3,17 @@
 @section('titulo', 'Crear cuenta')
 
 @section('contenido')
-    <main class="contenedor">
+    <main class="contenedor auth">
+        @include('partials.auth-imagen', ['titulo' => 'Empieza tu camino en Cusco', 'texto' => 'Crea tu cuenta gratis. Si eres estudiante, marca tu horario y te mostramos solo los trabajos que encajan.'])
         <form class="formulario" id="formRegistro" action="{{ route('registro') }}" method="POST" enctype="multipart/form-data" novalidate>
             @csrf
             <h2>Crear cuenta</h2>
 
             @include('partials.errores')
+
+            @if (! $externo)
+                @include('partials.botones-externos', ['texto' => 'Registrarme con'])
+            @endif
 
             <label for="tipo">Soy</label>
             <select id="tipo" name="rol">
@@ -18,7 +23,7 @@
             </select>
 
             <label for="nombre">Nombres y apellidos</label>
-            <input type="text" id="nombre" name="nombre" value="{{ old('nombre') }}" required>
+            <input type="text" id="nombre" name="nombre" value="{{ old('nombre', $externo['nombre'] ?? '') }}" required>
 
             <label for="dni">DNI</label>
             <input type="text" id="dni" name="dni" value="{{ old('dni') }}" maxlength="8" inputmode="numeric" required>
@@ -38,13 +43,21 @@
             </div>
 
             <label for="email">Correo</label>
-            <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+            @if ($externo)
+                <input type="email" id="email" value="{{ $externo['email'] }}" disabled>
+                <small class="ayuda"><i class="bi bi-patch-check"></i> Comprobado con {{ $externo['via'] }}. Entrarás con ese botón, sin contraseña.
+                    @if (\App\Support\Acceso::esInstitucional($externo['email'])) Como es tu correo de la universidad, tu cuenta de estudiante quedará verificada. @endif
+                </small>
+            @else
+                <input type="email" id="email" name="email" value="{{ old('email') }}" required>
 
-            <label for="clave">Contraseña</label>
-            <input type="password" id="clave" name="password" required>
+                <label for="clave">Contraseña</label>
+                <input type="password" id="clave" name="password" minlength="8" required>
+                <small class="ayuda">Mínimo 8 caracteres, con letras y números.</small>
 
-            <label for="clave2">Repetir contraseña</label>
-            <input type="password" id="clave2" name="password_confirmation" required>
+                <label for="clave2">Repetir contraseña</label>
+                <input type="password" id="clave2" name="password_confirmation" required>
+            @endif
 
             <p class="error" id="mensajeRegistro"></p>
             <button type="submit" class="btn">Crear cuenta</button>

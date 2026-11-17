@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contacto;
+use App\Models\EventoSeguridad;
 use App\Models\Habitacion;
 use App\Models\Postulacion;
 use App\Models\Reporte;
@@ -44,7 +45,11 @@ class AdminController extends Controller
                 ->groupBy('rol')->pluck('total', 'rol'),
         ];
 
-        return view('admin.panel', compact('datos', 'pendientes', 'graficos'));
+        // lo ultimo que paso, para el costado del panel
+        $actividad = EventoSeguridad::with('usuario')->latest('created_at')->latest('id')->take(7)->get();
+        $nuevos = Usuario::where('rol', '!=', 'admin')->latest()->latest('id')->take(5)->get();
+
+        return view('admin.panel', compact('datos', 'pendientes', 'graficos', 'actividad', 'nuevos'));
     }
 
     public function usuarios(Request $request)
@@ -73,6 +78,7 @@ class AdminController extends Controller
         abort_if($usuario->verificacion === 'no_aplica', 422);
 
         $usuario->update(['verificacion' => $request->accion]);
+        EventoSeguridad::registrar('verificacion', 'El admin marcó a ' . $usuario->email . ' como ' . $request->accion, $usuario);
 
         $usuario->notify(new Aviso(
             $request->accion === 'verificado' ? 'Tu cuenta fue verificada. Ya puedes publicar.' : 'Tu documento fue rechazado por el administrador.',
@@ -107,6 +113,7 @@ class AdminController extends Controller
         $denunciado = $reporte->denunciado();
         if ($denunciado && $denunciado->rol !== 'admin') {
             $denunciado->update(['suspendido' => true]);
+            EventoSeguridad::registrar('suspension', 'Por reporte: ' . $reporte->motivo, $denunciado);
         }
 
         return back()->with('ok', 'Se suspendió la cuenta de ' . ($denunciado->nombre ?? 'el usuario') . '. Sus publicaciones ya no se muestran.');
@@ -116,6 +123,7 @@ class AdminController extends Controller
     {
         abort_if($usuario->rol === 'admin', 403);
         $usuario->update(['suspendido' => ! $usuario->suspendido]);
+        EventoSeguridad::registrar($usuario->suspendido ? 'suspension' : 'reactivacion', 'Desde la lista de usuarios', $usuario);
 
         return back()->with('ok', $usuario->nombre . ($usuario->suspendido ? ' fue suspendido.' : ' fue reactivado.'));
     }
@@ -132,5 +140,27 @@ class AdminController extends Controller
         $contacto->update(['leido' => ! $contacto->leido]);
 
         return back();
+    }
+
+    // bitacora de seguridad
+    public function seguridad(Request $request)
+    {
+        $tipo = $request->input('tipo');
+        $eventos = EventoSeguridad::with('usuario')
+            ->when($tipo === 'alertas', fn ($q) => $q->whereIn('tipo', collect(EventoSeguridad::TIPOS)->filter(fn ($t) => $t[1])->keys()))
+            ->when($tipo && $tipo !== 'alertas', fn ($q) => $q->where('tipo', $tipo))
+            ->when($request->filled('buscar'), fn ($q) => $q->whereLike('email', '%' . $request->buscar . '%'))
+            ->latest('created_at')->latest('id')->paginate(30)->withQueryString();
+
+        // resumen de las ultimas 24 horas
+        $desde = now()->subDay();
+        $resumen = [
+            'login' => EventoSeguridad::where('tipo', 'login')->where('created_at', '>=', $desde)->count(),
+            'login_fallido' => EventoSeguridad::where('tipo', 'login_fallido')->where('created_at', '>=', $desde)->count(),
+            'bloqueo' => EventoSeguridad::where('tipo', 'bloqueo')->where('created_at', '>=', $desde)->count(),
+            'acceso_denegado' => EventoSeguridad::where('tipo', 'acceso_denegado')->where('created_at', '>=', $desde)->count(),
+        ];
+
+        return view('admin.seguridad', compact('eventos', 'resumen', 'tipo'));
     }
 }

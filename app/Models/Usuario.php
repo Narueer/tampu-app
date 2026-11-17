@@ -15,13 +15,33 @@ class Usuario extends Authenticatable
     protected $fillable = [
         'nombre', 'email', 'dni', 'celular', 'procedencia', 'foto',
         'rol', 'verificacion', 'suspendido', 'documento', 'password',
+        'email_verificado_at', 'correo_institucional',
     ];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'codigo_correo', 'dos_pasos_secreto', 'dos_pasos_codigos'];
 
     protected function casts(): array
     {
-        return ['password' => 'hashed', 'suspendido' => 'boolean'];
+        return [
+            'password' => 'hashed',
+            'suspendido' => 'boolean',
+            'email_verificado_at' => 'datetime',
+            'codigo_correo_vence' => 'datetime',
+            'dos_pasos_activo' => 'boolean',
+            // el secreto va cifrado con la APP_KEY y los codigos de respaldo solo como hash
+            'dos_pasos_secreto' => 'encrypted',
+            'dos_pasos_codigos' => 'array',
+        ];
+    }
+
+    public function correoConfirmado(): bool
+    {
+        return $this->email_verificado_at !== null;
+    }
+
+    public function esEstudianteVerificado(): bool
+    {
+        return $this->rol === 'estudiante' && $this->correo_institucional !== null;
     }
 
     public function habitaciones()

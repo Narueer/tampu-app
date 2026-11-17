@@ -3,7 +3,8 @@
 @section('titulo', 'Iniciar sesión')
 
 @section('contenido')
-    <main class="contenedor">
+    <main class="contenedor auth">
+        @include('partials.auth-imagen', ['titulo' => 'Qué bueno verte otra vez', 'texto' => 'Revisa tus solicitudes, tus postulaciones y los mensajes que te llegaron.'])
         <form class="formulario" id="formLogin" action="{{ route('login') }}" method="POST" novalidate>
             @csrf
             <h2>Iniciar sesión</h2>
@@ -23,6 +24,8 @@
 
             <p class="error" id="mensajeLogin"></p>
             <button type="submit" class="btn">Ingresar</button>
+
+            @include('partials.botones-externos', ['texto' => 'Entrar con'])
 
             <p>¿No tienes cuenta? <a href="{{ route('registro') }}">Regístrate aquí</a></p>
         </form>

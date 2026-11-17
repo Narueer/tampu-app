@@ -3,8 +3,9 @@
 @section('titulo', 'Contacto')
 
 @section('contenido')
+    @include('partials.banner', ['titulo' => 'Contacto', 'texto' => 'Escríbenos si tienes una duda, un problema con tu cuenta o quieres avisarnos de una estafa.', 'imagen' => 'img/cusco/cuesta-san-blas.jpg'])
+
     <main class="contenedor">
-        <h1 class="titulo-pagina">Contacto</h1>
 
         <div class="contacto">
             <form class="caja" action="{{ route('contacto') }}" method="POST">
@@ -47,6 +48,11 @@
                 <p><i class="bi bi-geo-alt"></i> Cusco, Perú</p>
                 <p class="aviso">Si alguien te pide un adelanto sin dejarte ver el cuarto, no pagues. Usa el botón "Reportar" de la publicación o escríbenos.</p>
                 <p class="texto-suave">También puedes resolver dudas rápidas con el asistente (botón de abajo a la derecha).</p>
+                @auth
+                    @if (auth()->user()->rol !== 'admin')
+                        <p><a href="{{ route('asesor') }}" class="btn btn-borde"><i class="bi bi-headset"></i> Hablar con un asesor</a></p>
+                    @endif
+                @endauth
             </aside>
         </div>
     </main>

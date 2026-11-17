@@ -6,7 +6,17 @@
     <main class="contenedor">
         @include('partials.subnav')
 
-        <h1 class="titulo-pagina">Hola, {{ auth()->user()->nombre }}</h1>
+        @include('partials.bienvenida', [
+            'subtitulo' => 'Aquí ves tus visitas, tus postulaciones y tu horario de clases.',
+            'acciones' => [[route('habitaciones.index'), 'search', 'Buscar cuarto'], [route('trabajos.index', ['compatible' => 1]), 'briefcase', 'Trabajos compatibles']],
+        ])
+
+        @include('partials.kpis', ['kpis' => [
+            ['house-door', $solicitudes->count(), 'Visitas solicitadas', 'terracota'],
+            ['check2-circle', $solicitudes->where('estado', 'aceptada')->count(), 'Visitas aceptadas', 'verde'],
+            ['person-workspace', $postulaciones->count(), 'Postulaciones', 'azul'],
+            ['heart', auth()->user()->favoritos()->count(), 'Favoritos', 'rosa', route('estudiante.favoritos')],
+        ]])
 
         <div class="caja">
             <h2><i class="bi bi-calendar-week"></i> Mi horario de clases</h2>

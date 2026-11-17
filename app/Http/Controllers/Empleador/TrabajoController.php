@@ -87,7 +87,7 @@ class TrabajoController extends Controller
 
     private function validar(Request $request): array
     {
-        return $request->validate([
+        $datos = $request->validate([
             'titulo' => 'required|string|max:120',
             'empresa' => 'required|string|max:100',
             'descripcion' => 'required|string|max:1000',
@@ -98,9 +98,17 @@ class TrabajoController extends Controller
             'estado' => 'required|in:activa,cerrada',
             'turnos' => 'required|array|min:1',
             'turnos.*' => ['regex:/^[a-z]+-(manana|tarde|noche)$/'],
+            'direccion' => 'nullable|string|max:150',
+            'lat' => 'nullable|numeric|between:-14,-13',
+            'lng' => 'nullable|numeric|between:-72.5,-71.5',
+            'requisitos' => 'nullable|string|max:800',
+            'vacantes' => 'nullable|integer|min:1|max:50',
         ], [
             'turnos.required' => 'Marca al menos un turno de trabajo.',
         ]);
+        $datos['vacantes'] ??= 1;
+
+        return $datos;
     }
 
     private function guardarTurnos(Request $request, Trabajo $trabajo): void

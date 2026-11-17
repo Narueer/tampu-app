@@ -78,9 +78,20 @@ El correo de contacto que se muestra en la página se cambia en el archivo `.env
 | FullCalendar 6.1.15 | Calendario | MIT |
 | Chart.js 4.4.4 | Gráficos | MIT |
 | league/flysystem-aws-s3-v3 | Subir archivos a Supabase Storage | MIT |
+| Bootstrap 5.3.3 (jsDelivr) | Carruseles, ventana modal y grilla | MIT |
 | Bootstrap Icons 1.11.3 (jsDelivr) | Íconos | MIT |
+| qrcodejs 1.0.0 (cdnjs) | Código QR de la verificación en dos pasos | MIT |
 | Poppins (Google Fonts) | Tipografía | SIL Open Font License 1.1 |
 | Unsplash | Fotos de ejemplo de habitaciones (`public/img/habitaciones`) | Licencia Unsplash |
+| [Plaza de Armas](https://commons.wikimedia.org/wiki/File:Cusco_-_Plaza_de_Armas_-_panoramio.jpg), Pavel Špindler (`img/cusco/plaza.jpg`) | Portada | CC BY 3.0 |
+| [Catedral del Cusco](https://commons.wikimedia.org/wiki/File:Katedraal_langs_Plaza_de_Armas,_Cusco,_a.jpg), Bernard Brönn (`img/cusco/catedral.jpg`) | Cabeceras | CC BY-SA 4.0 |
+| [Plaza San Blas](https://commons.wikimedia.org/wiki/File:Plaza_San_Blas,_Cusco,_Peru_2019-10-09.jpg), Alexey Komarov (`img/cusco/san-blas.jpg`) | Portada y Trabajos | CC BY-SA 4.0 |
+| [Cuesta de San Blas](https://commons.wikimedia.org/wiki/File:Cuesta_de_San_Blas_5.jpg), Pedro Szekely (`img/cusco/cuesta-san-blas.jpg`) | Login y collage | CC BY-SA 2.0 |
+
+| Fotos de la galería (`img/habitaciones/galeria`) | Dormitorios, baños y cocinas de ejemplo | CC0, CC BY 4.0 y CC BY-SA 4.0 (autores en `CREDITOS.md` de esa carpeta) |
+| OpenStreetMap / Nominatim | Ubicación de universidades, calles y lugares de los datos de prueba | ODbL |
+
+Las fotos de Wikimedia se redujeron de tamaño para la web; no se les cambió nada más.
 
 ## Problemas comunes
 

@@ -76,7 +76,26 @@ Copiar el resultado completo (empieza con `base64:`).
 
 ## 6. Opcional
 
-**Correos de verdad** (recuperar contraseña y copia de los mensajes de contacto). Con una cuenta de Gmail del equipo: activar la verificación en dos pasos, crear una **contraseña de aplicación** y agregar en Render las variables `MAIL_*` que están comentadas en `.env.nube.ejemplo`. Sin esto, los correos solo quedan registrados en los logs de Render.
+### Entrar con el correo de la universidad (Google)
+
+Sirve si el correo de la universidad se abre en Gmail. Con esto aparece el botón **Entrar con Google** y los estudiantes que usan su correo `@continental.edu.pe` quedan como **estudiante verificado**.
+
+1. Entrar a https://console.cloud.google.com con cualquier cuenta de Google y crear un proyecto llamado `tampu`.
+2. **APIs y servicios → Pantalla de consentimiento de OAuth**: tipo **Externo**, nombre `TAMPU`, el correo del equipo y guardar. En **Público** tocar **Publicar app** (los permisos que pedimos, correo y nombre, no necesitan revisión de Google).
+3. **APIs y servicios → Credenciales → Crear credenciales → ID de cliente de OAuth**:
+   - Tipo: **Aplicación web**.
+   - URI de redireccionamiento autorizados: `https://tampu-app.onrender.com/externo/google/vuelta` (y, para probar en la PC, `http://127.0.0.1:8000/externo/google/vuelta`).
+4. Copiar el **ID de cliente** y el **Secreto** y ponerlos en Render como `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`. No se escriben en el código ni se mandan por chat.
+
+### Entrar con Microsoft
+
+Solo si el correo de la universidad es de Microsoft 365 (se abre en Outlook). En https://portal.azure.com → **Registros de aplicaciones → Nuevo registro**: nombre `TAMPU`, cuentas de "cualquier directorio organizativo" y URI de redirección **Web** `https://tampu-app.onrender.com/externo/microsoft/vuelta`. Luego, en **Certificados y secretos**, crear un secreto. En Render van `MICROSOFT_CLIENT_ID` (el "Id. de aplicación") y `MICROSOFT_CLIENT_SECRET` (el "Valor" del secreto). Solo entran cuentas del dominio de la universidad. Algunas universidades piden que el área de TI apruebe la aplicación; si sale ese aviso, se usa Google o el correo y contraseña.
+
+### Verificación en dos pasos
+
+No necesita configurar nada: cada usuario la activa en **Mi perfil** con Google Authenticator o Microsoft Authenticator. El secreto se guarda cifrado con la `APP_KEY`, así que **si se cambia la `APP_KEY`, hay que desactivar y volver a activar** la verificación (o entrar con un código de respaldo).
+
+**Correos de verdad** (recuperar contraseña, código para confirmar el correo y copia de los mensajes de contacto). Cuando el correo está configurado, TAMPU pide confirmar el correo con un código antes de publicar, postular o escribir. Con una cuenta de Gmail del equipo: activar la verificación en dos pasos, crear una **contraseña de aplicación** y agregar en Render las variables `MAIL_*` que están comentadas en `.env.nube.ejemplo`. Sin esto, los correos solo quedan registrados en los logs de Render.
 
 **Dominio propio con Cloudflare.** Si compran un dominio: en Render → Settings → Custom Domains agregar el dominio; en Cloudflare → DNS crear el registro CNAME que indica Render. Cambiar `APP_URL` al nuevo dominio.
 

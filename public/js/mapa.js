@@ -18,12 +18,36 @@ if (divMapa) {
     const mapa = crearMapa("mapa", 13);
     const grupo = [];
 
+    // con muchos cuartos el precio va en un globito al pasar el mouse, para que no se amontonen
+    const compacto = puntos.filter(p => !p.tipo).length > 12;
+
     puntos.forEach(function (p) {
-        let texto = "<b>" + p.titulo + "</b><br>S/ " + p.precio + " al mes";
+        let texto = "<b>" + p.titulo + "</b>";
+        if (compacto && !p.tipo) {
+            texto += "<br>S/ " + p.precio + " al mes";
+            if (p.url) texto += '<br><a href="' + p.url + '">Ver detalle</a>';
+            L.circleMarker([p.lat, p.lng], { radius: 8, color: "#fff", weight: 2, fillColor: "#b4532a", fillOpacity: 1 })
+                .addTo(mapa).bindPopup(texto).bindTooltip("S/ " + p.precio, { direction: "top", offset: [0, -6] });
+            grupo.push([p.lat, p.lng]);
+            return;
+        }
+        let icono;
+        if (p.tipo === "uni") {
+            // universidad
+            icono = L.divIcon({ className: "marca-uni", html: '<i class="bi bi-mortarboard-fill"></i>', iconSize: [34, 34], iconAnchor: [17, 17] });
+            texto += "<br>Universidad";
+        } else if (p.tipo === "trabajo") {
+            icono = L.divIcon({ className: "marca-precio marca-trabajo", html: '<i class="bi bi-briefcase-fill"></i> ' + p.pago, iconSize: null });
+            texto += "<br>" + p.empresa + "<br>" + p.pago;
+        } else {
+            // habitacion: el precio se ve en el mismo marcador
+            icono = L.divIcon({ className: "marca-precio", html: "S/ " + p.precio, iconSize: null });
+            texto += "<br>S/ " + p.precio + " al mes";
+        }
         if (p.url) {
             texto += '<br><a href="' + p.url + '">Ver detalle</a>';
         }
-        L.marker([p.lat, p.lng]).addTo(mapa).bindPopup(texto);
+        L.marker([p.lat, p.lng], { icon: icono }).addTo(mapa).bindPopup(texto);
         grupo.push([p.lat, p.lng]);
     });
 

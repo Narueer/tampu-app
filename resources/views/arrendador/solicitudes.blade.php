@@ -25,7 +25,7 @@
                     </tr>
                     @foreach ($solicitudes as $s)
                         <tr>
-                            <td><b>{{ $s->estudiante->nombre }}</b><br><span class="texto-suave">De {{ $s->estudiante->procedencia ?: '—' }}</span></td>
+                            <td><b>{{ $s->estudiante->nombre }}</b> @include('partials.insignia-uni', ['usuario' => $s->estudiante])<br><span class="texto-suave">De {{ $s->estudiante->procedencia ?: '—' }}</span></td>
                             <td>{{ $s->habitacion->titulo }}</td>
                             <td>{{ $s->fecha_visita->format('d/m/Y') }}</td>
                             <td>{{ $s->mensaje }}</td>

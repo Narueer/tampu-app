@@ -6,14 +6,22 @@
     <main class="contenedor">
         @include('partials.subnav')
 
-        <div class="cabecera-panel">
-            <h1 class="titulo-pagina">Mis habitaciones</h1>
-            <div>
-                @if (auth()->user()->esVerificado())
-                    <a href="{{ route('arrendador.habitaciones.create') }}" class="btn"><i class="bi bi-plus-lg"></i> Nueva habitación</a>
-                @endif
-            </div>
-        </div>
+        @include('partials.bienvenida', [
+            'subtitulo' => 'Administra tus habitaciones y responde las visitas que te piden.',
+            'acciones' => auth()->user()->esVerificado()
+                ? [[route('arrendador.habitaciones.create'), 'plus-lg', 'Nueva habitación'], [route('arrendador.solicitudes'), 'envelope', 'Ver solicitudes']]
+                : [],
+        ])
+
+        @php($promedio = $habitaciones->whereNotNull('resenas_avg_estrellas')->avg('resenas_avg_estrellas'))
+        @include('partials.kpis', ['kpis' => [
+            ['house', $habitaciones->count(), 'Habitaciones', 'terracota'],
+            ['door-open', $habitaciones->where('estado', 'disponible')->count(), 'Disponibles', 'verde'],
+            ['envelope', (int) $habitaciones->sum('solicitudes_count'), 'Solicitudes recibidas', 'azul', route('arrendador.solicitudes')],
+            ['star', $promedio ? number_format($promedio, 1) : '—', 'Promedio de reseñas', 'amarillo'],
+        ]])
+
+        <h2 class="titulo-bloque">Mis habitaciones</h2>
 
         @include('partials.aviso-verificacion')
 
