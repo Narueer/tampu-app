@@ -7,6 +7,9 @@ PUERTO=${PORT:-80}
 sed -i "s/Listen 80$/Listen ${PUERTO}/" /etc/apache2/ports.conf
 sed -i "s/<VirtualHost \*:80>/<VirtualHost *:${PUERTO}>/" /etc/apache2/sites-available/000-default.conf
 
+# los errores de laravel salen en los Logs de Render
+export LOG_CHANNEL="${LOG_CHANNEL:-stderr}"
+
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache

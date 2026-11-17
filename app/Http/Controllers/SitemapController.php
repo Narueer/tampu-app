@@ -4,33 +4,48 @@ namespace App\Http\Controllers;
 
 use App\Models\Habitacion;
 use App\Models\Trabajo;
+use Illuminate\Support\Facades\Log;
 
 class SitemapController extends Controller
 {
-    // lista de paginas publicas para Google
+    // lista de paginas publicas para Google, armada como texto xml
     public function index()
     {
-        $paginas = collect([
-            ['url' => route('inicio'), 'fecha' => now()],
-            ['url' => route('habitaciones.index'), 'fecha' => now()],
-            ['url' => route('trabajos.index'), 'fecha' => now()],
-            ['url' => route('nosotros'), 'fecha' => null],
-            ['url' => route('contacto'), 'fecha' => null],
-        ]);
+        $paginas = [
+            [route('inicio'), now()],
+            [route('habitaciones.index'), now()],
+            [route('trabajos.index'), now()],
+            [route('nosotros'), null],
+            [route('contacto'), null],
+        ];
 
         foreach (HabitacionController::DISTRITOS as $d) {
-            $paginas->push(['url' => route('habitaciones.index', ['distrito' => $d]), 'fecha' => null]);
+            $paginas[] = [route('habitaciones.index', ['distrito' => $d]), null];
         }
 
-        foreach (Habitacion::publicadas()->get() as $h) {
-            $paginas->push(['url' => route('habitaciones.show', $h), 'fecha' => $h->updated_at]);
+        // si falla la consulta igual se entregan las paginas principales
+        try {
+            foreach (Habitacion::publicadas()->get(['habitaciones.id', 'habitaciones.updated_at']) as $h) {
+                $paginas[] = [route('habitaciones.show', $h->id), $h->updated_at];
+            }
+            foreach (Trabajo::publicadas()->get(['trabajos.id', 'trabajos.updated_at']) as $t) {
+                $paginas[] = [route('trabajos.show', $t->id), $t->updated_at];
+            }
+        } catch (\Throwable $e) {
+            Log::error('Sitemap: ' . $e->getMessage());
         }
 
-        foreach (Trabajo::publicadas()->get() as $t) {
-            $paginas->push(['url' => route('trabajos.show', $t), 'fecha' => $t->updated_at]);
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        foreach ($paginas as [$url, $fecha]) {
+            $xml .= '  <url><loc>' . htmlspecialchars($url, ENT_XML1) . '</loc>';
+            if ($fecha) {
+                $xml .= '<lastmod>' . $fecha->toAtomString() . '</lastmod>';
+            }
+            $xml .= "</url>\n";
         }
+        $xml .= '</urlset>';
 
-        return response()->view('sitemap', ['paginas' => $paginas])
-            ->header('Content-Type', 'application/xml; charset=UTF-8');
+        return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 }
