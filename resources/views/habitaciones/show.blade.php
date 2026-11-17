@@ -37,9 +37,9 @@
             </button>
         </div>
 
-        <!-- galeria: una foto grande y dos chicas; todas se ven en el modal -->
-        <div class="galeria {{ count($fotos) < 3 ? 'galeria-simple' : '' }}">
-            @foreach (array_slice($fotos, 0, 3) as $i => $f)
+        <!-- galeria tipo revista: una foto grande y hasta cuatro chicas; todas se ven en el modal -->
+        <div class="galeria galeria-{{ min(count($fotos), 5) }} {{ count($fotos) < 2 ? 'galeria-simple' : '' }}">
+            @foreach (array_slice($fotos, 0, 5) as $i => $f)
                 <button type="button" class="galeria-foto {{ $i === 0 ? 'galeria-principal' : '' }}" data-bs-toggle="modal" data-bs-target="#fotoGrande" data-foto="{{ $i }}" aria-label="Ver foto {{ $i + 1 }}">
                     <img src="{{ $f['url'] }}" alt="{{ $f['descripcion'] }}" @if ($i > 0) loading="lazy" @endif>
                 </button>
@@ -134,7 +134,7 @@
                 @endif
             </div>
 
-            <aside>
+            <aside id="reservar" data-caja-reserva>
                 <p class="precio">S/ {{ number_format($habitacion->precio, 0) }} <small>al mes</small></p>
                 @if ($habitacion->garantia)
                     <p class="texto-suave garantia">Garantía de S/ {{ number_format($habitacion->garantia, 0) }}, se paga recién al mudarte.</p>
@@ -189,6 +189,22 @@
                 <p class="aviso">Nunca pagues adelantos sin haber visitado la habitación. El celular del arrendador se muestra cuando acepta tu visita.</p>
             </aside>
         </div>
+        <!-- barra con el precio que aparece al bajar -->
+        <div class="barra-reserva" id="barraReserva">
+            <div class="contenedor">
+                <img src="{{ $habitacion->fotoUrl() }}" alt="">
+                <div class="barra-reserva-texto">
+                    <b>{{ $habitacion->titulo }}</b>
+                    <span>S/ {{ number_format($habitacion->precio, 0) }} al mes · {{ $habitacion->distrito }}</span>
+                </div>
+                @auth
+                    <a href="#reservar" class="btn">{{ auth()->user()->rol === 'estudiante' ? 'Solicitar visita' : 'Ver detalle' }}</a>
+                @else
+                    <a href="{{ route('login') }}" class="btn">Solicitar visita</a>
+                @endauth
+            </div>
+        </div>
+
         @if ($similares->isNotEmpty())
             <section class="similares">
                 <div class="encabezado-seccion con-flechas">

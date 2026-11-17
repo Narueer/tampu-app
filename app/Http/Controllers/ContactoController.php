@@ -43,4 +43,17 @@ class ContactoController extends Controller
 
         return back()->with('ok', 'Gracias por escribirnos. Te responderemos a tu correo lo antes posible.');
     }
+
+    // boletin: guarda el correo como un mensaje para el administrador
+    public function boletin(Request $request)
+    {
+        $datos = $request->validate(['email' => 'required|email|max:100']);
+
+        Contacto::firstOrCreate(
+            ['email' => $datos['email'], 'asunto' => 'Boletín de cuartos nuevos'],
+            ['nombre' => 'Suscriptor del boletín', 'mensaje' => 'Quiere recibir por correo las habitaciones nuevas que se publiquen.']
+        );
+
+        return redirect()->to(route('inicio') . '#boletin')->with('ok', '¡Listo! Te avisaremos cuando se publiquen cuartos nuevos.');
+    }
 }

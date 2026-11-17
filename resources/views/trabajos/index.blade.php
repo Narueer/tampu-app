@@ -39,6 +39,14 @@
             <button type="submit" class="btn">Filtrar</button>
         </form>
 
+        <!-- chips de modalidad -->
+        <div class="chips-filtro" aria-label="Modalidad">
+            <a href="{{ route('trabajos.index', request()->except('modalidad')) }}" class="{{ request('modalidad') ? '' : 'activo' }}">Todas</a>
+            @foreach (['medio tiempo' => 'Medio tiempo', 'por horas' => 'Por horas', 'practicas' => 'Prácticas'] as $valor => $nombre)
+                <a href="{{ route('trabajos.index', array_merge(request()->except('modalidad'), ['modalidad' => $valor])) }}" class="{{ request('modalidad') === $valor ? 'activo' : '' }}">{{ $nombre }}</a>
+            @endforeach
+        </div>
+
         <p id="total">{{ $trabajos->count() }} oferta(s){{ $compatible ? ' que no chocan con tus clases' : '' }}</p>
 
         @if ($puntos->isNotEmpty())

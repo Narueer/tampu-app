@@ -74,7 +74,5 @@
                 @endforeach
             </div>
         </section>
-
-        <p class="creditos-fotos">Fotos de Cusco: Pavel Špindler (CC BY 3.0), Bernard Brönn y Alexey Komarov (CC BY-SA 4.0) y Pedro Szekely (CC BY-SA 2.0), vía Wikimedia Commons. Fotos de habitaciones: Unsplash y Openverse (CC0, CC BY y CC BY-SA). Ubicaciones: © colaboradores de OpenStreetMap.</p>
     </main>
 @endsection

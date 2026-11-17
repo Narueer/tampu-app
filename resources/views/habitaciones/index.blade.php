@@ -54,7 +54,21 @@
 
             <!-- lista -->
             <div class="resultados">
-                <p id="total">{{ $habitaciones->count() }} habitación(es) encontrada(s)</p>
+                <!-- chips para cambiar de distrito rapido -->
+                <div class="chips-filtro" aria-label="Distritos">
+                    <a href="{{ route('habitaciones.index', request()->except('distrito')) }}" class="{{ request('distrito') ? '' : 'activo' }}">Todos</a>
+                    @foreach ($distritos as $d)
+                        <a href="{{ route('habitaciones.index', array_merge(request()->except('distrito'), ['distrito' => $d])) }}" class="{{ request('distrito') === $d ? 'activo' : '' }}">{{ $d }}</a>
+                    @endforeach
+                </div>
+
+                <div class="barra-resultados">
+                    <p id="total">{{ $habitaciones->count() }} habitación(es) encontrada(s)</p>
+                    <div class="cambiar-vista" role="group" aria-label="Forma de ver">
+                        <button type="button" data-vista="cuadricula" aria-label="Ver en cuadrícula" title="Cuadrícula"><i class="bi bi-grid"></i></button>
+                        <button type="button" data-vista="lista" aria-label="Ver en lista" title="Lista"><i class="bi bi-list-ul"></i></button>
+                    </div>
+                </div>
                 @if ($puntos->isNotEmpty())
                     <div id="mapa" class="mapa" data-puntos='@json($puntos)'></div>
                 @endif

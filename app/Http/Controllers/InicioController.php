@@ -9,6 +9,16 @@ use App\Models\Usuario;
 
 class InicioController extends Controller
 {
+    // una linea sobre cada distrito para la seccion de barrios
+    const BARRIOS = [
+        'Cusco' => 'El centro histórico: plazas, museos y la vida de la ciudad a pocos pasos.',
+        'Wanchaq' => 'Comercial y bien conectado, con mercados, bancos y buses a todas partes.',
+        'Santiago' => 'Barrio tradicional con precios más bajos y mucho movimiento.',
+        'San Sebastián' => 'Residencial y tranquilo, camino a los campus del este.',
+        'San Jerónimo' => 'Cerca del campus de Larapa, con calles amplias y menos ruido.',
+        'Saylla' => 'Al sureste, la opción más cercana a Angostura.',
+    ];
+
     public function inicio()
     {
         $destacadas = Habitacion::publicadas()->withAvg('resenas', 'estrellas')->withCount('fotos')->latest()->take(6)->get();
@@ -31,6 +41,16 @@ class InicioController extends Controller
         $porDistrito = Habitacion::publicadas()->selectRaw('distrito, count(*) as total, min(precio) as desde')
             ->groupBy('distrito')->get()->keyBy('distrito');
 
+        // barrios: un cuarto de cada distrito pone la foto
+        $barrios = collect(HabitacionController::DISTRITOS)->filter(fn ($d) => isset($porDistrito[$d]))->map(fn ($d) => [
+            'nombre' => $d,
+            'total' => $porDistrito[$d]->total,
+            'desde' => $porDistrito[$d]->desde,
+            'texto' => self::BARRIOS[$d] ?? '',
+            'foto' => Habitacion::publicadas()->where('distrito', $d)->withAvg('resenas', 'estrellas')
+                ->get()->sortByDesc('resenas_avg_estrellas')->first()?->fotoUrl(),
+        ])->values();
+
         // cuartos cerca de cada universidad
         $universidades = collect(\App\Support\Lugares::UNIVERSIDADES)->map(fn ($u, $clave) => $u + [
             'clave' => $clave,
@@ -46,6 +66,7 @@ class InicioController extends Controller
 
         return view('inicio', [
             'porDistrito' => $porDistrito,
+            'barrios' => $barrios,
             'universidades' => $universidades,
             'puntos' => $puntos,
             'destacadas' => $destacadas,

@@ -24,7 +24,8 @@
     <script>document.documentElement.classList.add('con-js');</script>
     @stack('estilos')
 </head>
-<body class="{{ request()->routeIs('mensajes.ver') ? 'en-chat' : '' }}">
+<body class="{{ request()->routeIs('mensajes.ver') ? 'en-chat' : '' }} {{ request()->routeIs('inicio') ? 'pagina-inicio' : '' }}">
+    <div id="progreso" aria-hidden="true"></div>
 
     <!-- menu -->
     <header id="cabecera">
@@ -71,7 +72,7 @@
     </header>
 
     @if (session('ok') || session('error'))
-        <div class="contenedor">
+        <div class="contenedor avisos-flash">
             @if (session('ok'))
                 <p class="alerta alerta-ok"><i class="bi bi-check-circle"></i> {{ session('ok') }}</p>
             @endif
@@ -94,7 +95,7 @@
                         <img src="{{ asset('img/logo-160.png') }}" alt="Logo de Tampu"> Tampu
                     </a>
                     <p class="pie-texto">Habitaciones seguras y trabajos que encajan con tus clases, para estudiantes que llegan a Cusco.</p>
-                    <button type="button" id="btnInstalar" class="btn-instalar oculto"><i class="bi bi-phone"></i> Instalar la app</button>
+                    <button type="button" id="btnInstalar" class="btn-instalar oculto" data-instalar><i class="bi bi-phone"></i> Instalar la app</button>
                 </div>
                 <div class="col-lg-2 col-md-6 col-6">
                     <h4>Explora</h4>

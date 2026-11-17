@@ -49,6 +49,8 @@
             </div>
         </div>
 
+        <a href="#contenido-inicio" class="bajar" aria-label="Bajar al contenido"><span></span></a>
+
         <button class="carousel-control-prev" type="button" data-bs-target="#portada" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Anterior</span>
@@ -93,7 +95,23 @@
         </form>
     </div>
 
-    <main class="sin-espacio">
+    <!-- cinta que se desliza sola -->
+    <div class="cinta" aria-label="Universidades y ventajas">
+        <div class="cinta-pista">
+            @foreach ([1, 2] as $vuelta)
+                <div class="cinta-grupo" @if ($vuelta === 2) aria-hidden="true" @endif>
+                    @foreach ($universidades as $u)
+                        <span><i class="bi bi-mortarboard"></i> {{ $u['nombre'] }}</span>
+                    @endforeach
+                    <span><i class="bi bi-patch-check"></i> Cuartos verificados</span>
+                    <span><i class="bi bi-house-heart"></i> Visita antes de pagar</span>
+                    <span><i class="bi bi-calendar2-week"></i> Trabajos según tu horario</span>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    <main class="sin-espacio" id="contenido-inicio">
         <!-- numeros -->
         <section class="seccion-numeros">
             <div class="contenedor">
@@ -211,8 +229,33 @@
             </div>
         </section>
 
-        <!-- mapa con todos los cuartos -->
+        <!-- barrios de cusco -->
         <section class="seccion fondo-blanco">
+            <div class="contenedor">
+                <div class="encabezado-seccion con-flechas revelar">
+                    <div>
+                        <span class="sobretitulo">Barrios de Cusco</span>
+                        <h2>¿Dónde te <em>gustaría vivir</em>?</h2>
+                    </div>
+                    <a href="{{ route('habitaciones.index') }}" class="btn btn-borde">Ver todos <i class="bi bi-arrow-right"></i></a>
+                </div>
+                <div class="barrios">
+                    @foreach ($barrios as $b)
+                        <a href="{{ route('habitaciones.index', ['distrito' => $b['nombre']]) }}" class="barrio revelar" style="--fondo-img: url('{{ $b['foto'] }}')">
+                            <span class="barrio-numero">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                            <div class="barrio-texto">
+                                <h3>{{ $b['nombre'] }}</h3>
+                                <p>{{ $b['texto'] }}</p>
+                                <span class="barrio-datos">{{ $b['total'] }} {{ $b['total'] == 1 ? 'cuarto' : 'cuartos' }} · desde S/ {{ number_format($b['desde'], 0) }} <i class="bi bi-arrow-up-right"></i></span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        <!-- mapa con todos los cuartos -->
+        <section class="seccion">
             <div class="contenedor">
                 <div class="row g-4 align-items-center">
                     <div class="col-lg-4 revelar">
@@ -279,6 +322,42 @@
             </div>
         </section>
 
+        <!-- linea de tiempo: de los tampus incas a hoy -->
+        <section class="seccion seccion-historia">
+            <div class="contenedor">
+                <div class="encabezado-seccion revelar">
+                    <span class="sobretitulo">De dónde viene el nombre</span>
+                    <h2>Del Qhapaq Ñan <em>a tu primer cuarto</em></h2>
+                </div>
+                <ol class="linea-historia">
+                    <li class="revelar">
+                        <span class="hito-fecha">Siglo XV</span>
+                        <i class="bi bi-signpost-split"></i>
+                        <h3>El camino inca</h3>
+                        <p>El Qhapaq Ñan unía el Tawantinsuyu con miles de kilómetros de caminos que salían desde Cusco.</p>
+                    </li>
+                    <li class="revelar">
+                        <span class="hito-fecha">En el camino</span>
+                        <i class="bi bi-house-door"></i>
+                        <h3>Los tampus</h3>
+                        <p>A lo largo de la ruta había tampus: casas de descanso con techo, comida y depósitos para el viajero.</p>
+                    </li>
+                    <li class="revelar">
+                        <span class="hito-fecha">2014</span>
+                        <i class="bi bi-globe-americas"></i>
+                        <h3>Patrimonio mundial</h3>
+                        <p>La UNESCO declaró al Qhapaq Ñan Patrimonio de la Humanidad, compartido por seis países.</p>
+                    </li>
+                    <li class="revelar">
+                        <span class="hito-fecha">Hoy</span>
+                        <i class="bi bi-phone"></i>
+                        <h3>TAMPU</h3>
+                        <p>Una casa de paso digital para el estudiante que llega a Cusco: cuarto seguro y trabajo que respeta sus clases.</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
         <!-- opiniones en carrusel -->
         @if ($resenas->isNotEmpty())
             <section class="seccion seccion-opiniones">
@@ -342,6 +421,80 @@
                                 <figcaption>Cuesta de San Blas</figcaption>
                             </figure>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- preguntas frecuentes -->
+        <section class="seccion">
+            <div class="contenedor">
+                <div class="row g-4 g-lg-5">
+                    <div class="col-lg-4 revelar">
+                        <span class="sobretitulo">Preguntas frecuentes</span>
+                        <h2 class="titulo-grande">Lo que todos <em>preguntan</em></h2>
+                        <p class="texto-suave">Si tu duda no está aquí, escríbenos o pregúntale al asistente del botón de abajo.</p>
+                        <a href="{{ route('contacto') }}" class="btn btn-borde mt-3">Escríbenos <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="col-lg-8 revelar">
+                        <div class="accordion preguntas" id="preguntas">
+                            @foreach ([
+                                ['¿Usar TAMPU cuesta algo?', 'No. Buscar cuartos, postular a trabajos y publicar es gratis para estudiantes, arrendadores y empresas.'],
+                                ['¿Cómo sé que el arrendador es real?', 'Antes de publicar, el administrador revisa el DNI o RUC de cada cuenta. Solo las cuentas verificadas aparecen en la página.'],
+                                ['¿Qué hago si me piden un adelanto sin ver el cuarto?', 'No lo pagues. Pide la visita desde la página y usa el botón "Reportar" en la publicación. El administrador lo revisa.'],
+                                ['¿Cómo funciona el filtro por horario?', 'Marcas en tu panel los turnos en los que tienes clases. En Trabajos puedes ver solo las ofertas que no se cruzan con ellos.'],
+                                ['¿Cuándo veo el celular del arrendador?', 'Cuando el arrendador acepta tu solicitud de visita. Así tus datos y los suyos quedan protegidos.'],
+                                ['¿Puedo instalar TAMPU en mi celular?', 'Sí. Desde el navegador del celular elige "Instalar app" o "Agregar a pantalla de inicio" y se abre como una aplicación.'],
+                            ] as [$pregunta, $respuesta])
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header">
+                                        <button class="accordion-button {{ $loop->first ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#pregunta{{ $loop->index }}" aria-expanded="{{ $loop->first ? 'true' : 'false' }}">
+                                            <span class="pregunta-numero">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span> {{ $pregunta }}
+                                        </button>
+                                    </h3>
+                                    <div id="pregunta{{ $loop->index }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#preguntas">
+                                        <div class="accordion-body">{{ $respuesta }}</div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- boletin y app en el celular -->
+        <section class="seccion seccion-app" id="boletin">
+            <div class="contenedor">
+                <div class="row g-5 align-items-center">
+                    <div class="col-lg-5 revelar">
+                        <div class="celular-escena">
+                            <div class="celular">
+                                <img src="{{ asset('img/app-celular.jpg') }}" alt="TAMPU abierto en un celular">
+                            </div>
+                            <div class="globo-flotante globo-app flotar-lento">
+                                <i class="bi bi-bell-fill"></i>
+                                <div><b>Nuevo cuarto en Wanchaq</b><small>S/ 280 al mes · verificado</small></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 revelar">
+                        <span class="sobretitulo">En tu bolsillo</span>
+                        <h2 class="titulo-grande">Lleva TAMPU <em>en tu celular</em></h2>
+                        <p class="texto-suave">Instálala como app desde el navegador y recibe los avisos de tus visitas y postulaciones. Si quieres, también te avisamos por correo cuando haya cuartos nuevos.</p>
+                        <form action="{{ route('boletin') }}" method="POST" class="form-boletin">
+                            @csrf
+                            <label for="correoBoletin" class="visually-hidden">Tu correo</label>
+                            <input type="email" id="correoBoletin" name="email" placeholder="tu correo electrónico" required maxlength="100">
+                            <button type="submit" class="btn">Avísame <i class="bi bi-arrow-right"></i></button>
+                        </form>
+                        @include('partials.errores')
+                        <div class="app-ventajas">
+                            <span><i class="bi bi-lightning-charge"></i> Abre al instante</span>
+                            <span><i class="bi bi-bell"></i> Avisos de visitas</span>
+                            <span><i class="bi bi-wifi-off"></i> Funciona con mala señal</span>
+                        </div>
+                        <button type="button" class="btn btn-borde mt-4 oculto" data-instalar><i class="bi bi-phone"></i> Instalar la app</button>
                     </div>
                 </div>
             </div>

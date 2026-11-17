@@ -188,25 +188,23 @@ if ("serviceWorker" in navigator) {
 
 // boton "Instalar la app" (Chrome en Android y computadora)
 let pedidoInstalar = null;
-const btnInstalar = document.getElementById("btnInstalar");
+const botonesInstalar = document.querySelectorAll("[data-instalar]");
 
 window.addEventListener("beforeinstallprompt", function (evento) {
     evento.preventDefault();
     pedidoInstalar = evento;
-    if (btnInstalar) {
-        btnInstalar.classList.remove("oculto");
-    }
+    botonesInstalar.forEach(b => b.classList.remove("oculto"));
 });
 
-if (btnInstalar) {
-    btnInstalar.addEventListener("click", function () {
+botonesInstalar.forEach(function (boton) {
+    boton.addEventListener("click", function () {
         if (pedidoInstalar) {
             pedidoInstalar.prompt();
             pedidoInstalar = null;
-            btnInstalar.classList.add("oculto");
+            botonesInstalar.forEach(b => b.classList.add("oculto"));
         }
     });
-}
+});
 
 // campana y mensajes en vivo: cada 10 segundos pregunta si hay algo nuevo
 const avisoNuevo = document.getElementById("avisoNuevo");
@@ -345,4 +343,89 @@ if (btnCompartir) {
             btnCompartir.innerHTML = '<i class="bi bi-check2"></i> Enlace copiado';
         }
     });
+}
+
+// titulo de la portada: cada palabra entra por separado
+document.querySelectorAll(".portada-texto h1").forEach(function (titulo) {
+    let n = 0;
+    function partir(nodo) {
+        Array.from(nodo.childNodes).forEach(function (hijo) {
+            if (hijo.nodeType === 3) {
+                const trozos = hijo.textContent.split(/(\s+)/);
+                const grupo = document.createDocumentFragment();
+                trozos.forEach(function (t) {
+                    if (!t.trim()) {
+                        grupo.appendChild(document.createTextNode(t));
+                        return;
+                    }
+                    const caja = document.createElement("span");
+                    caja.className = "palabra";
+                    const palabra = document.createElement("span");
+                    palabra.textContent = t;
+                    palabra.style.setProperty("--i", n++);
+                    caja.appendChild(palabra);
+                    grupo.appendChild(caja);
+                });
+                hijo.replaceWith(grupo);
+            } else if (hijo.nodeType === 1 && hijo.tagName !== "BR") {
+                partir(hijo);
+            }
+        });
+    }
+    partir(titulo);
+    titulo.classList.add("partido");
+});
+
+// barra de progreso arriba
+const progreso = document.getElementById("progreso");
+if (progreso) {
+    const medir = function () {
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        progreso.style.transform = "scaleX(" + (total > 0 ? window.scrollY / total : 0) + ")";
+    };
+    window.addEventListener("scroll", medir, { passive: true });
+    medir();
+}
+
+// tarjetas que se inclinan un poco con el mouse
+if (window.matchMedia("(hover: hover) and (pointer: fine)").matches && !sinMovimiento) {
+    document.querySelectorAll(".tarjeta, .tarjeta-uni, .pasos .paso, .tarjeta-trabajo, .barrio").forEach(function (el) {
+        el.addEventListener("pointermove", function (e) {
+            const r = el.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width - 0.5;
+            const y = (e.clientY - r.top) / r.height - 0.5;
+            el.style.transform = "perspective(900px) rotateX(" + (-y * 5) + "deg) rotateY(" + (x * 5) + "deg) translateY(-6px)";
+            el.style.setProperty("--luz-x", (x + 0.5) * 100 + "%");
+            el.style.setProperty("--luz-y", (y + 0.5) * 100 + "%");
+        });
+        el.addEventListener("pointerleave", function () {
+            el.style.transform = "";
+        });
+    });
+}
+
+// listado: ver en cuadricula o en lista (se recuerda en este navegador)
+const botonesVista = document.querySelectorAll("[data-vista]");
+if (botonesVista.length) {
+    const lista = document.querySelector(".tarjetas");
+    const poner = function (vista) {
+        lista.classList.toggle("vista-lista", vista === "lista");
+        botonesVista.forEach(b => b.classList.toggle("activo", b.dataset.vista === vista));
+        try { localStorage.setItem("tampu-vista", vista); } catch (e) {}
+    };
+    botonesVista.forEach(b => b.addEventListener("click", () => poner(b.dataset.vista)));
+    let guardada = "cuadricula";
+    try { guardada = localStorage.getItem("tampu-vista") || "cuadricula"; } catch (e) {}
+    poner(guardada);
+}
+
+// detalle: barra fija con el precio cuando la caja de reserva sale de la pantalla
+const barraReserva = document.getElementById("barraReserva");
+const cajaReserva = document.querySelector("[data-caja-reserva]");
+if (barraReserva && cajaReserva && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (entradas) {
+        const fuera = !entradas[0].isIntersecting && entradas[0].boundingClientRect.top < 0;
+        barraReserva.classList.toggle("visible", fuera);
+        document.body.classList.toggle("con-barra", fuera);
+    }).observe(cajaReserva);
 }

@@ -31,6 +31,7 @@ Route::get('/trabajos', [TrabajoController::class, 'index'])->name('trabajos.ind
 Route::get('/trabajos/{trabajo}', [TrabajoController::class, 'show'])->whereNumber('trabajo')->name('trabajos.show');
 Route::get('/contacto', [ContactoController::class, 'formulario'])->name('contacto');
 Route::post('/contacto', [ContactoController::class, 'enviar'])->middleware('throttle:5,1');
+Route::post('/boletin', [ContactoController::class, 'boletin'])->middleware('throttle:5,1')->name('boletin');
 Route::post('/asistente', [ChatbotController::class, 'responder'])->middleware('throttle:30,1')->name('asistente');
 
 // login, registro y recuperar contraseña
