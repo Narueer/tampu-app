@@ -20,8 +20,9 @@
     --radio-grande: 22px;
     --sombra: 0 1px 2px rgba(27, 42, 37, 0.04), 0 12px 32px -8px rgba(27, 42, 37, 0.12);
     --sombra-fuerte: 0 2px 6px rgba(27, 42, 37, 0.06), 0 30px 60px -18px rgba(27, 42, 37, 0.28);
-    --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
-    --sans: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+    /* titulos: Montserrat, texto: Inter (se leen bien en el celular) */
+    --serif: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    --sans: 'Inter', 'Segoe UI', Arial, sans-serif;
 
     --bs-body-font-family: var(--sans);
     --bs-body-color: var(--texto);
@@ -2442,4 +2443,29 @@ main.auth .formulario .btn[type=submit] {
     color: var(--texto-suave);
     font-size: 0.85rem;
     margin-bottom: 8px;
+}
+
+/* Z. Tipografia Montserrat + Inter */
+h1, h2, h3,
+.titulo-grande,
+.encabezado-seccion h2 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.portada-texto h1 {
+    font-weight: 700;
+    font-size: clamp(2.3rem, 5vw, 4.1rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+}
+
+.portada-texto h1 span {
+    font-weight: 600;
+}
+
+@media (min-width: 769px) and (max-height: 760px) {
+    .portada-texto h1 {
+        font-size: clamp(2.2rem, 4.6vh + 1rem, 3.6rem);
+    }
 }
