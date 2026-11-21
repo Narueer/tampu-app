@@ -64,7 +64,7 @@
                 </div>
 
                 <div class="barra-resultados">
-                    <p id="total">{{ $habitaciones->count() }} habitación(es) encontrada(s)</p>
+                    <p id="total">{{ $habitaciones->total() }} habitación(es) encontrada(s)</p>
                     <div class="cambiar-vista" role="group" aria-label="Forma de ver">
                         <button type="button" data-vista="cuadricula" aria-label="Ver en cuadrícula" title="Cuadrícula"><i class="bi bi-grid"></i></button>
                         <button type="button" data-vista="lista" aria-label="Ver en lista" title="Lista"><i class="bi bi-list-ul"></i></button>
@@ -80,6 +80,13 @@
                         <p class="vacio">No hay habitaciones con esos filtros. Prueba con otro distrito o un precio mayor.</p>
                     @endforelse
                 </div>
+                @if ($habitaciones->hasPages())
+                    <div class="paginas">
+                        @if ($habitaciones->previousPageUrl())<a class="btn btn-borde" href="{{ $habitaciones->previousPageUrl() }}">Anteriores</a>@endif
+                        <span>Página {{ $habitaciones->currentPage() }} de {{ $habitaciones->lastPage() }}</span>
+                        @if ($habitaciones->nextPageUrl())<a class="btn btn-borde" href="{{ $habitaciones->nextPageUrl() }}">Siguientes</a>@endif
+                    </div>
+                @endif
             </div>
         </div>
     </main>

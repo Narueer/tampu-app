@@ -6,6 +6,8 @@ use App\Models\Habitacion;
 use App\Models\Resena;
 use App\Models\Trabajo;
 use App\Models\Usuario;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class InicioController extends Controller
 {
@@ -29,35 +31,54 @@ class InicioController extends Controller
             ->whereHas('habitacion', fn ($q) => $q->publicadas())
             ->where('estrellas', '>=', 4)->latest()->take(6)->get();
 
-        $numeros = [
-            'habitaciones' => Habitacion::publicadas()->count(),
-            'trabajos' => Trabajo::publicadas()->count(),
-            'verificados' => Usuario::where('verificacion', 'verificado')->where('suspendido', false)->count(),
-            'distritos' => count(HabitacionController::DISTRITOS),
-            'promedio' => round((float) Resena::avg('estrellas'), 1),
-        ];
+        // los numeros y conteos de la portada cambian poco: se guardan 60 segundos en cache
+        // para no repetir las mismas consultas agrupadas en cada visita
+        ['numeros' => $numeros, 'porDistrito' => $porDistrito, 'mejores' => $mejores, 'porUniversidad' => $porUniversidad] =
+            Cache::remember('inicio.resumen', 60, function () {
+                $numeros = [
+                    'habitaciones' => Habitacion::publicadas()->count(),
+                    'trabajos' => Trabajo::publicadas()->count(),
+                    'verificados' => Usuario::where('verificacion', 'verificado')->where('suspendido', false)->count(),
+                    'distritos' => count(HabitacionController::DISTRITOS),
+                    'promedio' => round((float) Resena::avg('estrellas'), 1),
+                ];
 
-        // cuantas habitaciones hay por distrito y precio desde
-        $porDistrito = Habitacion::publicadas()->selectRaw('distrito, count(*) as total, min(precio) as desde')
-            ->groupBy('distrito')->get()->keyBy('distrito');
+                // cuantas habitaciones hay por distrito y precio desde
+                $porDistrito = Habitacion::publicadas()->selectRaw('distrito, count(*) as total, min(precio) as desde')
+                    ->groupBy('distrito')->get()->keyBy('distrito');
 
-        // barrios: un cuarto de cada distrito pone la foto
+                // barrios: el cuarto mejor calificado de cada distrito pone la foto.
+                // Antes era una consulta por distrito (6) que traia todos los cuartos;
+                // ahora es una sola consulta que trae solo un cuarto por distrito
+                $promedio = '(select coalesce(avg(estrellas), 0) from resenas where resenas.habitacion_id = habitaciones.id)';
+                $mejores = DB::query()->fromSub(
+                    Habitacion::publicadas()->select('id', 'distrito', 'foto')
+                        ->selectRaw("row_number() over (partition by distrito order by $promedio desc, id) as puesto"),
+                    'm'
+                )->where('puesto', 1)->get()->keyBy('distrito');
+
+                // cuartos cerca de cada universidad: un solo conteo agrupado en vez de uno por universidad
+                $porUniversidad = Habitacion::publicadas()->whereNotNull('cerca_de')
+                    ->selectRaw('cerca_de, count(*) as total')->groupBy('cerca_de')->pluck('total', 'cerca_de');
+
+                return compact('numeros', 'porDistrito', 'mejores', 'porUniversidad');
+            });
+
         $barrios = collect(HabitacionController::DISTRITOS)->filter(fn ($d) => isset($porDistrito[$d]))->map(fn ($d) => [
             'nombre' => $d,
             'total' => $porDistrito[$d]->total,
             'desde' => $porDistrito[$d]->desde,
             'texto' => self::BARRIOS[$d] ?? '',
-            'foto' => Habitacion::publicadas()->where('distrito', $d)->withAvg('resenas', 'estrellas')
-                ->get()->sortByDesc('resenas_avg_estrellas')->first()?->fotoUrl(),
+            'foto' => isset($mejores[$d]) ? (new Habitacion(['foto' => $mejores[$d]->foto]))->fotoUrl() : null,
         ])->values();
 
-        // cuartos cerca de cada universidad
         $universidades = collect(\App\Support\Lugares::UNIVERSIDADES)->map(fn ($u, $clave) => $u + [
             'clave' => $clave,
-            'total' => Habitacion::publicadas()->where('cerca_de', $clave)->count(),
+            'total' => (int) ($porUniversidad[$clave] ?? 0),
         ]);
 
-        $puntos = Habitacion::publicadas()->whereNotNull('lat')->get()->map(fn ($h) => [
+        // para el mapa solo hacen falta 5 columnas, no todas
+        $puntos = Habitacion::publicadas()->whereNotNull('lat')->get(['id', 'titulo', 'precio', 'lat', 'lng'])->map(fn ($h) => [
             'lat' => (float) $h->lat, 'lng' => (float) $h->lng, 'titulo' => $h->titulo,
             'precio' => (int) $h->precio, 'url' => route('habitaciones.show', $h),
         ])->merge(collect(\App\Support\Lugares::UNIVERSIDADES)->map(fn ($u) => [

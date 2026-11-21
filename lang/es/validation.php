@@ -22,6 +22,14 @@ return [
         'numeric' => 'El valor de :attribute no es válido.',
     ],
     'exists' => 'El :attribute seleccionado no existe.',
+    // reglas de Password::min(8)->letters()->numbers()
+    'password' => [
+        'letters' => 'La :attribute debe tener al menos una letra.',
+        'mixed' => 'La :attribute debe tener mayúsculas y minúsculas.',
+        'numbers' => 'La :attribute debe tener al menos un número.',
+        'symbols' => 'La :attribute debe tener al menos un símbolo.',
+        'uncompromised' => 'Esa :attribute apareció en una filtración de datos. Elige otra.',
+    ],
     'different' => 'El :attribute debe ser distinto.',
     'required_without' => 'El campo :attribute es obligatorio.',
     'min' => [
