@@ -2988,3 +2988,16 @@ input[type="file"]:hover::file-selector-button {
 .asistente .burbuja.bot {
     white-space: pre-line;
 }
+
+/* AD. Fotos del equipo */
+.avatar-equipo { width: 96px; height: 96px; }
+.avatar-equipo.foto {
+    display: block;
+    margin: 0 auto 14px;
+    object-fit: cover;
+    border: 4px solid white;
+    outline: 2px solid var(--terracota);
+    background: var(--crema, #f6f1ea);
+    box-shadow: 0 10px 22px rgba(180, 83, 42, 0.25);
+}
+.tarjeta-equipo:hover .avatar-equipo.foto { outline-color: var(--dorado, #c8963e); }

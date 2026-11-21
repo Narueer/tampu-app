@@ -63,11 +63,15 @@
                 <h2>Nuestro equipo</h2>
             </div>
             <div class="row g-4">
-                @foreach (['Wernher Alvares Rodriguez', 'César Augusto Juro Huillca', 'David Achahuanco Bayona', 'Olenka Valeria Aedo Vargas'] as $nombre)
+                @foreach (['wernher' => 'Wernher Alvares Rodriguez', 'cesar' => 'César Augusto Juro Huillca', 'david' => 'David Achahuanco Bayona', 'olenka' => 'Olenka Valeria Aedo Vargas'] as $foto => $nombre)
                     @php($partes = explode(' ', $nombre))
                     <div class="col-6 col-lg-3 revelar">
                         <div class="tarjeta-equipo">
-                            <span class="avatar-equipo">{{ mb_substr($partes[0], 0, 1) }}{{ mb_substr($partes[count($partes) - 2], 0, 1) }}</span>
+                            @if (file_exists(public_path("img/equipo/{$foto}.webp")))
+                                <img class="avatar-equipo foto" src="{{ asset("img/equipo/{$foto}.webp") }}" alt="Foto de {{ $nombre }}" loading="lazy" width="96" height="96">
+                            @else
+                                <span class="avatar-equipo">{{ mb_substr($partes[0], 0, 1) }}{{ mb_substr($partes[count($partes) - 2], 0, 1) }}</span>
+                            @endif
                             <h3>{{ $nombre }}</h3>
                             <p>Integrante del equipo</p>
                         </div>
