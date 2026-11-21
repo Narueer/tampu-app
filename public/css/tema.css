@@ -2351,19 +2351,6 @@ main.auth .formulario .btn[type=submit] {
     }
 }
 
-/* boton del asistente: mas chico y pegado a la esquina para no tapar botones */
-.btn-asistente {
-    width: 50px !important;
-    height: 50px !important;
-    right: 16px !important;
-    bottom: 16px !important;
-    font-size: 1.2rem;
-}
-
-.btn-asistente:hover {
-    transform: translateY(-2px) scale(1.05);
-}
-
 /* tablas de los paneles: filas mas aireadas y faciles de seguir */
 .tabla td {
     padding: 14px 12px;
@@ -2455,9 +2442,10 @@ h1, h2, h3,
 
 .portada-texto h1 {
     font-weight: 700;
-    font-size: clamp(2.3rem, 5vw, 4.1rem);
+    font-size: clamp(2.2rem, 4.3vw, 3.9rem);
     line-height: 1.08;
     letter-spacing: -0.03em;
+    max-width: 940px;
 }
 
 .portada-texto h1 span {
@@ -2467,5 +2455,512 @@ h1, h2, h3,
 @media (min-width: 769px) and (max-height: 760px) {
     .portada-texto h1 {
         font-size: clamp(2.2rem, 4.6vh + 1rem, 3.6rem);
+    }
+}
+
+/* AA. Asistente Tampu (con la mascota) */
+.btn-asistente {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 62px;
+    height: 62px;
+    padding: 0;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background: var(--crema, #f6eee2) !important;
+    box-shadow: 0 14px 30px -10px rgba(14, 30, 26, 0.55), 0 0 0 1px rgba(176, 80, 42, 0.15) !important;
+    overflow: visible;
+    cursor: pointer;
+    z-index: 1060;
+    transition: transform 0.25s cubic-bezier(0.2, 0.75, 0.2, 1), box-shadow 0.25s;
+}
+
+.btn-asistente img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.btn-asistente:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 18px 34px -10px rgba(14, 30, 26, 0.6), 0 0 0 4px rgba(176, 80, 42, 0.18) !important;
+}
+
+.btn-asistente.activo {
+    transform: scale(0.94);
+}
+
+.asistente-punto {
+    position: absolute;
+    right: 1px;
+    bottom: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #2fb36d;
+    border: 2.5px solid #fff;
+}
+
+.asistente-punto::after {
+    content: "";
+    position: absolute;
+    inset: -2.5px;
+    border-radius: 50%;
+    border: 2px solid #2fb36d;
+    animation: latido 2.4s ease-out infinite;
+}
+
+@keyframes latido {
+    0% { transform: scale(1); opacity: 0.7; }
+    80%, 100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* saludo que aparece una vez */
+.asistente-aviso {
+    position: fixed;
+    right: 20px;
+    bottom: 94px;
+    max-width: 250px;
+    padding: 12px 34px 12px 16px;
+    background: #fff;
+    color: var(--tinta);
+    font-size: 0.88rem;
+    line-height: 1.4;
+    border-radius: 16px 16px 4px 16px;
+    box-shadow: 0 16px 36px -14px rgba(14, 30, 26, 0.45);
+    border: 1px solid var(--borde);
+    cursor: pointer;
+    z-index: 1001;
+    animation: aparecer 0.35s cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.asistente-aviso.oculto {
+    display: none;
+}
+
+.asistente-aviso-cerrar {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    border: none;
+    background: none;
+    color: var(--texto-suave);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* ventana */
+.asistente {
+    right: 20px;
+    bottom: 96px;
+    width: 380px;
+    height: min(600px, calc(100vh - 130px));
+    border-radius: 24px;
+    border: 1px solid rgba(233, 223, 210, 0.9);
+    background: var(--papel, #fffdf9);
+    box-shadow: 0 30px 60px -20px rgba(14, 30, 26, 0.45), 0 0 0 1px rgba(14, 30, 26, 0.04);
+    transform-origin: bottom right;
+    z-index: 1060;
+}
+
+.asistente:not(.oculto) {
+    animation: abrirAsistente 0.32s cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+@keyframes abrirAsistente {
+    from { opacity: 0; transform: translateY(14px) scale(0.96); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes aparecer {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+}
+
+.asistente-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 14px 14px 16px;
+    background: linear-gradient(120deg, #10251f, var(--verde-andino) 70%, #2c4a3e);
+    color: #fff;
+    position: relative;
+}
+
+.asistente-cabecera::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--terracota) 0 18px, var(--ocre, #d39a3c) 18px 24px, #2c4a3e 24px 42px, var(--ocre, #d39a3c) 42px 48px);
+    opacity: 0.9;
+}
+
+.asistente-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    flex: none;
+}
+
+.asistente-titulo {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    flex: 1;
+}
+
+.asistente-titulo strong {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.asistente-titulo small {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.en-linea {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3fd48a;
+    box-shadow: 0 0 0 3px rgba(63, 212, 138, 0.25);
+}
+
+.asistente-cerrar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff;
+    font-size: 0.9rem !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.asistente-cerrar:hover {
+    background: rgba(255, 255, 255, 0.24) !important;
+}
+
+.asistente-mensajes {
+    padding: 18px 16px 12px;
+    gap: 10px;
+    background:
+        radial-gradient(circle at 100% 0, rgba(211, 154, 60, 0.08), transparent 45%),
+        var(--fondo, #f7f1e8);
+    scroll-behavior: smooth;
+}
+
+.asistente-bienvenida {
+    text-align: center;
+    padding: 4px 10px 8px;
+}
+
+.asistente-bienvenida img {
+    width: 104px;
+    height: auto;
+    filter: drop-shadow(0 10px 16px rgba(14, 30, 26, 0.18));
+}
+
+.asistente-bienvenida p {
+    margin: 8px auto 0;
+    max-width: 260px;
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+}
+
+.fila-bot {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    animation: aparecer 0.25s ease-out;
+}
+
+.mini-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    flex: none;
+    border: 1.5px solid #fff;
+    box-shadow: 0 2px 6px rgba(14, 30, 26, 0.15);
+}
+
+.asistente .burbuja {
+    max-width: 82%;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    border: none;
+    animation: aparecer 0.25s ease-out;
+}
+
+.asistente .burbuja.bot {
+    background: #fff;
+    color: var(--tinta);
+    border-radius: 18px 18px 18px 6px;
+    box-shadow: 0 4px 14px -8px rgba(14, 30, 26, 0.3);
+}
+
+.asistente .burbuja.usuario {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--terracota), #c8673a);
+    color: #fff;
+    border-radius: 18px 18px 6px 18px;
+    box-shadow: 0 6px 16px -10px rgba(176, 80, 42, 0.9);
+}
+
+.burbuja-enlaces {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.asistente .burbuja.bot .burbuja-enlaces a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--fondo, #f7f1e8);
+    color: var(--terracota);
+    font-weight: 600;
+    font-size: 0.84rem;
+    text-decoration: none;
+}
+
+.asistente .burbuja.bot .burbuja-enlaces a::after {
+    content: "\2192";
+}
+
+.asistente .burbuja.bot .burbuja-enlaces a:hover {
+    background: var(--terracota);
+    color: #fff;
+}
+
+/* tres puntos mientras responde */
+.burbuja.escribiendo {
+    display: inline-flex;
+    gap: 4px;
+    padding: 14px 16px;
+}
+
+.burbuja.escribiendo span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--terracota);
+    opacity: 0.35;
+    animation: puntos 1.2s infinite ease-in-out;
+}
+
+.burbuja.escribiendo span:nth-child(2) { animation-delay: 0.15s; }
+.burbuja.escribiendo span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes puntos {
+    0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-4px); }
+}
+
+.asistente .sugerencias {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+    padding-left: 36px;
+}
+
+.asistente .sugerencias button {
+    width: auto;
+}
+
+.asistente .sugerencias button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--borde);
+    background: #fff;
+    color: var(--tinta);
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.asistente .sugerencias button i {
+    color: var(--terracota);
+}
+
+.asistente .sugerencias button:hover {
+    background: var(--terracota);
+    border-color: var(--terracota);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.asistente .sugerencias button:hover i {
+    color: #fff;
+}
+
+.asistente-form {
+    align-items: center;
+    gap: 8px;
+    padding: 12px 12px 6px;
+    border-top: 1px solid var(--borde);
+    background: var(--papel, #fffdf9);
+}
+
+.asistente-form input {
+    flex: 1;
+    height: 46px;
+    padding: 0 18px !important;
+    border: 1px solid var(--borde) !important;
+    border-radius: 999px !important;
+    background: #fff;
+    font-size: 0.9rem;
+    box-shadow: none !important;
+}
+
+.asistente-form input:focus {
+    border-color: var(--terracota) !important;
+    box-shadow: 0 0 0 3px rgba(176, 80, 42, 0.15) !important;
+    outline: none;
+}
+
+.asistente-form button {
+    width: 46px;
+    height: 46px;
+    flex: none;
+    padding: 0 !important;
+    border-radius: 50%;
+    background: var(--terracota) !important;
+    color: #fff !important;
+    font-size: 1rem !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 18px -10px rgba(176, 80, 42, 0.9);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.asistente-form button:hover {
+    transform: scale(1.06);
+    background: #9a4422 !important;
+}
+
+.asistente-pie {
+    margin: 0;
+    padding: 0 12px 10px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--texto-suave);
+    background: var(--papel, #fffdf9);
+}
+
+@media (max-width: 768px) {
+    .asistente {
+        left: 10px;
+        right: 10px;
+        width: auto;
+        bottom: 86px;
+        height: calc(100vh - 110px);
+        height: calc(100dvh - 110px);
+        border-radius: 22px;
+    }
+
+    .asistente-aviso {
+        right: 14px;
+        bottom: 90px;
+        max-width: 220px;
+    }
+}
+
+/* AB. Detalles finales */
+
+/* seleccion de texto y foco visible con los colores de TAMPU */
+::selection {
+    background: rgba(176, 80, 42, 0.18);
+    color: inherit;
+}
+
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(176, 80, 42, 0.45);
+    outline-offset: 2px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* campos para subir fotos o documentos con el estilo de la pagina */
+input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1.5px dashed var(--borde);
+    border-radius: 14px;
+    background: var(--papel, #fffdf9);
+    color: var(--texto-suave);
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+input[type="file"]:hover {
+    border-color: var(--terracota);
+    background: #fff;
+}
+
+input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 999px;
+    background: var(--tinta);
+    color: #fff;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+input[type="file"]:hover::file-selector-button {
+    background: var(--terracota);
+}
+
+/* en el celular el boton "Ver todos" baja y el titulo usa todo el ancho */
+@media (max-width: 768px) {
+    .encabezado-seccion.con-flechas {
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 14px;
+    }
+
+    .encabezado-seccion.con-flechas > div:first-child {
+        flex: 1 1 100%;
     }
 }

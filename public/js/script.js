@@ -104,29 +104,92 @@ if (btnAsistente && asistente) {
     const lista = document.getElementById("asistenteMensajes");
     const formAsistente = document.getElementById("asistenteForm");
     const inputAsistente = document.getElementById("asistenteTexto");
+    const aviso = document.getElementById("asistenteAviso");
+    const avatar = asistente.dataset.avatar;
     const token = document.querySelector('meta[name="csrf-token"]').content;
 
+    function abrir(abierto) {
+        asistente.classList.toggle("oculto", !abierto);
+        btnAsistente.classList.toggle("activo", abierto);
+        btnAsistente.setAttribute("aria-expanded", abierto ? "true" : "false");
+        if (aviso) aviso.classList.add("oculto");
+        if (abierto) inputAsistente.focus();
+    }
+
     btnAsistente.addEventListener("click", function () {
-        asistente.classList.toggle("oculto");
-        inputAsistente.focus();
+        abrir(asistente.classList.contains("oculto"));
     });
 
     document.getElementById("cerrarAsistente").addEventListener("click", function () {
-        asistente.classList.add("oculto");
+        abrir(false);
     });
 
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !asistente.classList.contains("oculto")) abrir(false);
+    });
+
+    // saludo corto una sola vez por visita
+    if (aviso) {
+        let visto = false;
+        try { visto = sessionStorage.getItem("tampuAviso") === "1"; } catch (e) {}
+        if (!visto) {
+            const mostrar = function () {
+                if (asistente.classList.contains("oculto")) aviso.classList.remove("oculto");
+                try { sessionStorage.setItem("tampuAviso", "1"); } catch (e) {}
+            };
+            if (document.body.classList.contains("pagina-inicio")) {
+                // en la portada sale recien al bajar, para no tapar el buscador
+                const alBajar = function () {
+                    if (window.scrollY > 600) {
+                        window.removeEventListener("scroll", alBajar);
+                        setTimeout(mostrar, 800);
+                    }
+                };
+                window.addEventListener("scroll", alBajar, { passive: true });
+            } else {
+                setTimeout(mostrar, 4000);
+            }
+        }
+        aviso.querySelector(".asistente-aviso-cerrar").addEventListener("click", function () {
+            aviso.classList.add("oculto");
+        });
+        aviso.addEventListener("click", function (e) {
+            if (!e.target.closest(".asistente-aviso-cerrar")) abrir(true);
+        });
+    }
+
+    function bajar() {
+        lista.scrollTop = lista.scrollHeight;
+    }
+
+    // mensaje del usuario o del bot; el del bot lleva la carita de Tampu
     function burbuja(texto, clase) {
         const div = document.createElement("div");
         div.className = "burbuja " + clase;
         div.textContent = texto;
-        lista.appendChild(div);
-        lista.scrollTop = lista.scrollHeight;
+        if (clase === "bot") {
+            const fila = document.createElement("div");
+            fila.className = "fila-bot";
+            const img = document.createElement("img");
+            img.src = avatar;
+            img.alt = "";
+            img.className = "mini-avatar";
+            fila.appendChild(img);
+            fila.appendChild(div);
+            lista.appendChild(fila);
+        } else {
+            lista.appendChild(div);
+        }
+        bajar();
         return div;
     }
 
     function preguntar(texto) {
         burbuja(texto, "usuario");
-        const espera = burbuja("Escribiendo...", "bot");
+        const espera = burbuja("", "bot");
+        espera.classList.add("escribiendo");
+        espera.innerHTML = "<span></span><span></span><span></span>";
+        espera.setAttribute("aria-label", "Escribiendo");
 
         fetch(asistente.dataset.url, {
             method: "POST",
@@ -135,14 +198,21 @@ if (btnAsistente && asistente) {
         })
             .then(r => r.json())
             .then(datos => {
+                espera.classList.remove("escribiendo");
+                espera.removeAttribute("aria-label");
                 espera.textContent = datos.texto;
 
-                datos.enlaces.forEach(function (e) {
-                    const a = document.createElement("a");
-                    a.href = e.url;
-                    a.textContent = e.texto;
-                    espera.appendChild(a);
-                });
+                if (datos.enlaces.length) {
+                    const enlaces = document.createElement("div");
+                    enlaces.className = "burbuja-enlaces";
+                    datos.enlaces.forEach(function (e) {
+                        const a = document.createElement("a");
+                        a.href = e.url;
+                        a.textContent = e.texto;
+                        enlaces.appendChild(a);
+                    });
+                    espera.appendChild(enlaces);
+                }
 
                 if (datos.sugerencias.length) {
                     const cont = document.createElement("div");
@@ -155,9 +225,10 @@ if (btnAsistente && asistente) {
                     });
                     lista.appendChild(cont);
                 }
-                lista.scrollTop = lista.scrollHeight;
+                bajar();
             })
             .catch(() => {
+                espera.classList.remove("escribiendo");
                 espera.textContent = "Ups, no pude responder. Intenta otra vez.";
             });
     }
@@ -173,8 +244,9 @@ if (btnAsistente && asistente) {
 
     // botones de sugerencia
     lista.addEventListener("click", function (evento) {
-        if (evento.target.matches(".sugerencias button")) {
-            preguntar(evento.target.textContent);
+        const boton = evento.target.closest(".sugerencias button");
+        if (boton) {
+            preguntar(boton.textContent.trim());
         }
     });
 }
