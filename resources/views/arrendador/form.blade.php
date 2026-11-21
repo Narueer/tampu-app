@@ -36,7 +36,7 @@
                 <div>
                     <label for="tipo">Tipo</label>
                     <select id="tipo" name="tipo" required>
-                        @foreach (['individual' => 'Individual', 'compartida' => 'Compartida', 'minidepartamento' => 'Minidepartamento'] as $valor => $texto)
+                        @foreach (\App\Models\Habitacion::TIPOS as $valor => $texto)
                             <option value="{{ $valor }}" @selected(old('tipo', $habitacion->tipo) === $valor)>{{ $texto }}</option>
                         @endforeach
                     </select>

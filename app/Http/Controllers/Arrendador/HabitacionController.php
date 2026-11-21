@@ -111,7 +111,7 @@ class HabitacionController extends Controller
             'lat' => 'nullable|numeric|between:-14,-13',
             'lng' => 'nullable|numeric|between:-72.5,-71.5',
             'precio' => 'required|numeric|min:50|max:5000',
-            'tipo' => 'required|in:individual,compartida,minidepartamento',
+            'tipo' => 'required|in:' . implode(',', array_keys(Habitacion::TIPOS)),
             'servicios' => 'nullable|array',
             'estado' => 'required|in:disponible,ocupada',
             'foto' => ($editando ? 'nullable' : 'required') . '|image|mimes:jpg,jpeg,png,webp|max:2048',

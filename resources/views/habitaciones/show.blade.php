@@ -32,6 +32,7 @@
                         · <span class="estrellas">@include('partials.estrellas', ['n' => $habitacion->promedio()])</span>
                         <a href="#resenas">{{ $habitacion->promedio() }} ({{ $habitacion->resenas->count() }} reseña{{ $habitacion->resenas->count() > 1 ? 's' : '' }})</a>
                     @endif
+                    · <i class="bi bi-clock-history"></i> Publicado {{ $habitacion->created_at->locale('es')->diffForHumans() }}
                 </p>
             </div>
             <button type="button" class="btn btn-borde btn-chico" id="btnCompartir" data-url="{{ url()->current() }}" data-titulo="{{ $habitacion->titulo }}">
@@ -55,7 +56,7 @@
             <div class="principal">
                 <!-- datos rapidos -->
                 <div class="datos-rapidos">
-                    <div><i class="bi bi-door-open"></i><span>Tipo</span><b>{{ ucfirst($habitacion->tipo) }}</b></div>
+                    <div><i class="bi bi-door-open"></i><span>Tipo</span><b>{{ $habitacion->tipoTexto() }}</b></div>
                     @if ($habitacion->metros)
                         <div><i class="bi bi-arrows-angle-expand"></i><span>Tamaño</span><b>{{ $habitacion->metros }} m²</b></div>
                     @endif

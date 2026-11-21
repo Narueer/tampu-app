@@ -6,4 +6,5 @@
     <p class="texto-suave">{{ $t->empresa }} · <i class="bi bi-geo-alt"></i> {{ $t->distrito }}</p>
     <p class="tarjeta-trabajo-horario"><i class="bi bi-clock"></i> {{ $t->horarioTexto() }}</p>
     <p class="precio">S/ {{ number_format($t->pago, 0) }} <small>por {{ $t->pago_por === 'dia' ? 'día' : $t->pago_por }}</small></p>
+    @if ($t->created_at)<p class="publicado"><i class="bi bi-clock-history"></i> {{ $t->created_at->locale('es')->diffForHumans() }}</p>@endif
 </a>

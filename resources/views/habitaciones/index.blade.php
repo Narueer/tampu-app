@@ -30,9 +30,9 @@
                 <label for="tipo">Tipo</label>
                 <select id="tipo" name="tipo">
                     <option value="">Todos</option>
-                    <option value="individual" @selected(request('tipo') === 'individual')>Individual</option>
-                    <option value="compartida" @selected(request('tipo') === 'compartida')>Compartida</option>
-                    <option value="minidepartamento" @selected(request('tipo') === 'minidepartamento')>Minidepartamento</option>
+                    @foreach (\App\Models\Habitacion::TIPOS as $valor => $texto)
+                        <option value="{{ $valor }}" @selected(request('tipo') === $valor)>{{ $texto }}</option>
+                    @endforeach
                 </select>
 
                 <label for="cerca">Cerca de</label>

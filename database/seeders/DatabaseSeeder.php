@@ -181,6 +181,7 @@ class DatabaseSeeder extends Seeder
 
         // mas habitaciones con galeria, mas trabajos y ubicaciones revisadas
         $this->call(AmpliarDatosSeeder::class);
+        $this->call(MasDatosSeeder::class);
     }
 
     private function visita($habitacion, $estudiante, $dias, $mensaje)

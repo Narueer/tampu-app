@@ -2964,3 +2964,27 @@ input[type="file"]:hover::file-selector-button {
         flex: 1 1 100%;
     }
 }
+
+/* AC. Fecha de publicacion y etiqueta "Nuevo" */
+.publicado {
+    margin: 6px 0 10px;
+    font-size: 0.78rem;
+    color: var(--texto-suave);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tarjeta-trabajo .publicado {
+    margin: 6px 0 0;
+}
+
+.etiqueta.etiqueta-nuevo {
+    background: var(--terracota) !important;
+    color: #fff !important;
+    border-color: var(--terracota) !important;
+}
+
+.asistente .burbuja.bot {
+    white-space: pre-line;
+}

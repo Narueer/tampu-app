@@ -3,10 +3,12 @@
     <div class="trabajo-info">
         <span class="etiqueta verificado">✔ Verificado</span> <span class="etiqueta">{{ ucfirst($t->modalidad) }}</span>
         @if ($t->vacantes > 1)<span class="etiqueta etiqueta-vacantes">{{ $t->vacantes }} vacantes</span>@endif
+        @if ($t->created_at && $t->created_at->gt(now()->subDays(2)))<span class="etiqueta etiqueta-nuevo">Nuevo</span>@endif
         <h3><a href="{{ route('trabajos.show', $t) }}">{{ $t->titulo }}</a></h3>
         <p>{{ $t->empresa }} · <i class="bi bi-geo-alt"></i> {{ $t->direccion ? $t->direccion . ', ' : '' }}{{ $t->distrito }}</p>
         <p class="texto-suave">{{ $t->descripcion }}</p>
         <p><i class="bi bi-clock"></i> {{ $t->horarioTexto() }}</p>
+        @if ($t->created_at)<p class="publicado"><i class="bi bi-clock-history"></i> Publicado {{ $t->created_at->locale('es')->diffForHumans() }}</p>@endif
         <a href="{{ route('trabajos.show', $t) }}" class="ver-mas">Ver detalle y requisitos <i class="bi bi-arrow-right"></i></a>
     </div>
     <div class="trabajo-pago">

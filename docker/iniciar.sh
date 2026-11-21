@@ -19,5 +19,7 @@ php artisan migrate --force
 php artisan db:seed --force
 # datos extra (galerias, mas cuartos y trabajos); si ya estan, no hace nada
 php artisan db:seed --class=AmpliarDatosSeeder --force || echo "No se pudieron cargar los datos extra; la app sigue funcionando"
+# 100 viviendas y 60 trabajos mas; si ya estan, no hace nada
+php artisan db:seed --class=MasDatosSeeder --force || echo "No se pudieron cargar las 100 viviendas; la app sigue funcionando"
 
 exec apache2-foreground

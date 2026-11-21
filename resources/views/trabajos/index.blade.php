@@ -48,7 +48,7 @@
             @endforeach
         </div>
 
-        <p id="total">{{ $trabajos->count() }} oferta(s){{ $compatible ? ' que no chocan con tus clases' : '' }}</p>
+        <p id="total">{{ $trabajos->total() }} oferta(s){{ $compatible ? ' que no chocan con tus clases' : '' }}</p>
 
         @if ($puntos->isNotEmpty())
             <div id="mapa" class="mapa mapa-trabajos" data-puntos='@json($puntos)'></div>
@@ -59,6 +59,7 @@
         @empty
             <p class="vacio">No hay ofertas con esos filtros.</p>
         @endforelse
+        @include('partials.paginacion', ['p' => $trabajos])
     </main>
 @endsection
 

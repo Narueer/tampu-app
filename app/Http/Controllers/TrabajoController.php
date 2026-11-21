@@ -40,7 +40,10 @@ class TrabajoController extends Controller
             });
         }
 
-        $trabajos = $consulta->latest()->latest('id')->get();
+        // el mapa muestra todas las ofertas filtradas, la lista va de 15 en 15
+        $paraMapa = (clone $consulta)->setEagerLoads([])
+            ->get(['trabajos.id', 'titulo', 'empresa', 'pago', 'pago_por', 'lat', 'lng']);
+        $trabajos = $consulta->latest()->latest('id')->paginate(15)->withQueryString();
 
         $postulados = [];
         if ($usuario && $usuario->rol === 'estudiante') {
@@ -48,7 +51,7 @@ class TrabajoController extends Controller
         }
 
         // puntos para el mapa de ofertas
-        $puntos = $trabajos->whereNotNull('lat')->map(fn ($t) => [
+        $puntos = $paraMapa->whereNotNull('lat')->map(fn ($t) => [
             'lat' => (float) $t->lat, 'lng' => (float) $t->lng, 'titulo' => $t->titulo, 'empresa' => $t->empresa,
             'pago' => $t->pagoTexto(), 'tipo' => 'trabajo', 'url' => route('trabajos.show', $t),
         ])->values();

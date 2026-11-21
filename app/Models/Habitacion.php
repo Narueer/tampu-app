@@ -9,6 +9,15 @@ class Habitacion extends Model
 {
     protected $table = 'habitaciones';
 
+    // tipos de vivienda: valor que se guarda => texto que se muestra
+    const TIPOS = [
+        'individual' => 'Cuarto individual',
+        'compartida' => 'Cuarto compartido',
+        'minidepartamento' => 'Minidepartamento',
+        'roomies' => 'Depa con roomies',
+        'residencia' => 'Casa de estudiantes',
+    ];
+
     protected $fillable = [
         'titulo', 'descripcion', 'distrito', 'direccion', 'cerca_de',
         'lat', 'lng', 'precio', 'tipo', 'servicios', 'foto', 'estado',
@@ -82,5 +91,10 @@ class Habitacion extends Model
     {
         return $query->where('estado', 'disponible')
             ->whereHas('arrendador', fn ($q) => $q->where('verificacion', 'verificado')->where('suspendido', false));
+    }
+
+    public function tipoTexto(): string
+    {
+        return self::TIPOS[$this->tipo] ?? ucfirst($this->tipo);
     }
 }

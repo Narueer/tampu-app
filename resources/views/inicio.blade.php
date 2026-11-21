@@ -100,9 +100,9 @@
                 <label for="bTipo"><i class="bi bi-door-open"></i> Tipo</label>
                 <select id="bTipo" name="tipo">
                     <option value="">Todos</option>
-                    <option value="individual">Individual</option>
-                    <option value="compartida">Compartida</option>
-                    <option value="minidepartamento">Minidepartamento</option>
+                    @foreach (\App\Models\Habitacion::TIPOS as $valor => $texto)
+                        <option value="{{ $valor }}">{{ $texto }}</option>
+                    @endforeach
                 </select>
             </div>
             <button type="submit" class="btn btn-grande"><i class="bi bi-search"></i> Buscar</button>

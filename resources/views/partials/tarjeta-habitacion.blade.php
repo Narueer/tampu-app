@@ -17,7 +17,8 @@
     </div>
     <div class="info">
         <span class="etiqueta verificado">✔ Verificado</span>
-        <span class="etiqueta">{{ ucfirst($h->tipo) }}</span>
+        <span class="etiqueta">{{ $h->tipoTexto() }}</span>
+        @if ($h->created_at && $h->created_at->gt(now()->subDays(2)))<span class="etiqueta etiqueta-nuevo">Nuevo</span>@endif
         <h3>{{ $h->titulo }}</h3>
         <p><i class="bi bi-geo-alt"></i> {{ $h->distrito }}@if ($h->cerca_de) - cerca de {{ $h->cerca_de }}@endif</p>
         @if ($h->metros || $h->bano)
@@ -30,6 +31,7 @@
         @if ($h->resenas_avg_estrellas)
             <p class="estrellas">@include('partials.estrellas', ['n' => $h->resenas_avg_estrellas]) <small>{{ number_format($h->resenas_avg_estrellas, 1) }}</small></p>
         @endif
+        @if ($h->created_at)<p class="publicado"><i class="bi bi-clock-history"></i> Publicado {{ $h->created_at->locale('es')->diffForHumans() }}</p>@endif
         <a href="{{ route('habitaciones.show', $h) }}" class="btn btn-borde">Ver detalle</a>
     </div>
 </div>

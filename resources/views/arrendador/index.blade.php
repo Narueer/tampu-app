@@ -41,7 +41,7 @@
                     @foreach ($habitaciones as $h)
                         <tr>
                             <td><img src="{{ $h->fotoUrl() }}" alt="" class="mini"></td>
-                            <td><b>{{ $h->titulo }}</b><br><span class="texto-suave">{{ $h->distrito }} · {{ ucfirst($h->tipo) }}</span>
+                            <td><b>{{ $h->titulo }}</b><br><span class="texto-suave">{{ $h->distrito }} · {{ $h->tipoTexto() }}</span>
                                 @if ($h->resenas_avg_estrellas)
                                     <br><span class="estrellas">@include('partials.estrellas', ['n' => $h->resenas_avg_estrellas])</span>
                                 @endif

@@ -28,7 +28,9 @@
         </div>
         <div class="sugerencias">
             <button type="button"><i class="bi bi-house-door"></i>Cuartos en Wanchaq hasta 400</button>
-            <button type="button"><i class="bi bi-briefcase"></i>Trabajos compatibles</button>
+            <button type="button"><i class="bi bi-people"></i>Busco roomies</button>
+            <button type="button"><i class="bi bi-briefcase"></i>Trabajo los fines de semana</button>
+            <button type="button"><i class="bi bi-cash-coin"></i>Precios por distrito</button>
             <button type="button"><i class="bi bi-shield-check"></i>¿Cómo evito estafas?</button>
             <button type="button"><i class="bi bi-headset"></i>Hablar con un asesor</button>
         </div>
