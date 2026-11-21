@@ -26,3 +26,6 @@ Thumbs.db
 !/public/uploads/habitaciones/.gitkeep
 /public/uploads/perfiles/*
 !/public/uploads/perfiles/.gitkeep
+
+# archivos que guarda la app de Claude
+/Claude outputs/
