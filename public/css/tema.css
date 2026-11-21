@@ -2331,3 +2331,115 @@ main.auth .formulario .btn[type=submit] {
     flex: none;
     white-space: nowrap;
 }
+
+/* Y. Ajustes de diseño (entrega final) */
+
+/* la portada sigue casi a pantalla completa, pero deja ver el buscador entero
+   sin tener que bajar (antes quedaba cortado en laptops de pantalla baja) */
+@media (min-width: 769px) {
+    .pagina-inicio .portada-carrusel .carousel-item {
+        height: calc(100vh - 72px);
+        height: calc(100svh - 72px);
+        min-height: 520px;
+    }
+}
+
+@media (min-width: 769px) and (max-height: 760px) {
+    .portada-texto h1 {
+        font-size: clamp(2.4rem, 5.2vh + 1rem, 4rem);
+    }
+}
+
+/* boton del asistente: mas chico y pegado a la esquina para no tapar botones */
+.btn-asistente {
+    width: 50px !important;
+    height: 50px !important;
+    right: 16px !important;
+    bottom: 16px !important;
+    font-size: 1.2rem;
+}
+
+.btn-asistente:hover {
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* tablas de los paneles: filas mas aireadas y faciles de seguir */
+.tabla td {
+    padding: 14px 12px;
+    line-height: 1.35;
+}
+
+.tabla tr:nth-child(even) td {
+    background-color: #fdfaf5;
+}
+
+.tabla .estado {
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+}
+
+/* acciones que quitan acceso se distinguen en rojo suave */
+.btn-borde.btn-alerta {
+    color: var(--error, #c0392b);
+    border-color: rgba(192, 57, 43, 0.35);
+}
+
+.btn-borde.btn-alerta:hover {
+    background-color: var(--error, #c0392b);
+    border-color: var(--error, #c0392b);
+    color: #fff;
+}
+
+/* paginacion con numeros */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 36px 0 12px;
+}
+
+.paginacion a,
+.paginacion span {
+    min-width: 42px;
+    height: 42px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 999px;
+    border: 1px solid var(--borde);
+    background-color: var(--papel);
+    color: var(--tinta);
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.paginacion a:hover {
+    border-color: var(--terracota);
+    color: var(--terracota);
+    transform: translateY(-1px);
+}
+
+.paginacion .actual {
+    background-color: var(--terracota);
+    border-color: var(--terracota);
+    color: #fff;
+    box-shadow: 0 8px 18px -10px rgba(176, 80, 42, 0.9);
+}
+
+.paginacion .apagado {
+    opacity: 0.4;
+}
+
+.paginacion-total {
+    text-align: center;
+    color: var(--texto-suave);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}

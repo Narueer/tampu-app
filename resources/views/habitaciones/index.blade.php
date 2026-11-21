@@ -80,13 +80,7 @@
                         <p class="vacio">No hay habitaciones con esos filtros. Prueba con otro distrito o un precio mayor.</p>
                     @endforelse
                 </div>
-                @if ($habitaciones->hasPages())
-                    <div class="paginas">
-                        @if ($habitaciones->previousPageUrl())<a class="btn btn-borde" href="{{ $habitaciones->previousPageUrl() }}">Anteriores</a>@endif
-                        <span>Página {{ $habitaciones->currentPage() }} de {{ $habitaciones->lastPage() }}</span>
-                        @if ($habitaciones->nextPageUrl())<a class="btn btn-borde" href="{{ $habitaciones->nextPageUrl() }}">Siguientes</a>@endif
-                    </div>
-                @endif
+                @include('partials.paginacion', ['p' => $habitaciones])
             </div>
         </div>
     </main>

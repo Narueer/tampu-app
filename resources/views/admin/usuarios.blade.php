@@ -50,7 +50,7 @@
                                     <span class="estado est-mal">Suspendida</span>
                                     <button class="btn btn-borde btn-chico">Reactivar</button>
                                 @else
-                                    <button class="btn btn-borde btn-chico">Suspender</button>
+                                    <button class="btn btn-borde btn-chico btn-alerta">Suspender</button>
                                 @endif
                             </form>
                         </td>

@@ -61,13 +61,7 @@
                 </table>
             </div>
 
-            @if ($eventos->hasPages())
-                <div class="paginas">
-                    @if ($eventos->previousPageUrl())<a class="btn btn-borde" href="{{ $eventos->previousPageUrl() }}">Anteriores</a>@endif
-                    <span>Página {{ $eventos->currentPage() }} de {{ $eventos->lastPage() }}</span>
-                    @if ($eventos->nextPageUrl())<a class="btn btn-borde" href="{{ $eventos->nextPageUrl() }}">Siguientes</a>@endif
-                </div>
-            @endif
+            @include('partials.paginacion', ['p' => $eventos])
         @endif
     </main>
 @endsection
