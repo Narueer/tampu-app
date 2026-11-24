@@ -61,6 +61,33 @@ class ChatbotController extends Controller
         'gimnasio' => ['gimnasio', 'fitness'], 'marketing' => ['marketing', 'redes'], 'redes sociales' => ['redes', 'community'],
     ];
 
+    // palabras cortas que solo cuentan como palabra completa ("bus" no debe coincidir con "busco")
+    const ENTERAS = ['bus', 'chat', 'app', 'menu', 'carro', 'clave', 'mesa', 'cafe', 'guia', 'caja', 'venta', 'tour', 'perro', 'gato',
+        'uac', 'ruc', 'sello', 'depa', 'civil', 'combi', 'clima', 'frio', 'rumi', 'oferta', 'mozo', 'hotel', 'hostal', 'ingles', 'redes',
+        'ia', 'gpt', 'ok', 'si', 'no', 'ya', 'hi', 'ola', 'lima', 'ica', 'ate', 'usa', 'pareja', 'novia', 'novio', 'hora', 'casero'];
+
+    // lugares donde TAMPU no funciona (para responder "cuartos en Lima" con amabilidad)
+    const LUGARES = [
+        'Lima' => ['lima', 'miraflores', 'san isidro', 'surco', 'barranco', 'los olivos', 'la molina', 'san juan de lurigancho', 'sjl', 'callao',
+            'jesus maria', 'lince', 'pueblo libre', 'chorrillos', 'villa el salvador', 'san borja', 'rimac', 'comas'],
+        'Arequipa' => ['arequipa'], 'Puno' => ['puno'], 'Juliaca' => ['juliaca'], 'Tacna' => ['tacna'], 'Trujillo' => ['trujillo'],
+        'Chiclayo' => ['chiclayo'], 'Piura' => ['piura'], 'Ica' => ['ica'], 'Huancayo' => ['huancayo'], 'Ayacucho' => ['ayacucho'],
+        'Abancay' => ['abancay'], 'Andahuaylas' => ['andahuaylas'], 'Puerto Maldonado' => ['puerto maldonado', 'madre de dios'],
+        'Iquitos' => ['iquitos'], 'Cajamarca' => ['cajamarca'], 'Huaraz' => ['huaraz'], 'Tarapoto' => ['tarapoto'], 'Pucallpa' => ['pucallpa'],
+        'Chimbote' => ['chimbote'], 'Moquegua' => ['moquegua'], 'Huánuco' => ['huanuco'], 'Tumbes' => ['tumbes'],
+        'Sicuani' => ['sicuani'], 'Quillabamba' => ['quillabamba'], 'Espinar' => ['espinar'], 'Urubamba' => ['urubamba'], 'Calca' => ['calca'],
+        'Pisac' => ['pisac'], 'Ollantaytambo' => ['ollantaytambo'], 'Chumbivilcas' => ['chumbivilcas'],
+    ];
+    const PAISES = ['venezuela', 'venezolan', 'colombia', 'colombian', 'bolivia', 'bolivian', 'chile', 'chilen', 'argentin', 'ecuador',
+        'ecuatorian', 'brasil', 'mexic', 'espana', 'estados unidos', 'extranjer', 'carnet de extranjeria', 'pasaporte', 'no tengo dni'];
+
+    const CHISTES = [
+        'En Cusco hay dos estaciones: "hace frío" y "hace más frío" 🥶. Por eso siempre pregunta si el cuarto tiene agua caliente.',
+        'Mi antiguo casero me dijo que el cuarto tenía vista al mar… era un póster en la pared 🌊. En TAMPU las fotos son reales.',
+        '—¿Cuánto cuesta el cuarto? —S/ 300. —¿Y si lo comparto? —S/ 300 cada uno 😅. Por eso conviene comparar precios aquí.',
+        '¿Por qué el estudiante llevó una escalera a la universidad? Porque le dijeron que iba a estudiar en el nivel superior 🎓.',
+    ];
+
     // dudas frecuentes: [palabras, respuesta, enlaces opcionales]
     const PREGUNTAS = [
         'estafa' => [['estafa', 'enganar', 'confiar', 'fraude', 'me robaron', 'es seguro', 'adelanto'],
@@ -77,13 +104,14 @@ class ChatbotController extends Controller
         'publicar' => [['publicar', 'anunciar', 'tengo un cuarto', 'alquilo', 'ofrezco trabajo', 'tengo un negocio'],
             'Para publicar, crea una cuenta de arrendador (cuartos) o de empleador (trabajos) y sube tu DNI o RUC. Cuando el administrador te verifique, podrás publicar gratis desde tu panel.',
             [['texto' => 'Registrarme para publicar', 'ruta' => 'registro']]],
-        'precio_tampu' => [['cuesta usar', 'es gratis', 'cobran', 'comision', 'pagar por usar'],
+        'precio_tampu' => [['cuesta usar', 'es gratis', 'cobran', 'comision', 'pagar por usar', 'cuesta tampu', 'cuesta la pagina', 'cuesta la app', 'cuesta registrarme', 'cuesta publicar'],
             'Usar TAMPU es gratis para estudiantes, arrendadores y empresas. No cobramos comisión. Si alguien te pide pagar "por TAMPU", repórtalo.'],
         'contrasena' => [['contrasena', 'olvide', 'clave', 'password'],
             'En "Iniciar sesión" toca "¿Olvidaste tu contraseña?" y te enviamos un enlace a tu correo para crear una nueva.'],
         'dos_pasos' => [['dos pasos', '2 pasos', 'autenticador', 'google authenticator', 'codigo de seguridad'],
             'En "Mi perfil" → "Seguridad de la cuenta" puedes activar la verificación en dos pasos con Google o Microsoft Authenticator. Así, aunque alguien sepa tu contraseña, no podrá entrar.'],
-        'pedir_visita' => [['solicitar visita', 'pedir visita', 'agendar', 'como visito', 'quiero visitar'],
+        'pedir_visita' => [['solicitar visita', 'pedir visita', 'agendar', 'como visito', 'quiero visitar', 'pido una visita', 'pedir una visita',
+            'solicito una visita', 'solicitar una visita', 'visitar el cuarto', 'ir a ver el cuarto', 'como veo el cuarto'],
             'Abre la habitación, elige la fecha y toca "Solicitar visita". Cuando el arrendador acepta, ves su celular y puedes descargar una constancia en PDF.'],
         'postular' => [['postul', 'aplicar a', 'enviar cv'],
             'En Trabajos toca "Postular" en la oferta que te guste y escribe un mensaje corto. La empresa acepta o rechaza y te llega una notificación; si te aceptan, el turno aparece en tu calendario.'],
@@ -109,13 +137,33 @@ class ChatbotController extends Controller
             'En Cusco el pasaje en bus o combi cuesta alrededor de S/ 1 a S/ 1.50. Por la Av. de la Cultura pasan muchas líneas hacia la UNSAAC, la U. Andina (Larapa) y San Jerónimo; para la U. Continental (Angostura) hay buses por la Vía Expresa. En el detalle de cada cuarto ves cuánto demoras a cada universidad.'],
         'costo_vida' => [['costo de vida', 'cuanto gasto', 'menu', 'presupuesto', 'cuanto necesito'],
             'Como referencia: un menú cuesta entre S/ 8 y S/ 12, el pasaje alrededor de S/ 1, y un cuarto individual entre S/ 250 y S/ 450 al mes. Muchos estudiantes gastan entre S/ 700 y S/ 1 100 al mes en total.'],
+        'mascotas' => [['mascota', 'perro', 'perrito', 'gato', 'gatito'],
+            'Depende de cada arrendador: algunos aceptan mascotas pequeñas y otros no. Antes de pedir la visita, escríbele desde "Enviar mensaje" en la habitación y pregúntale; así no pierdes el viaje.'],
+        'parejas' => [['pareja', 'con mi enamorad', 'con mi novi', 'con mi esposa', 'con mi esposo', 'con mi hijo', 'con mi hija', 'con mi familia'],
+            'Algunos arrendadores aceptan parejas o familias, sobre todo en minidepartamentos. Busca "minidepa" y confirma por mensaje con el dueño antes de visitar.',
+            [['texto' => 'Ver habitaciones', 'ruta' => 'habitaciones.index']]],
+        'borrar_cuenta' => [['borrar mi cuenta', 'borro mi cuenta', 'elimino mi cuenta', 'borrar la cuenta', 'eliminar mi cuenta', 'darme de baja', 'cerrar mi cuenta', 'borrar cuenta', 'eliminar cuenta', 'borrar mis datos'],
+            'Por ahora no hay un botón para borrar la cuenta. Escríbenos desde Contacto pidiéndolo y el equipo la desactiva; tus publicaciones dejarán de mostrarse.',
+            [['texto' => 'Ir a Contacto', 'ruta' => 'contacto']]],
+        'universidades' => [['que universidades', 'universidades hay', 'universidades de cusco', 'cuales universidades', 'que institutos'],
+            'Puedo buscar cuartos cerca de la UNSAAC (Av. de la Cultura), la U. Andina (Larapa, San Jerónimo), la U. Continental (Angostura, Saylla) y el IST Túpac Amaru. Escribe por ejemplo "cuarto cerca de la Andina".'],
     ];
 
     public function responder(Request $request)
     {
         $request->validate(['mensaje' => 'required|string|max:200']);
         $original = trim($request->mensaje);
-        $texto = ' ' . $this->normalizar($original) . ' ';
+        $texto = ' ' . $this->corregir($this->normalizar($original)) . ' ';
+
+        // 0. mensajes muy cortos o sin sentido: emojis, risas, "ok", teclazos
+        if ($r = $this->charlaCorta($request, $texto)) {
+            return $r;
+        }
+        // "hola buenas tardes, busco cuarto" -> se responde al saludo solo si no pide nada más
+        $sinSaludo = preg_replace('/^\s*((buenas tardes|buenas noches|buenos dias|buen dia|hola|holi|ola|buenas|hey|hi|hello|alo|saludos|que tal|que hay|amigo|amiga|tampu|bot)[\s,!.¡]*)+/', ' ', $texto);
+        if (trim($sinSaludo) !== '' && trim($sinSaludo) !== trim($texto)) {
+            $texto = ' ' . trim($sinSaludo) . ' ';
+        }
 
         // 1. pedir una persona
         if ($this->tiene($texto, ['asesor', 'hablar con alguien', 'hablar con una persona', 'persona real', 'humano', 'soporte', 'atencion al cliente'])) {
@@ -123,24 +171,25 @@ class ChatbotController extends Controller
         }
 
         // 2. conversacion corta
-        if (preg_match('/^\s*(hola|holi|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal)\W*$/', $texto)) {
+        if (preg_match('/^\s*((buenas tardes|buenas noches|buenos dias|buen dia|hola|holi|ola|buenas|hey|hi|hello|alo|saludos|que tal|que hay|tampu|bot)[\s,!.¡]*)+$/', $texto)) {
             $nombre = $request->user() ? ' ' . explode(' ', $request->user()->nombre)[0] : '';
 
             return $this->respuesta("¡Hola$nombre! Soy Tampu 👋 Puedo buscarte cuartos (por distrito, precio, tipo o universidad), trabajos que encajen con tus clases y resolver dudas sobre vivir en Cusco.", [], self::SUGERENCIAS);
         }
-        if ($this->tiene($texto, [' gracias', 'chau', 'adios', 'hasta luego', 'listo eso es todo'])) {
-            return $this->respuesta('¡De nada! Que te vaya muy bien en tus estudios. Si necesitas algo más, aquí estaré.');
+        if (preg_match('/^\s*(hola\W*)?(como estas|como te va|todo bien|que tal estas)\W*$/', $texto)) {
+            return $this->respuesta('¡Muy bien, gracias por preguntar! 😊 Listo para ayudarte. ¿Buscas cuarto, trabajo o tienes alguna duda sobre Cusco?', [], self::SUGERENCIAS);
         }
-        if ($this->tiene($texto, ['quien eres', 'que eres', 'eres un bot', 'eres humano', 'como te llamas'])) {
-            return $this->respuesta('Soy Tampu, el asistente virtual de TAMPU. Respondo al instante con la información de la página; si necesitas a una persona, escribe "hablar con un asesor".', [], self::SUGERENCIAS);
-        }
-        if ($this->tiene($texto, ['que puedes hacer', 'como funcionas', 'que haces']) || trim($texto) === 'ayuda') {
-            return $this->respuesta('Puedo: buscar cuartos ("minidepa en Wanchaq hasta 600"), buscar roomies o casas de estudiantes, mostrarte trabajos ("trabajo de mozo los fines de semana"), decirte precios promedio por distrito y darte consejos para no caer en estafas.',
-                [], ['Precios promedio por distrito', 'Busco roomies', 'Trabajo por horas los sábados', 'Qué revisar en la visita']);
+        if ($this->tiene($texto, ['gracias', 'chau', 'adios', 'hasta luego', 'nos vemos', 'listo eso es todo', 'eso es todo'])) {
+            return $this->respuesta('¡De nada! Que te vaya muy bien en tus estudios. Si necesitas algo más, aquí estaré. 👋');
         }
 
-        // 3. que pide: datos que se reconocen en el mensaje
+        // 3. temas especiales: qué es la página, otras ciudades, insultos, preguntas fuera de tema…
         $datos = $this->extraer($texto);
+        $pideTrabajo = $this->tiene($texto, ['trabajo', 'empleo', 'chamba', 'cachuelo', 'practica', 'chambear', 'trabajar', 'medio tiempo', 'por horas', 'oferta']);
+        $pideCuarto = $this->tiene($texto, ['cuarto', 'habitacion', 'alquil', 'vivir', 'vivienda', 'hospedaje', 'donde quedarme', 'roomie', 'rumi', 'minidepa', 'mini depa', 'depa', 'departamento', 'residencia', 'pension', 'casa de estudiantes', 'casa estudiantil']);
+        if ($r = $this->temaEspecial($request, $texto, $datos, $pideCuarto, $pideTrabajo)) {
+            return $r;
+        }
         $quiereCuarto = $this->tiene($texto, ['cuarto', 'habitacion', 'alquil', 'vivir', 'vivienda', 'hospedaje', 'donde quedarme', 'roomie', 'rumi', 'minidepa', 'depa', 'residencia', 'pension', 'casa de estudiantes'])
             || isset($datos['tipo']) || isset($datos['servicios']);
         $quiereTrabajo = $this->tiene($texto, ['trabajo', 'empleo', 'chamba', 'cachuelo', 'practica', 'chambear', 'trabajar', 'medio tiempo', 'por horas', 'oferta'])
@@ -148,8 +197,14 @@ class ChatbotController extends Controller
 
         // 4. precios promedio y cantidades
         if ($this->tiene($texto, ['promedio', 'cuanto cuesta', 'cuanto cuestan', 'precio normal', 'cuanto se paga', 'precios por distrito', 'precio de ', 'precios de', 'cuanto sale'])
-            && ! $quiereTrabajo) {
+            && ! $quiereTrabajo && ! $this->tiene($texto, ['tampu', 'usar la', 'la pagina', 'la app', 'registrarme', 'publicar', 'pasaje'])) {
             return $this->precios($datos);
+        }
+
+        // solo cambia el orden de la búsqueda anterior: "los mejor calificados", "los más recientes"
+        $previa = $request->session()->get('asistente.ultima');
+        if (isset($datos['orden']) && $previa && $previa['busqueda'] === 'cuartos' && ! $quiereTrabajo) {
+            return $this->buscarHabitaciones($request, array_merge($previa['datos'], $datos, ['pagina' => 0]));
         }
 
         // 5. dudas frecuentes (si pregunta "como...", "que...", etc. va primero la duda)
@@ -166,7 +221,8 @@ class ChatbotController extends Controller
 
         // 6. busquedas; si solo agrega un detalle ("solo con baño propio") se suma a la busqueda anterior
         $ultima = $request->session()->get('asistente.ultima');
-        $nombraCuarto = $this->tiene($texto, ['cuarto', 'habitacion', 'alquil', 'vivienda', 'hospedaje', 'roomie', 'rumi', 'depa', 'residencia', 'pension', 'casa de estudiantes']);
+        $nombraCuarto = $this->tiene($texto, ['cuarto', 'habitacion', 'alquil', 'vivienda', 'hospedaje', 'roomie', 'rumi', 'depa', 'minidepa', 'mini depa',
+            'departamento', 'minidepartamento', 'residencia', 'pension', 'casa de estudiantes', 'casa estudiantil']);
         $nombraTrabajo = $this->tiene($texto, ['trabajo', 'empleo', 'chamba', 'cachuelo', 'practica', 'oferta']);
         if ($this->tiene($texto, ['cualquier distrito', 'otro distrito', 'todos los distritos']) && $ultima) {
             $previos = $ultima['datos'];
@@ -185,11 +241,12 @@ class ChatbotController extends Controller
                 $datos['servicios'] = array_values(array_unique(array_merge($base['servicios'], $datos['servicios'])));
             }
 
-            return $this->buscarHabitaciones($request, array_merge($base, $datos));
+            return $this->buscarHabitaciones($request, array_merge($base, $datos, ['pagina' => 0]));
         }
 
         // 7. seguimiento de la ultima busqueda: "¿y en Santiago?", "más baratos", "cerca de la UNSAAC"
-        $esSeguimiento = $datos || $this->tiene($texto, ['mas barato', 'mas baratos', 'mas economico', 'otro', 'otros', 'mas opciones', ' y ']);
+        $masDeLoMismo = $this->tiene($texto, ['mas opciones', 'ver mas', 'otras opciones', 'otros', 'otras', 'siguientes', 'mas resultados', 'muestrame mas', 'hay mas', 'algo mas']);
+        $esSeguimiento = $datos || $masDeLoMismo || $this->tiene($texto, ['mas barato', 'mas baratos', 'mas economico', 'otro', ' y ']);
         if ($ultima && $esSeguimiento) {
             if ($ultima['busqueda'] === 'trabajos') {
                 return $this->buscarTrabajos($request, $texto, array_merge($ultima['datos'], $datos));
@@ -197,6 +254,8 @@ class ChatbotController extends Controller
             if ($this->tiene($texto, ['mas barato', 'mas baratos', 'mas economico']) && isset($ultima['datos']['precio'])) {
                 $datos['precio'] = max(150, $ultima['datos']['precio'] - 80);
             }
+            // "más opciones" pasa a la siguiente página; un filtro nuevo vuelve a la primera
+            $datos['pagina'] = $masDeLoMismo && ! array_diff_key($datos, ['orden' => 1]) ? ($ultima['datos']['pagina'] ?? 0) + 1 : 0;
 
             return $this->buscarHabitaciones($request, array_merge($ultima['datos'], $datos));
         }
@@ -205,8 +264,7 @@ class ChatbotController extends Controller
             return $this->respuestaFaq($faq);
         }
 
-        return $this->respuesta('No te entendí del todo 🤔. Puedes escribirme cosas como "cuarto con baño propio cerca de la Andina", "busco roomies en Wanchaq", "trabajo de mozo los sábados" o "¿cuánto cuesta un cuarto en Santiago?".',
-            [], self::SUGERENCIAS);
+        return $this->noEntendi($request, $texto);
     }
 
     // ---------------------------------------------------------------- lectura del mensaje
@@ -242,10 +300,21 @@ class ChatbotController extends Controller
         if (preg_match('/entre\s*s?\/?\s*(\d{2,4})\s*y\s*s?\/?\s*(\d{2,4})/', $texto, $m)) {
             $datos['precio_min'] = (int) $m[1];
             $datos['precio'] = (int) $m[2];
-        } elseif (preg_match('/(\d{3,4})/', $texto, $m) && (int) $m[1] >= 100 && (int) $m[1] <= 3000) {
+        } elseif (preg_match('/(?<![\d.,])(\d{3,4})(?![\d.,])/', $texto, $m) && (int) $m[1] >= 100 && (int) $m[1] <= 3000) {
             $datos['precio'] = (int) $m[1];
+        } elseif (preg_match('/(?:s\/\.?\s*|hasta )(\d{1,2})(?!\d)|(?<!\d)(\d{1,2})\s*(?:soles|sol|lucas|luquitas)/', $texto, $m)) {
+            $datos['precio'] = (int) ($m[1] !== '' ? $m[1] : $m[2]);
         } elseif ($this->tiene($texto, ['barato', 'economico', 'poco dinero', 'no tengo mucha plata', 'accesible'])) {
             $datos['precio'] = 300;
+        }
+
+        // orden de los resultados
+        if ($this->tiene($texto, ['mejor calificad', 'mejor puntuad', 'mejores resenas', 'mas estrellas', 'mejor valorad', 'los mejores', 'las mejores', 'mejor opinion'])) {
+            $datos['orden'] = 'estrellas';
+        } elseif ($this->tiene($texto, ['mas nuevos', 'mas nuevas', 'mas recientes', 'recien publicad', 'ultimos publicad', 'ultimas publicad', 'publicados hoy', 'lo ultimo', 'lo nuevo'])) {
+            $datos['orden'] = 'nuevos';
+        } elseif ($this->tiene($texto, ['mas barato', 'mas baratos', 'mas economico', 'el mas barato'])) {
+            $datos['orden'] = 'precio';
         }
 
         // trabajo: modalidad, turnos y rubro
@@ -271,7 +340,7 @@ class ChatbotController extends Controller
             $datos['dias'] = ['domingo'];
         }
         foreach (self::RUBROS as $clave => $buscar) {
-            if (str_contains($texto, $clave)) {
+            if ($this->coincide($texto, $clave)) {
                 $datos['rubro'] = $buscar;
                 $datos['rubro_texto'] = trim($clave);
                 break;
@@ -320,9 +389,23 @@ class ChatbotController extends Controller
             $partes[] = 'con ' . mb_strtolower($s);
         }
 
+        $orden = $datos['orden'] ?? 'precio';
+        if ($orden === 'estrellas') {
+            $consulta->whereHas('resenas');
+        }
         $total = (clone $consulta)->count();
-        $lista = $consulta->orderBy('precio')->take(4)->get();
+        $pagina = max(0, (int) ($datos['pagina'] ?? 0));
+        if ($pagina * 4 >= $total) {
+            $pagina = 0;   // se acabaron: vuelve a empezar
+        }
+        $consulta = match ($orden) {
+            'estrellas' => $consulta->orderByDesc('resenas_avg_estrellas')->orderBy('precio'),
+            'nuevos' => $consulta->orderByDesc('created_at'),
+            default => $consulta->orderBy('precio'),
+        };
+        $lista = $consulta->skip($pagina * 4)->take(4)->get();
         $resumen = $partes ? ' (' . implode(', ', $partes) . ')' : '';
+        $titulo = ['estrellas' => 'las mejor calificadas', 'nuevos' => 'las publicadas más recientemente'][$orden] ?? 'las más económicas';
 
         if ($lista->isEmpty()) {
             $sug = [];
@@ -350,7 +433,9 @@ class ChatbotController extends Controller
         $consejo = isset($datos['tipo']) && $datos['tipo'] === 'roomies'
             ? ' Tip: antes de mudarte, conversa con tus futuros roomies sobre horarios, visitas y limpieza.'
             : '';
-        $intro = $total === 1 ? "Encontré 1 opción$resumen:" : "Encontré $total opciones$resumen.$consejo Estas son las más económicas:";
+        $intro = $total === 1 ? "Encontré 1 opción$resumen:"
+            : ($pagina > 0 ? 'Aquí van otras ' . $lista->count() . " de las $total opciones$resumen:"
+                : "Encontré $total opciones$resumen.$consejo Estas son $titulo:");
         if ($total === 1) {
             $intro .= $consejo;
         }
@@ -370,9 +455,15 @@ class ChatbotController extends Controller
         if (! isset($datos['tipo'])) {
             $sug[] = 'Busco roomies';
         }
+        if ($total > ($pagina + 1) * 4) {
+            array_unshift($sug, 'Más opciones');
+        }
+        if ($orden !== 'estrellas' && $total > 4) {
+            $sug[] = 'Los mejor calificados';
+        }
         $sug[] = 'Qué revisar en la visita';
 
-        return $this->respuesta($intro, $enlaces, array_slice($sug, 0, 3));
+        return $this->respuesta($intro, $enlaces, array_slice($sug, 0, 4));
     }
 
     private function precios(array $datos)
@@ -477,6 +568,414 @@ class ChatbotController extends Controller
         return $this->respuesta($intro, $enlaces, ['Trabajo los fines de semana', 'Prácticas', 'Trabajo de profesor']);
     }
 
+    // ---------------------------------------------------------------- usuarios "difíciles"
+
+    // texto que se antepone a la siguiente respuesta (ej. "¡Bienvenido desde Puno!")
+    private string $prefijo = '';
+    private bool $esFallo = false;
+
+    private function charlaCorta(Request $request, string $texto)
+    {
+        $limpio = trim(preg_replace('/[^a-z0-9 ]+/', ' ', $texto));
+        $limpio = preg_replace('/\s+/', ' ', $limpio);
+
+        // vacío, solo signos o solo emojis
+        if ($limpio === '') {
+            return $this->respuesta('¿Hola? 👀 Escríbeme qué necesitas: un cuarto, un trabajo o alguna duda sobre vivir en Cusco.', [], self::SUGERENCIAS);
+        }
+        // risas
+        if (preg_match('/^((ja|je|ji|jo|ha|he|xd|lol|lmao|jsjs|js)\s*)+$/', $limpio)) {
+            return $this->respuesta('😄 ¡Qué bueno verte de buen humor! ¿Te ayudo a buscar un cuarto, un trabajo o resolver alguna duda?', [], self::SUGERENCIAS);
+        }
+        // afirmaciones sueltas
+        if (preg_match('/^(ok|okey|okay|si|sip|ya|dale|listo|bueno|vale|perfecto|claro|genial|chevere|bacan|entendido|de acuerdo|aja)( gracias)?$/', $limpio)) {
+            $ultima = $request->session()->get('asistente.ultima');
+            $sug = $ultima ? ['Más opciones', '¿Y más baratos?', 'Buscar trabajo', 'Hablar con un asesor'] : self::SUGERENCIAS;
+
+            return $this->respuesta('¡Perfecto! 👍 ¿Qué más necesitas?', [], $sug);
+        }
+        // negaciones sueltas
+        if (preg_match('/^(no|nop|nada|no gracias|ninguno|ninguna|nel)$/', $limpio)) {
+            return $this->respuesta('Está bien 🙂. Si luego necesitas algo, aquí estaré.');
+        }
+        // teclazos: "asdfgh", "jkjkjk", palabras sin vocales
+        $palabras = explode(' ', $limpio);
+        $raras = array_filter($palabras, fn ($p) => strlen($p) >= 4 && (! preg_match('/[aeiou]/', $p)
+            || preg_match('/(asd|sdf|dsa|qwe|zxc|hjk|dfg|fgh|wer|ert|rty|uio|jkj|ghg|bla(bla)+|lalala|ñañaña)/', $p)
+            || preg_match('/[bcdfghjklmnpqrstvwxz]{5,}/', $p)));
+        if ($raras && count($raras) >= max(1, count($palabras) / 2)) {
+            return $this->respuesta('Creo que se escribió algo por accidente 😅. Cuéntame con tus palabras qué buscas, por ejemplo "cuarto barato en Santiago".', [], self::SUGERENCIAS);
+        }
+
+        return null;
+    }
+
+    private function temaEspecial(Request $request, string $texto, array &$datos, bool $pideCuarto, bool $pideTrabajo)
+    {
+        $hayBusqueda = $pideCuarto || $pideTrabajo;
+
+        // crisis: siempre primero
+        if ($this->tiene($texto, ['suicid', 'matarme', 'quitarme la vida', 'no quiero vivir', 'hacerme dano', 'me quiero morir', 'quiero morirme', 'quisiera morir'])
+            && ! preg_match('/morir(me)? de (frio|hambre|risa|sueno|calor|verguenza|aburrimiento)/', $texto)) {
+            return $this->respuesta("Lamento mucho que te sientas así 💛. No estás solo/a y lo que sientes importa.\nPor favor habla ahora con alguien: en Perú puedes llamar gratis a la Línea 113, opción 5 (salud mental), a cualquier hora. Si estás en peligro inmediato, llama al 106 (SAMU).\nTambién puedes acercarte al área de bienestar de tu universidad o contarle a alguien de confianza.");
+        }
+
+        // insultos: responder con calma
+        if ($this->tiene($texto, ['tonto', 'tonta', 'idiota', 'estupid', 'inutil', 'basura', 'mierda', 'ctm', 'csm', 'conchatuma', 'huevon', 'cojudo',
+            'imbecil', 'maldito', 'carajo', 'puta', 'puto', 'pendejo', 'no sirves', 'bot malo', 'no entiendes nada', 'burro', 'pesimo'])) {
+            return $this->respuesta('Uy, parece que no te estoy ayudando bien 😅. Perdón. Probemos otra vez: dime qué buscas (un cuarto, un trabajo o una duda) o escribe "asesor" para hablar con una persona del equipo.',
+                [], ['Buscar cuarto', 'Buscar trabajo', 'Hablar con un asesor']);
+        }
+
+        // identidad: "eres chatgpt", "eres una ia", "eres humano"
+        if ($this->tiene($texto, ['chatgpt', 'gpt', 'inteligencia artificial', 'eres una ia', 'eres ia', 'eres un robot', 'eres robot', 'eres real',
+            'eres humano', 'eres una persona', 'quien eres', 'que eres', 'eres un bot', 'como te llamas', 'tu nombre'])) {
+            return $this->respuesta('Soy Tampu 🤖, el asistente virtual de TAMPU. No soy ChatGPT ni una persona: el equipo me programó para entender preguntas sobre cuartos, trabajos y vida estudiantil en Cusco, y respondo con la información real de la página. Si necesitas a una persona, escribe "asesor".',
+                [], self::SUGERENCIAS);
+        }
+
+        // datos personales del usuario: "¿me aceptaron la visita?", "¿tengo mensajes?"
+        if ($r = $this->misDatos($request, $texto)) {
+            return $r;
+        }
+        // recién llegado o pedido muy vago: "acabo de llegar", "ayúdame"
+        if (! $hayBusqueda && $this->tiene($texto, ['acabo de llegar', 'recien llegue', 'recien llego', 'soy nuevo', 'soy nueva', 'no se que hacer', 'no se por donde',
+            'por donde empiezo', 'que me recomiendas', 'ayudame', 'necesito ayuda', 'busco algo', 'quiero algo', 'primera vez en cusco', 'no conozco cusco', 'no conozco la ciudad'])) {
+            return $this->respuesta("¡Bienvenido/a a Cusco! 🏔️ Te recomiendo ir en este orden:\n1) Busca cuarto cerca de tu universidad y compara precios.\n2) Pide la visita y conoce el cuarto antes de pagar (nunca des adelantos a ciegas).\n3) Regístrate, marca tu horario de clases y busca un trabajo que no se cruce.\nLos primeros días toma con calma la altura. ¿Empezamos por el cuarto?",
+                [], ['Cuarto cerca de la UNSAAC', 'Cuarto cerca de la Andina', 'Cuarto cerca de la Continental', '¿Qué distrito me conviene?']);
+        }
+        // comparar distritos o pedir recomendación de zona
+        if ($r = $this->compararDistritos($texto, $datos)) {
+            return $r;
+        }
+
+        // qué es la página
+        if ($this->tiene($texto, ['que es esta pagina', 'que es esta web', 'que es este sitio', 'que es esto', 'que es tampu', 'para que sirve', 'de que trata',
+            'de que se trata', 'que hace esta pagina', 'que hace la pagina', 'que hacen', 'que ofrecen', 'como funciona la pagina', 'como funciona tampu',
+            'como funciona esto', 'explicame', 'no entiendo la pagina', 'que significa tampu', 'por que se llama', 'en que me ayuda', 'como me ayuda'])) {
+            return $this->respuesta("TAMPU es una página web gratuita para estudiantes que llegan a Cusco desde provincia. Te ayuda con dos cosas:\n🏠 Encontrar cuarto: habitaciones, minidepas, roomies y casas de estudiantes de arrendadores con DNI verificado. Ves fotos, precio, reseñas y a cuántos minutos queda tu universidad, y pides la visita antes de pagar.\n💼 Encontrar trabajo: ofertas de empresas con RUC verificado que no chocan con tu horario de clases.\nEl nombre viene del quechua: un tampu era un lugar de descanso en el camino.",
+                [['texto' => 'Ver cuartos', 'url' => route('habitaciones.index')], ['texto' => 'Ver trabajos', 'url' => route('trabajos.index')], ['texto' => 'Crear mi cuenta', 'url' => route('registro')]],
+                ['¿Qué puedes hacer?', '¿Es gratis?', '¿Cómo evito estafas?']);
+        }
+        if ($this->tiene($texto, ['que puedes hacer', 'como funcionas', 'que haces', 'en que me puedes ayudar', 'que sabes hacer']) || trim($texto) === 'ayuda') {
+            return $this->respuesta('Puedo: buscar cuartos ("minidepa en Wanchaq hasta 600"), buscar roomies o casas de estudiantes, mostrarte trabajos ("trabajo de mozo los fines de semana"), decirte precios promedio por distrito y darte consejos para no caer en estafas.',
+                [], ['Precios promedio por distrito', 'Busco roomies', 'Trabajo por horas los sábados', 'Qué revisar en la visita']);
+        }
+
+        // quiénes hicieron la página
+        if ($this->tiene($texto, ['quienes son', 'quien creo', 'quien hizo', 'quienes hicieron', 'quienes crearon', 'creador', 'desarrollador', 'quien te creo',
+            'quien te hizo', 'quien te programo', 'son una empresa', 'de que universidad son'])) {
+            return $this->respuesta('TAMPU es el proyecto final del curso Programación Web de la Universidad Continental (Cusco, 2026). Lo hicieron Wernher Alvares, César Juro, David Achahuanco y Olenka Aedo, después de entrevistar a estudiantes que llegaron de provincia.',
+                [['texto' => 'Conocer al equipo', 'url' => route('nosotros')]], self::SUGERENCIAS);
+        }
+
+        // contacto con el equipo
+        if ($this->tiene($texto, ['telefono de', 'su telefono', 'tu telefono', 'numero de ustedes', 'su numero', 'su correo', 'correo de ustedes', 'whatsapp',
+            'contactarlos', 'contactar con ustedes', 'comunicarme con ustedes', 'contacto', 'escribirles'])) {
+            return $this->respuesta('Puedes escribirle al equipo de TAMPU desde la página de Contacto, o hablar con un asesor por el chat de Mensajes si ya tienes cuenta.',
+                [['texto' => 'Ir a Contacto', 'url' => route('contacto')], ['texto' => 'Hablar con un asesor', 'url' => route('asesor')]]);
+        }
+
+        // inglés
+        if ($this->tiene($texto, ['hello', 'english', 'speak', 'room', 'apartment', 'rent', 'job', 'please', 'looking for', 'thank you', 'thanks', 'how much', 'i need'])
+            && ! $this->tiene($texto, ['cuarto', 'trabajo', 'quiero', 'busco', 'hola'])) {
+            return $this->respuesta("Hi! 👋 I'm Tampu. For now I only understand Spanish, but you can still browse everything: rooms (\"cuartos\") and jobs (\"trabajos\") are open to everyone. Try writing \"cuarto en Wanchaq hasta 400\".",
+                [['texto' => 'Rooms / Cuartos', 'url' => route('habitaciones.index')], ['texto' => 'Jobs / Trabajos', 'url' => route('trabajos.index')]]);
+        }
+
+        // pareja/familia antes que "novia" (es una pregunta válida)
+        if ($this->tiene($texto, ['pareja', 'con mi enamorad', 'con mi novi', 'con mi esposa', 'con mi esposo', 'con mi familia', 'con mi hijo', 'con mi hija'])) {
+            return $this->respuestaFaq(self::PREGUNTAS['parejas']);
+        }
+        // temas que no corresponden
+        if ($this->tiene($texto, ['novia', 'novio', 'enamorada', 'enamorado', 'citas', 'ligar', 'sexo', 'sexual', 'desnud', 'prostitu', 'escort', 'droga',
+            'marihuana', 'cocaina', 'pistola', 'hackear', 'contrasena de otro'])) {
+            return $this->respuesta('Con eso no te puedo ayudar 🙈. Yo sé de cuartos, trabajos y vida estudiantil en Cusco. ¿Te busco algo de eso?', [], self::SUGERENCIAS);
+        }
+
+        // emergencias y estafas ya ocurridas
+        if ($this->tiene($texto, ['me estafaron', 'me timaron', 'me enganaron', 'me robaron el adelanto', 'perdi mi dinero', 'pague y no', 'deposite y no', 'fui estafad'])) {
+            return $this->respuesta("Siento mucho lo que pasó 😔. Haz esto lo antes posible:\n1) Guarda pruebas: capturas del chat, el anuncio, el voucher o la constancia de Yape/Plin.\n2) Llama a tu banco o billetera digital para reportar la operación.\n3) Denuncia en la comisaría más cercana o en la fiscalía.\n4) Si la publicación está en TAMPU, usa el botón \"Reportar\" para que el administrador suspenda la cuenta.",
+                [['texto' => 'Ver cómo reportar', 'url' => route('habitaciones.index')]], ['¿Cómo evito estafas?', 'Hablar con un asesor']);
+        }
+        if ($this->tiene($texto, ['emergencia', 'policia', 'bomberos', 'ambulancia', 'accidente', 'me asaltaron', 'me robaron', 'me atacaron'])) {
+            return $this->respuesta("Si es una emergencia, llama ahora:\n🚓 Policía: 105\n🚑 SAMU (ambulancia): 106\n🚒 Bomberos: 116\nCuando estés a salvo, si el problema tiene que ver con una publicación de TAMPU, repórtala desde la página.");
+        }
+
+        // problemas con el dueño
+        if ($this->tiene($texto, ['no me devuelve', 'no me devuelven', 'me quiere botar', 'me botaron', 'me desalojan', 'me quieren sacar', 'me cobra de mas',
+            'me cobran de mas', 'problema con mi casero', 'problema con el dueno', 'problema con mi arrendador', 'mi casero', 'mi arrendador'])) {
+            return $this->respuesta("Lo siento, es una situación incómoda. Te recomiendo:\n1) Revisar tu contrato o recibos (qué se acordó sobre la garantía y los pagos).\n2) Pedirle por escrito (mensaje o carta) lo que te debe, con fecha.\n3) Si no hay acuerdo, acudir a un centro de conciliación o a la municipalidad de tu distrito.\nSi el arrendador publica en TAMPU, también puedes reportarlo para que el administrador lo revise.",
+                [], ['¿Cómo funciona la garantía?', 'Hablar con un asesor']);
+        }
+
+        // estudiantes extranjeros
+        if ($this->tiene($texto, self::PAISES) && ! $hayBusqueda) {
+            return $this->respuesta('¡Bienvenido/a! Puedes ver todos los cuartos y trabajos sin registrarte. Para crear una cuenta, por ahora el registro pide un DNI peruano de 8 dígitos; si tienes carné de extranjería o pasaporte, escríbenos desde Contacto y te ayudamos.',
+                [['texto' => 'Ver cuartos', 'url' => route('habitaciones.index')], ['texto' => 'Ir a Contacto', 'url' => route('contacto')]]);
+        }
+
+        // otras ciudades: "cuarto en Lima" (fuera) vs "soy de Puno" (viene de allí)
+        if ($lugar = $this->lugarMencionado($texto)) {
+            [$nombre, $palabra] = $lugar;
+            $esOrigen = preg_match('/(soy|vengo|vine|llegue|llego|somos|venimos|estoy llegando|recien llegue|me mude)\s+(de|desde)\s+(la |el )?' . preg_quote($palabra, '/') . '/', $texto);
+            if ($esOrigen) {
+                $this->prefijo = "¡Bienvenido/a desde $nombre! 🙌 ";
+                if (! $hayBusqueda) {
+                    return $this->respuesta('Aquí te ayudo a encontrar cuarto en la ciudad del Cusco y trabajos que no choquen con tus clases. ¿Por dónde empezamos?', [], self::SUGERENCIAS);
+                }
+            } else {
+                $enCusco = in_array($nombre, ['Sicuani', 'Quillabamba', 'Espinar', 'Urubamba', 'Calca', 'Pisac', 'Ollantaytambo', 'Chumbivilcas']);
+
+                return $this->respuesta('Por ahora TAMPU solo funciona en la ciudad del Cusco' . ($enCusco ? " (no en $nombre)" : '') . ': Cusco, Wanchaq, Santiago, San Sebastián, San Jerónimo y Saylla 📍. Si vas a estudiar en Cusco, te ayudo a buscar aquí.',
+                    [], ['Cuartos en Wanchaq hasta 400', 'Precios promedio por distrito', 'Trabajos compatibles']);
+            }
+        }
+
+        // comprar/vender, anticresis
+        if ($this->tiene($texto, ['comprar', 'compro', 'venden casa', 'venta de casa', 'vendo mi', 'terreno', 'lote', 'anticresis', 'hipoteca'])) {
+            return $this->respuesta('TAMPU no vende casas ni terrenos: solo publica alquileres mensuales para estudiantes (cuartos, minidepas, roomies y casas de estudiantes).',
+                [], ['Buscar cuarto', 'Precios promedio por distrito']);
+        }
+
+        // turismo y hospedaje por noches
+        if (! $pideTrabajo && $this->tiene($texto, ['turista', 'por noche', 'noches', 'airbnb', 'booking', 'vacaciones', 'de viaje', 'machu picchu', 'machupicchu',
+            'valle sagrado', 'montana de colores', 'que visitar', 'lugares para visitar', 'lugares visitar', 'lugares turisticos', 'sitios turisticos', 'que conocer',
+            'conocer cusco', 'que hacer en cusco', 'lugares bonitos', 'paseo', 'tour', 'sacsayhuaman', 'qorikancha'])) {
+            return $this->respuesta('TAMPU es para estudiantes que alquilan por meses, no para hospedaje turístico por noches 🏔️. Si vienes de visita: no te pierdas la Plaza de Armas, San Blas, el Qorikancha y Sacsayhuamán; y para Machu Picchu compra la entrada con anticipación en la web oficial del Ministerio de Cultura. Si te quedas a estudiar, aquí te ayudo con el cuarto.',
+                [], ['Buscar cuarto', 'Consejos para la altura']);
+        }
+
+        // precio imposible: "cuarto a 50 soles", "cuarto gratis"
+        $gratis = $this->tiene($texto, ['gratis', 'gratuito', 'regalado', 'sin pagar', 'cero soles']) && ! $this->tiene($texto, ['es gratis', 'cobran', 'cuesta usar', 'tampu']);
+        if (($pideCuarto || isset($datos['tipo'])) && ($gratis || (isset($datos['precio']) && $datos['precio'] < 130))) {
+            $min = (int) Habitacion::publicadas()->min('precio');
+            $this->prefijo = ($gratis ? 'No hay cuartos gratis 😅' : "A S/ {$datos['precio']} no encontré cuartos 😅") . ", los más económicos en TAMPU empiezan en S/ $min. ";
+            $datos['precio'] = max($min + 100, 250);
+            unset($datos['precio_min']);
+
+            return $this->buscarHabitaciones($request, $datos);
+        }
+
+        // matemáticas sencillas
+        if (preg_match('/(-?\d+(?:[.,]\d+)?)\s*([\+\-x\*\/])\s*(-?\d+(?:[.,]\d+)?)/', $texto, $m) && $this->tiene($texto, ['cuanto es', 'cuanto da', 'calcula', 'resuelve', '='])) {
+            $a = (float) str_replace(',', '.', $m[1]);
+            $b = (float) str_replace(',', '.', $m[3]);
+            $r = match ($m[2]) { '+' => $a + $b, '-' => $a - $b, 'x', '*' => $a * $b, '/' => $b == 0 ? null : $a / $b };
+            $txt = $r === null ? 'No se puede dividir entre cero 🤓' : 'Eso da ' . rtrim(rtrim(number_format($r, 2, '.', ''), '0'), '.') . ' 🤓';
+
+            return $this->respuesta($txt . '. Igual lo mío son los números de los alquileres: ¿quieres ver precios promedio por distrito?', [], ['Precios promedio por distrito', 'Buscar cuarto']);
+        }
+        if ($this->tiene($texto, ['tarea', 'examen', 'hazme la', 'resuelve mi', 'ensayo', 'monografia'])) {
+            return $this->respuesta('Las tareas no son lo mío 😅, pero sí te puedo ayudar a encontrar un cuarto tranquilo con wifi y escritorio para estudiar.', [], ['Cuarto con wifi y escritorio', 'Buscar trabajo']);
+        }
+
+        // temas de actualidad que no maneja: política, deportes, farándula
+        if (! $hayBusqueda && $this->tiene($texto, ['gobierno', 'presidente', 'politic', 'elecciones', 'congreso', 'partido de', 'gano el partido', 'futbol',
+            'seleccion', 'mundial', 'cancion', 'pelicula', 'serie', 'farandula', 'noticias', 'dolar', 'bitcoin'])) {
+            return $this->respuesta('De ese tema no sé nada 😅: soy especialista en cuartos, trabajos y vida estudiantil en Cusco. ¿Te ayudo con algo de eso?', [], self::SUGERENCIAS);
+        }
+
+        // hora y fecha
+        if ($this->tiene($texto, ['que hora es', 'hora actual', 'que dia es', 'fecha de hoy', 'que fecha es', 'dia de hoy'])) {
+            $ahora = now('America/Lima')->locale('es');
+
+            return $this->respuesta('En Cusco es ' . $ahora->isoFormat('dddd D [de] MMMM, h:mm a') . ' 🕒. ¿Te ayudo con algo más?', [], self::SUGERENCIAS);
+        }
+        // clima de hoy (no tenemos pronóstico en vivo)
+        if ($this->tiene($texto, ['clima', 'tiempo hoy', 'va a llover', 'llovera', 'hace frio hoy', 'temperatura']) && $this->tiene($texto, ['hoy', 'manana', 'ahora', 'esta semana', 'va a', 'llovera'])) {
+            return $this->respuesta('No tengo el pronóstico en vivo 🌦️, pero en Cusco de día suele haber sol y las noches son frías casi todo el año; de diciembre a marzo llueve bastante. Lleva casaca y pregunta si tu cuarto tiene agua caliente.');
+        }
+
+        // chistes, cariño
+        if ($this->tiene($texto, ['chiste', 'algo gracioso', 'hazme reir', 'cuentame algo', 'aburrido', 'aburrida'])) {
+            return $this->respuesta(self::CHISTES[array_rand(self::CHISTES)] . ' ¿Te ayudo a buscar algo?', [], self::SUGERENCIAS);
+        }
+        if ($this->tiene($texto, ['te quiero', 'te amo', 'eres lindo', 'eres linda', 'me caes bien', 'eres genial', 'buen bot', 'eres el mejor', 'eres la mejor', 'que buen'])) {
+            return $this->respuesta('¡Gracias! 💛 Tú también me caes bien. ¿Te ayudo a buscar algo?', [], self::SUGERENCIAS);
+        }
+
+        // ánimo, dinero y comida (solo si no está pidiendo una búsqueda concreta)
+        if (! $hayBusqueda && $this->tiene($texto, ['triste', 'me siento solo', 'me siento sola', 'extrano a mi', 'deprim', 'ansiedad', 'estres', 'estresad', 'soledad', 'llorando', 'nadie me'])) {
+            return $this->respuesta("Llegar a una ciudad nueva no es fácil y es normal sentirse así 💛. Algunas ideas: habla seguido con tu familia, únete a algún taller o grupo de tu universidad y acércate al área de bienestar estudiantil, que ofrece apoyo psicológico gratuito.\nSi necesitas hablar con alguien ahora, en Perú puedes llamar a la Línea 113, opción 5 (salud mental).",
+                [], ['Busco roomies', 'Hablar con un asesor']);
+        }
+        if (! $hayBusqueda && $this->tiene($texto, ['no tengo dinero', 'no tengo plata', 'sin plata', 'sin dinero', 'estoy pobre', 'no me alcanza', 'beca', 'ayuda economica', 'prestamo'])) {
+            return $this->respuesta('Te entiendo, el primer mes es el más caro. Tres ideas: compartir un depa con roomies o un cuarto doble (sale más barato), buscar trabajos por horas que no choquen con tus clases, y revisar las becas de Pronabec (como Beca 18 o Beca Permanencia) y la oficina de bienestar de tu universidad.',
+                [], ['Busco roomies', 'Trabajo por horas los sábados', 'Cuartos baratos']);
+        }
+        if (! $hayBusqueda && $this->tiene($texto, ['hambre', 'donde comer', 'comida barata', 'menu barato', 'restaurante', 'almorzar', 'almuerzo'])) {
+            return $this->respuesta('Un menú en Cusco cuesta entre S/ 8 y S/ 12 🍲. Los mercados, como el de San Pedro en el centro o el de Wanchaq, tienen comida rica y barata. Si quieres ahorrar, te busco un cuarto con cocina o con desayuno incluido.',
+                [], ['Cuarto con cocina', 'Cuarto con desayuno']);
+        }
+
+        // cuántos cuartos/trabajos hay
+        if ($this->tiene($texto, ['cuantos cuartos', 'cuantas habitaciones', 'cuantas viviendas', 'cuantos trabajos', 'cuantas ofertas'])) {
+            $c = Habitacion::publicadas()->count();
+            $t = Trabajo::where('estado', 'activa')->count();
+
+            return $this->respuesta("Ahora mismo hay $c viviendas disponibles y $t ofertas de trabajo activas en TAMPU 📊.",
+                [['texto' => 'Ver cuartos', 'url' => route('habitaciones.index')], ['texto' => 'Ver trabajos', 'url' => route('trabajos.index')]]);
+        }
+
+        return null;
+    }
+
+    // ---------------------------------------------------------------- datos del propio usuario
+
+    private function misDatos(Request $request, string $texto)
+    {
+        $pregVisitas = $this->tiene($texto, ['mi visita', 'mis visitas', 'mi solicitud', 'mis solicitudes', 'aceptaron mi visita', 'aceptaron la visita', 'me aceptaron la visita', 'respondieron mi visita', 'estado de mi visita']);
+        $pregPost = $this->tiene($texto, ['mi postulacion', 'mis postulaciones', 'me aceptaron en el trabajo', 'me contrataron', 'respondieron mi postulacion', 'estado de mi postulacion', 'me llamaron del trabajo']);
+        $pregMsj = $this->tiene($texto, ['tengo mensajes', 'mensajes nuevos', 'me escribieron', 'me respondieron', 'mensajes sin leer', 'tengo algun mensaje']);
+        $pregFav = $this->tiene($texto, ['mis favoritos', 'lo que guarde', 'cuartos guardados', 'mis guardados']);
+        $pregPend = $this->tiene($texto, ['pendiente', 'que hay de nuevo', 'resumen de hoy', 'tengo solicitudes', 'quien quiere visitar', 'tengo postulantes', 'mis postulantes', 'mis cuartos', 'mis publicaciones', 'mis ofertas', 'resumen de mi cuenta', 'como voy']);
+        if (! ($pregVisitas || $pregPost || $pregMsj || $pregFav || $pregPend)) {
+            return null;
+        }
+        $yo = $request->user();
+        if (! $yo) {
+            return $this->respuesta('Para revisar tus visitas, postulaciones o mensajes primero inicia sesión 🔐.', [['texto' => 'Iniciar sesión', 'url' => route('login')]]);
+        }
+        $estado = fn ($e) => ['pendiente' => '⏳ pendiente', 'aceptada' => '✅ aceptada', 'rechazada' => '❌ rechazada'][$e] ?? $e;
+
+        if ($pregMsj) {
+            $ids = \App\Models\Conversacion::de($yo)->pluck('id');
+            $n = \App\Models\Mensaje::whereIn('conversacion_id', $ids)->where('usuario_id', '!=', $yo->id)->where('leido', false)->count();
+
+            return $this->respuesta($n ? "Tienes $n mensaje" . ($n > 1 ? 's' : '') . ' sin leer 📩.' : 'No tienes mensajes sin leer 📭.', [['texto' => 'Abrir mensajes', 'url' => route('mensajes')]]);
+        }
+
+        if ($yo->rol === 'estudiante') {
+            if ($pregFav) {
+                $n = $yo->favoritos()->count();
+
+                return $this->respuesta($n ? "Tienes $n habitación" . ($n > 1 ? 'es' : '') . ' guardada' . ($n > 1 ? 's' : '') . ' en favoritos ❤️.' : 'Aún no guardaste habitaciones. Toca el corazón ❤️ en las que te gusten.',
+                    [['texto' => 'Ver mis favoritos', 'url' => route('estudiante.favoritos')]]);
+            }
+            if ($pregPost) {
+                $lista = $yo->postulaciones()->with('trabajo')->latest()->take(3)->get();
+                if ($lista->isEmpty()) {
+                    return $this->respuesta('Todavía no postulaste a ningún trabajo. ¿Te busco ofertas que encajen con tu horario?', [], ['Trabajos compatibles']);
+                }
+                $txt = "Tus últimas postulaciones:\n" . $lista->map(fn ($p) => '• ' . ($p->trabajo->titulo ?? 'Oferta') . ': ' . $estado($p->estado))->implode("\n");
+
+                return $this->respuesta($txt, [['texto' => 'Ver mi panel', 'url' => route('estudiante.panel')]]);
+            }
+            $lista = $yo->solicitudes()->with('habitacion')->latest()->take(3)->get();
+            if ($lista->isEmpty()) {
+                return $this->respuesta('Todavía no pediste ninguna visita. Abre una habitación y toca "Solicitar visita".', [], ['Buscar cuarto']);
+            }
+            $txt = "Tus últimas visitas:\n" . $lista->map(fn ($s) => '• ' . ($s->habitacion->titulo ?? 'Habitación') . ' (' . optional($s->fecha_visita)->format('d/m') . '): ' . $estado($s->estado))->implode("\n");
+            if ($lista->contains('estado', 'aceptada')) {
+                $txt .= "\nEn las aceptadas ya puedes ver el celular del dueño y descargar tu constancia.";
+            }
+
+            return $this->respuesta($txt, [['texto' => 'Ver mi panel', 'url' => route('estudiante.panel')]]);
+        }
+        if ($yo->rol === 'arrendador') {
+            $cuartos = $yo->habitaciones()->count();
+            $pend = \App\Models\Solicitud::whereIn('habitacion_id', $yo->habitaciones()->pluck('id'))->where('estado', 'pendiente')->count();
+
+            return $this->respuesta("Tienes $cuartos " . ($cuartos === 1 ? 'habitación publicada' : 'habitaciones publicadas') . " y $pend " . ($pend === 1 ? 'solicitud de visita pendiente' : 'solicitudes de visita pendientes') . ' 🏠.',
+                [['texto' => 'Responder solicitudes', 'url' => route('arrendador.solicitudes')], ['texto' => 'Mis habitaciones', 'url' => route('arrendador.habitaciones.index')]]);
+        }
+        if ($yo->rol === 'empleador') {
+            $ofertas = $yo->trabajos()->count();
+            $pend = \App\Models\Postulacion::whereIn('trabajo_id', $yo->trabajos()->pluck('id'))->where('estado', 'pendiente')->count();
+
+            return $this->respuesta("Tienes $ofertas " . ($ofertas === 1 ? 'oferta publicada' : 'ofertas publicadas') . " y $pend " . ($pend === 1 ? 'postulación pendiente' : 'postulaciones pendientes') . ' 💼.',
+                [['texto' => 'Ver postulaciones', 'url' => route('empleador.postulaciones')], ['texto' => 'Mis ofertas', 'url' => route('empleador.trabajos.index')]]);
+        }
+        if ($yo->rol === 'admin') {
+            $ver = \App\Models\Usuario::where('verificacion', 'pendiente')->count();
+            $rep = \App\Models\Reporte::where('estado', 'pendiente')->count();
+
+            return $this->respuesta("Hay $ver cuenta" . ($ver === 1 ? '' : 's') . " por verificar y $rep reporte" . ($rep === 1 ? '' : 's') . ' pendiente' . ($rep === 1 ? '' : 's') . ' 🛡️.',
+                [['texto' => 'Ir al panel', 'url' => route('admin.panel')], ['texto' => 'Ver reportes', 'url' => route('admin.reportes')]]);
+        }
+
+        return null;
+    }
+
+    // ---------------------------------------------------------------- zonas
+
+    const ZONAS = [
+        'Cusco' => 'centro histórico; muy bien ubicado pero más turístico, ruidoso y caro',
+        'Wanchaq' => 'céntrico y comercial, con mucho transporte por la Av. de la Cultura; cerca de la UNSAAC',
+        'Santiago' => 'suele ser de los más económicos; tiene zonas muy tranquilas y otras más movidas',
+        'San Sebastián' => 'residencial y tranquilo, a medio camino entre la UNSAAC y la U. Andina',
+        'San Jerónimo' => 'tranquilo y cerca de la U. Andina (Larapa); precios accesibles',
+        'Saylla' => 'más alejado del centro pero cerca de la U. Continental (Angostura)',
+    ];
+
+    private function compararDistritos(string $texto, array $datos)
+    {
+        $nombrados = [];
+        foreach (self::DISTRITOS as $d => $palabras) {
+            if ($this->tiene($texto, $palabras)) {
+                $nombrados[] = $d;
+            }
+        }
+        $compara = count($nombrados) >= 2 && $this->tiene($texto, [' o ', ' vs ', 'versus', 'mejor', 'diferencia', 'compar', 'conviene', 'cual']);
+        $recomienda = $this->tiene($texto, ['que distrito', 'que zona', 'donde me conviene', 'que barrio', 'mejor zona', 'mejor distrito', 'me conviene vivir', 'donde vivir', 'donde es mejor vivir']);
+        if (! $compara && ! $recomienda) {
+            return null;
+        }
+        if (! $compara) {
+            $nombrados = match ($datos['uni'] ?? null) {
+                'UNSAAC' => ['Wanchaq', 'Cusco', 'Santiago'],
+                'U. Andina' => ['San Jerónimo', 'San Sebastián'],
+                'U. Continental' => ['Saylla', 'San Jerónimo'],
+                default => array_keys(self::ZONAS),
+            };
+        }
+        $precios = Habitacion::publicadas()->whereIn('distrito', $nombrados)->selectRaw('distrito, avg(precio) as promedio, count(*) as total')
+            ->groupBy('distrito')->get()->keyBy('distrito');
+        $lineas = collect($nombrados)->map(function ($d) use ($precios) {
+            $p = $precios[$d] ?? null;
+
+            return "• $d: " . self::ZONAS[$d] . ($p ? '. Promedio S/ ' . (int) round($p->promedio) . " ({$p->total} opciones)" : '') . '.';
+        })->implode("\n");
+        $intro = $compara ? 'Así se comparan:' : (isset($datos['uni']) ? "Si estudias en la {$datos['uni']}, te convienen estas zonas:" : 'Así es cada distrito donde hay cuartos en TAMPU:');
+        $sug = collect($nombrados)->take(3)->map(fn ($d) => "Cuartos en $d")->all();
+
+        return $this->respuesta("$intro\n$lineas\nLo más importante: que quede cerca de tu universidad o con un bus directo.", [], $sug);
+    }
+
+    private function lugarMencionado(string $texto): ?array
+    {
+        foreach (self::LUGARES as $nombre => $palabras) {
+            foreach ($palabras as $p) {
+                if ($this->coincide($texto, $p)) {
+                    return [$nombre, $p];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function noEntendi(Request $request, string $texto)
+    {
+        $this->esFallo = true;
+        $fallos = $request->session()->get('asistente.fallos', 0) + 1;
+        $request->session()->put('asistente.fallos', $fallos);
+
+        if ($fallos >= 2) {
+            return $this->respuesta('Sigo sin entenderte, perdón 😓. Mejor te paso con una persona del equipo, o elige una de estas opciones:',
+                $request->user() ? [['texto' => 'Hablar con un asesor', 'url' => route('asesor')]] : [['texto' => 'Escribir al equipo', 'url' => route('contacto')]],
+                ['¿Qué es TAMPU?', 'Buscar cuarto', 'Buscar trabajo']);
+        }
+        if (str_contains($texto, '?') || $this->tiene($texto, ['que ', 'como ', 'por que', 'cuando', 'donde '])) {
+            return $this->respuesta('Esa pregunta está fuera de lo que sé 😅. Yo sé de cuartos, trabajos y vida estudiantil en Cusco. Prueba con algo como "cuarto con baño propio cerca de la Andina" o "trabajo de mozo los sábados".',
+                [], ['¿Qué es TAMPU?', 'Buscar cuarto', 'Buscar trabajo']);
+        }
+
+        return $this->respuesta('No te entendí del todo 🤔. Puedes escribirme cosas como "cuarto con baño propio cerca de la Andina", "busco roomies en Wanchaq", "trabajo de mozo los sábados" o "¿cuánto cuesta un cuarto en Santiago?".',
+            [], self::SUGERENCIAS);
+    }
+
     // ---------------------------------------------------------------- otros
 
     private function pedirAsesor(Request $request)
@@ -505,7 +1004,7 @@ class ChatbotController extends Controller
         foreach (self::PREGUNTAS as $clave => $p) {
             $n = 0;
             foreach ($p[0] as $palabra) {
-                if (str_contains($texto, $palabra)) {
+                if ($this->coincide($texto, $palabra)) {
                     $n += strlen($palabra);
                 }
             }
@@ -527,22 +1026,81 @@ class ChatbotController extends Controller
 
     private function respuesta(string $texto, array $enlaces = [], array $sugerencias = [])
     {
+        $texto = $this->prefijo . $texto;
+        if (! $this->esFallo && request()->hasSession()) {
+            request()->session()->forget('asistente.fallos');
+        }
+
         return response()->json(compact('texto', 'enlaces', 'sugerencias'));
     }
 
     private function normalizar(string $texto): string
     {
-        return preg_replace('/\s+/', ' ', Str::lower(Str::ascii($texto)));
+        $texto = Str::lower(Str::ascii($texto));
+        $texto = preg_replace('/([a-z])\1{2,}/', '$1', $texto);   // "holaaa" -> "hola", "nooo" -> "no"
+        // abreviaturas de chat: "q", "k", "xq", "pq", "x favor", "tmb"
+        $texto = preg_replace(['/(?<![a-z0-9])(q|k|ke)(?![a-z0-9])/', '/(?<![a-z0-9])(xq|pq|porq)(?![a-z0-9])/', '/(?<![a-z0-9])(tmb|tb)(?![a-z0-9])/', '/(?<![a-z0-9])x(?= favor| fa)/', '/(?<!\d)\s+x\s+(?!\d)/'],
+            ['que', 'por que', 'tambien', 'por', ' por '], $texto);
+
+        return preg_replace('/\s+/', ' ', $texto);
     }
 
     private function tiene(string $texto, array $palabras): bool
     {
         foreach ($palabras as $p) {
-            if (str_contains($texto, $p)) {
+            if ($this->coincide($texto, $p)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    // corrige errores de tipeo en las palabras importantes ("habitasion", "trabjo", "santiogo", "cuarot")
+    const VOCABULARIO = ['cuarto', 'cuartos', 'habitacion', 'habitaciones', 'trabajo', 'trabajos', 'roomies', 'minidepa', 'departamento', 'residencia',
+        'estudiantes', 'wanchaq', 'santiago', 'sebastian', 'jeronimo', 'saylla', 'unsaac', 'andina', 'continental', 'alquiler', 'barato', 'baratos',
+        'economico', 'compartido', 'individual', 'amoblado', 'garantia', 'contrasena', 'postular', 'postulacion', 'favoritos', 'estafa', 'mensajes',
+        'calendario', 'horario', 'disponible', 'agua', 'caliente', 'universidad'];
+    const PROTEGIDAS = ['cuanto', 'cuantos', 'cuanta', 'cuantas', 'cuando', 'cuarta', 'cuatro', 'cuartel', 'trabaja', 'trabajar', 'trabajado', 'trabaje', 'estado',
+        'estafo', 'mensaje', 'horarios', 'barata', 'baratas', 'andino', 'andinas', 'alquile', 'alquilo', 'alquila', 'santo', 'santos', 'agua', 'aguas', 'saya', 'sala'];
+
+    private function corregir(string $texto): string
+    {
+        return preg_replace_callback('/[a-z]{5,}/', function ($m) {
+            $w = $m[0];
+            if (in_array($w, self::VOCABULARIO) || in_array($w, self::PROTEGIDAS)) {
+                return $w;
+            }
+            $tope = strlen($w) >= 8 ? 2 : 1;
+            foreach (self::VOCABULARIO as $v) {   // plurales y variantes ("postulaciones", "cuartito") se dejan como están
+                if (str_starts_with($w, $v) || str_starts_with($v, $w)) {
+                    return $w;
+                }
+            }
+            foreach (self::VOCABULARIO as $v) {
+                if (abs(strlen($v) - strlen($w)) > $tope) {
+                    continue;
+                }
+                $intercambio = strlen($v) === strlen($w) && count_chars($v, 1) == count_chars($w, 1) && levenshtein($v, $w) <= 2;
+                if (levenshtein($v, $w) <= $tope || $intercambio) {
+                    return $v;
+                }
+            }
+
+            return $w;
+        }, $texto);
+    }
+
+    // la palabra debe empezar donde empieza una palabra del mensaje; las cortas, además, deben terminar ahí
+    private function coincide(string $texto, string $p): bool
+    {
+        $t = trim($p);
+        if ($t === '') {
+            return false;
+        }
+        $inicio = ctype_alnum($t[0]) ? '(?<![a-z0-9])' : '';
+        $fin = (str_ends_with($p, ' ') || in_array($t, self::ENTERAS)) ? '(?:s|es)?(?![a-z0-9])' : '';
+
+        return (bool) preg_match('/' . $inicio . preg_quote($t, '/') . $fin . '/', $texto);
     }
 }
