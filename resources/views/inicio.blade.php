@@ -160,6 +160,7 @@
                 <div class="row g-4 pasos">
                     <div class="col-md-4 revelar">
                         <div class="paso">
+                            <img src="{{ asset('img/3d/paso-registro.webp') }}" alt="Mochila de viaje y carnet verificado" class="paso-ilustracion" loading="lazy">
                             <span class="paso-numero">1</span>
                             <i class="bi bi-person-plus"></i>
                             <h3>Regístrate</h3>
@@ -168,6 +169,7 @@
                     </div>
                     <div class="col-md-4 revelar">
                         <div class="paso">
+                            <img src="{{ asset('img/3d/paso-horario.webp') }}" alt="Calendario con los turnos de clase marcados" class="paso-ilustracion" loading="lazy">
                             <span class="paso-numero">2</span>
                             <i class="bi bi-calendar-week"></i>
                             <h3>Marca tu horario</h3>
@@ -176,6 +178,7 @@
                     </div>
                     <div class="col-md-4 revelar">
                         <div class="paso">
+                            <img src="{{ asset('img/3d/paso-visita.webp') }}" alt="Casita con su llave" class="paso-ilustracion" loading="lazy">
                             <span class="paso-numero">3</span>
                             <i class="bi bi-house-check"></i>
                             <h3>Solicita una visita</h3>
@@ -191,20 +194,14 @@
             <div class="contenedor">
                 <div class="row g-4 g-lg-5 align-items-center">
                     <div class="col-lg-6 revelar">
-                        <div class="collage">
-                            <img src="{{ asset('img/habitaciones/h5.jpg') }}" alt="Habitación iluminada con escritorio" class="collage-grande">
-                            <img src="{{ asset('img/cusco/cuesta-san-blas.jpg') }}" alt="Cuesta de San Blas en Cusco" class="collage-chica flotar">
-                            <div class="globo-flotante globo-1 flotar-lento">
-                                <i class="bi bi-patch-check-fill"></i>
-                                <div><b>Arrendador verificado</b><small>Revisamos su DNI</small></div>
-                            </div>
-                            @if ($numeros['promedio'])
-                                <div class="globo-flotante globo-2 flotar">
-                                    <i class="bi bi-star-fill"></i>
-                                    <div><b>{{ number_format($numeros['promedio'], 1) }} de 5</b><small>en reseñas de visitas</small></div>
-                                </div>
-                            @endif
-                        </div>
+                        {{-- maqueta 3D de un cuarto de estudiante (hecha en Blender por el equipo) --}}
+                        <figure class="ilustracion-panel">
+                            <img src="{{ asset('img/3d/cuarto.webp') }}" alt="Maqueta 3D de un cuarto de estudiante con cama, escritorio y ventana a los cerros" loading="lazy">
+                            <figcaption>
+                                <span><i class="bi bi-patch-check"></i> Arrendadores con DNI revisado</span>
+                                @if ($numeros['promedio'])<span><i class="bi bi-star"></i> {{ number_format($numeros['promedio'], 1) }} de 5 en reseñas de visitas</span>@endif
+                            </figcaption>
+                        </figure>
                     </div>
                     <div class="col-lg-6 revelar">
                         <span class="sobretitulo">Por qué TAMPU</span>
@@ -545,9 +542,12 @@
         <!-- llamado para arrendadores y empresas -->
         <section class="banda-cta" style="--fondo-img: url('{{ asset('img/cusco/catedral.jpg') }}')">
             <div class="contenedor revelar">
-                <h2>¿Tienes un cuarto o un trabajo <em>para estudiantes?</em></h2>
-                <p>Publica gratis. Verificamos tu cuenta y los estudiantes te escriben directamente.</p>
-                <a href="{{ route('registro') }}" class="btn btn-grande btn-claro">Publicar gratis</a>
+                <div>
+                    <h2>¿Tienes un cuarto o un trabajo <em>para estudiantes?</em></h2>
+                    <p>Publica gratis. Verificamos tu cuenta y los estudiantes te escriben directamente.</p>
+                    <a href="{{ route('registro') }}" class="btn btn-grande btn-claro">Publicar gratis</a>
+                </div>
+                <img src="{{ asset('img/3d/casa.webp') }}" alt="Casa cusqueña de adobe con balcón y base de piedra inca" class="banda-ilustracion" loading="lazy">
             </div>
         </section>
     </main>

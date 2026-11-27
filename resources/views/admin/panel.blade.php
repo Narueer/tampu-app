@@ -23,23 +23,61 @@
             ['flag', $datos['reportes'], 'Reportes por revisar', 'rosa', route('admin.reportes')],
         ]])
 
+        {{-- gráficos hechos con HTML (barras y proporciones): se leen mejor que los "donuts" y no cargan librerías --}}
+        @php
+            $distritos = collect($graficos['distritos']);
+            $maxTotal = max(1, (int) $distritos->max('total'));
+            $maxPrecio = max(1, (int) $distritos->max('promedio'));
+            $coloresEstado = ['aceptada' => '#2e7d5b', 'pendiente' => '#c8973f', 'rechazada' => '#b23b4b'];
+            $coloresRol = ['estudiante' => '#b0502a', 'arrendador' => '#c8973f', 'empleador' => '#17352f'];
+            $proporciones = [
+                ['Solicitudes de visita', 'solicitudes', collect($graficos['solicitudes']), $coloresEstado],
+                ['Postulaciones a trabajos', 'postulaciones', collect($graficos['postulaciones']), $coloresEstado],
+                ['Usuarios por rol', 'usuarios', collect($graficos['roles']), $coloresRol],
+            ];
+        @endphp
         <div class="graficos">
             <div class="caja">
-                <h2><i class="bi bi-bar-chart"></i> Habitaciones por distrito</h2>
-                <canvas id="grafDistritos"></canvas>
+                <h2>Habitaciones por distrito</h2>
+                <div class="barras-distrito">
+                    @foreach ($distritos as $d)
+                        <div class="barra-fila">
+                            <b>{{ $d->distrito }}</b>
+                            <span class="barra-pista"><span style="width: {{ round($d->total / $maxTotal * 100) }}%"></span></span>
+                            <span class="barra-valor">{{ $d->total }}</span>
+                        </div>
+                    @endforeach
+                </div>
             </div>
             <div class="caja">
-                <h2><i class="bi bi-cash-stack"></i> Precio promedio por distrito (S/)</h2>
-                <canvas id="grafPrecios"></canvas>
+                <h2>Precio promedio por distrito</h2>
+                <div class="barras-distrito">
+                    @foreach ($distritos->sortByDesc('promedio') as $d)
+                        <div class="barra-fila barra-precio">
+                            <b>{{ $d->distrito }}</b>
+                            <span class="barra-pista"><span style="width: {{ round($d->promedio / $maxPrecio * 100) }}%"></span></span>
+                            <span class="barra-valor">S/ {{ (int) $d->promedio }}</span>
+                        </div>
+                    @endforeach
+                </div>
             </div>
-            <div class="caja">
-                <h2><i class="bi bi-pie-chart"></i> Solicitudes de visita</h2>
-                <canvas id="grafSolicitudes"></canvas>
-            </div>
-            <div class="caja">
-                <h2><i class="bi bi-people"></i> Usuarios por rol</h2>
-                <canvas id="grafRoles"></canvas>
-            </div>
+            @foreach ($proporciones as [$titulo, $unidad, $valores, $colores])
+                @php($total = max(1, $valores->sum()))
+                <div class="caja">
+                    <h2>{{ $titulo }}</h2>
+                    <p class="proporcion-total">{{ $valores->sum() }}<small>{{ $unidad }} en total</small></p>
+                    <div class="proporcion" role="img" aria-label="{{ $titulo }}: {{ $valores->map(fn ($n, $k) => "$k $n")->implode(', ') }}">
+                        @foreach ($valores as $clave => $n)
+                            <span style="width: {{ $n / $total * 100 }}%; background: {{ $colores[$clave] ?? '#8c857a' }}" title="{{ ucfirst($clave) }}: {{ $n }}"></span>
+                        @endforeach
+                    </div>
+                    <ul class="proporcion-leyenda">
+                        @foreach ($valores as $clave => $n)
+                            <li><i style="background: {{ $colores[$clave] ?? '#8c857a' }}"></i> {{ ucfirst($clave) }} <span class="texto-suave">{{ round($n / $total * 100) }}%</span> <b>{{ $n }}</b></li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endforeach
         </div>
 
         <div class="row g-4 align-items-start">
@@ -116,54 +154,4 @@
     </main>
 @endsection
 
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <script>
-        const datos = @json($graficos);
-        const colores = ['#b4532a', '#1f3d36', '#c99a2e', '#6b8f71', '#8f3d1c'];
-        const colorEstado = { aceptada: '#2e7d5b', pendiente: '#c99a2e', rechazada: '#c0392b' };
-        Chart.defaults.font.family = 'Poppins';
-        Chart.defaults.color = '#666';
-        Chart.defaults.plugins.legend.position = 'bottom';
-        Chart.defaults.plugins.legend.labels.usePointStyle = true;
-        Chart.defaults.plugins.tooltip.backgroundColor = '#1f3d36';
-        Chart.defaults.plugins.tooltip.padding = 10;
-        Chart.defaults.plugins.tooltip.cornerRadius = 8;
 
-        new Chart(document.getElementById('grafDistritos'), {
-            type: 'bar',
-            data: {
-                labels: datos.distritos.map(d => d.distrito),
-                datasets: [{ label: 'Habitaciones', data: datos.distritos.map(d => d.total), backgroundColor: '#b4532a', borderRadius: 8, maxBarThickness: 46 }]
-            },
-            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-        });
-
-        new Chart(document.getElementById('grafPrecios'), {
-            type: 'bar',
-            data: {
-                labels: datos.distritos.map(d => d.distrito),
-                datasets: [{ label: 'Precio promedio', data: datos.distritos.map(d => d.promedio), backgroundColor: '#1f3d36', borderRadius: 8, maxBarThickness: 26 }]
-            },
-            options: { indexAxis: 'y', plugins: { legend: { display: false } } }
-        });
-
-        new Chart(document.getElementById('grafSolicitudes'), {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(datos.solicitudes).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
-                datasets: [{ data: Object.values(datos.solicitudes), backgroundColor: Object.keys(datos.solicitudes).map(e => colorEstado[e]), borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
-            },
-            options: { cutout: '68%' }
-        });
-
-        new Chart(document.getElementById('grafRoles'), {
-            type: 'pie',
-            data: {
-                labels: Object.keys(datos.roles).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
-                datasets: [{ data: Object.values(datos.roles), backgroundColor: colores, borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
-            },
-            options: { cutout: '55%' }
-        });
-    </script>
-@endpush

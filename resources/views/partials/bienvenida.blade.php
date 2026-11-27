@@ -1,6 +1,11 @@
 {{-- saludo arriba de cada panel --}}
 @php($yo = auth()->user())
-<div class="bienvenida">
+{{-- ilustración 3D según el rol (hechas en Blender, en public/img/3d) --}}
+@php($ilustracion = ['estudiante' => 'cuarto', 'arrendador' => 'casa', 'empleador' => 'horario', 'admin' => 'casa'][$yo->rol] ?? null)
+<div class="bienvenida {{ $ilustracion ? 'con-ilustracion' : '' }}">
+    @if ($ilustracion)
+        <img src="{{ asset("img/3d/$ilustracion.webp") }}" alt="" class="bienvenida-ilustracion" loading="lazy">
+    @endif
     <div class="bienvenida-quien">
         @if ($yo->foto)
             <img src="{{ $yo->fotoUrl() }}" alt="" class="bienvenida-avatar">

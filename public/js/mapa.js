@@ -19,7 +19,7 @@ if (divMapa) {
     const grupo = [];
 
     // con muchos cuartos el precio va en un globito al pasar el mouse, para que no se amontonen
-    const compacto = puntos.filter(p => !p.tipo).length > 12;
+    const compacto = puntos.filter(p => p.tipo !== "uni").length > 12;
 
     puntos.forEach(function (p) {
         let texto = "<b>" + p.titulo + "</b>";
@@ -31,6 +31,15 @@ if (divMapa) {
             const punto = L.divIcon({ className: "marca-punto tipo-" + (p.clase || "cuarto"), html: '<i class="bi bi-' + (p.icono || "house-fill") + '"></i>', iconSize: [22, 22], iconAnchor: [11, 11] });
             L.marker([p.lat, p.lng], { icon: punto }).addTo(mapa).bindPopup(texto)
                 .bindTooltip("S/ " + p.precio, { direction: "top", offset: [0, -10] });
+            grupo.push([p.lat, p.lng]);
+            return;
+        }
+        if (compacto && p.tipo === "trabajo") {
+            // muchas ofertas: punto con maletín; el pago aparece al pasar el mouse
+            texto += "<br>" + p.empresa + "<br>" + p.pago;
+            if (p.url) texto += '<br><a href="' + p.url + '">Ver detalle</a>';
+            const punto = L.divIcon({ className: "marca-punto marca-punto-trabajo", html: '<i class="bi bi-briefcase-fill"></i>', iconSize: [22, 22], iconAnchor: [11, 11] });
+            L.marker([p.lat, p.lng], { icon: punto }).addTo(mapa).bindPopup(texto).bindTooltip(p.pago, { direction: "top", offset: [0, -10] });
             grupo.push([p.lat, p.lng]);
             return;
         }
@@ -77,7 +86,7 @@ function agregarLeyenda(mapa, puntos, compacto) {
     }
     puntos.forEach(function (p) {
         if (p.tipo === "trabajo") {
-            fila("trabajo", '<b class="ley-trabajo"><i class="bi bi-briefcase-fill"></i></b>', "Trabajo");
+            fila("trabajo", '<b class="ley-trabajo"><i class="bi bi-briefcase-fill"></i></b>', compacto ? "Trabajo (pasa el mouse para ver el pago)" : "Trabajo");
         } else if (p.tipo === "uni") {
             fila("uni-" + (p.clase || "universidad"), '<b class="ley-uni marca-' + (p.clase || "universidad") + '"><i class="bi bi-' + (p.icono || "mortarboard-fill") + '"></i></b>', p.grupo || "Universidad");
         } else {
@@ -85,7 +94,7 @@ function agregarLeyenda(mapa, puntos, compacto) {
             fila("cuarto-" + (p.clase || "cuarto"), '<b class="ley-cuarto tipo-' + (p.clase || "cuarto") + '"><i class="bi bi-' + (p.icono || "house-fill") + '"></i></b>', p.grupo || "Cuarto");
         }
     });
-    if (filas.length < 2) return;   // con un solo tipo no hace falta
+    if (filas.length < 2 && !compacto) return;   // con un solo tipo y precios visibles no hace falta
     // los cuartos primero, después trabajos y lugares de estudio
     filas.unshift('<li class="ley-nota">' + (compacto ? "Pasa el mouse o toca un punto para ver el precio" : "Los cuartos muestran su precio al mes") + "</li>");
 

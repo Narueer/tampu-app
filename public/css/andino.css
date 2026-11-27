@@ -1,0 +1,621 @@
+/*
+ * Estilo andino moderno (se carga después de estilos.css y tema.css).
+ * Ideas: piedra inca, tejidos (pallay) y adobe; sin degradados, sin "pastillas" de colores,
+ * títulos con una serif cálida (Fraunces) y bordes finos en vez de sombras grandes.
+ */
+
+:root {
+    --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --piedra: #8c857a;
+    --piedra-clara: #d9d2c5;
+    --adobe: #efe6d8;
+    --radio: 8px;
+    --radio-grande: 14px;
+    --sombra: 0 1px 0 rgba(27, 42, 37, 0.04);
+    --sombra-fuerte: 0 18px 40px -24px rgba(27, 42, 37, 0.35);
+
+    /* franja de tejido (pallay): rombos escalonados en terracota, ocre y verde */
+    --tejido: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='12' viewBox='0 0 48 12'%3E%3Crect width='48' height='12' fill='%2317352f'/%3E%3Cpath d='M0 6 6 0h6l6 6-6 6H6z' fill='%23b0502a'/%3E%3Cpath d='M6 6 9 3l3 3-3 3z' fill='%23ecd3a4'/%3E%3Cpath d='M24 6l6-6h6l6 6-6 6h-6z' fill='%23c8973f'/%3E%3Cpath d='M30 6l3-3 3 3-3 3z' fill='%2317352f'/%3E%3C/svg%3E");
+    /* muro inca: piedras de distinto tamaño, apenas marcadas */
+    --muro: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='280' viewBox='0 0 420 280'%3E%3Cpath d='M11 4 114 4 121 11 121 46 114 53 11 53 4 46 4 11z M133 4 228 4 236 12 236 47 228 55 133 55 125 47 125 12z M248 4 301 4 309 12 309 45 301 53 248 53 240 45 240 12z M317 4 378 4 382 8 382 49 378 53 317 53 313 49 313 8z M391 4 411 4 416 9 416 51 411 56 391 56 386 51 386 9z M11 60 93 60 100 67 100 82 93 89 11 89 4 82 4 67z M112 60 162 60 170 68 170 86 162 94 112 94 104 86 104 68z M178 60 283 60 287 64 287 90 283 94 178 94 174 90 174 64z M296 60 336 60 341 65 341 88 336 93 296 93 291 88 291 65z M352 60 387 60 394 67 394 85 387 92 352 92 345 85 345 67z M406 60 408 60 416 68 416 80 408 88 406 88 398 80 398 68z M9 98 111 98 116 103 116 128 111 133 9 133 4 128 4 103z M127 98 196 98 203 105 203 131 196 138 127 138 120 131 120 105z M214 98 256 98 263 105 263 126 256 133 214 133 207 126 207 105z M274 98 341 98 348 105 348 127 341 134 274 134 267 127 267 105z M361 98 399 98 408 107 408 127 399 136 361 136 352 127 352 107z M12 142 71 142 79 150 79 178 71 186 12 186 4 178 4 150z M87 142 128 142 132 146 132 180 128 184 87 184 83 180 83 146z M143 142 188 142 195 149 195 181 188 188 143 188 136 181 136 149z M206 142 275 142 282 149 282 181 275 188 206 188 199 181 199 149z M295 142 325 142 334 151 334 179 325 188 295 188 286 179 286 151z M343 142 406 142 411 147 411 183 406 188 343 188 338 183 338 147z M13 192 89 192 98 201 98 232 89 241 13 241 4 232 4 201z M106 192 197 192 201 196 201 236 197 240 106 240 102 236 102 196z M214 192 267 192 276 201 276 233 267 242 214 242 205 233 205 201z M284 192 365 192 369 196 369 238 365 242 284 242 280 238 280 196z M377 192 412 192 416 196 416 237 412 241 377 241 373 237 373 196z M9 248 62 248 67 253 67 272 62 277 9 277 4 272 4 253z M75 248 125 248 129 252 129 278 125 282 75 282 71 278 71 252z M140 248 231 248 238 255 238 274 231 281 140 281 133 274 133 255z M247 248 354 248 359 253 359 274 354 279 247 279 242 274 242 253z M368 248 411 248 416 253 416 272 411 277 368 277 363 272 363 253z' fill='none' stroke='%23ffffff' stroke-opacity='.045' stroke-width='1.4'/%3E%3C/svg%3E");
+}
+
+/* ---------- letras ---------- */
+h1, h2, h3, .titulo-pagina {
+    font-family: var(--serif);
+    font-optical-sizing: auto;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* la palabra destacada ya no va en cursiva: va subrayada con una franja de tejido */
+h1 em, h2 em, h3 em {
+    font-style: normal;
+    font-weight: inherit;
+    color: inherit;
+    background-image: var(--tejido);
+    background-repeat: repeat-x;
+    background-size: auto 0.16em;
+    background-position: 0 92%;
+    padding-bottom: 0.06em;
+}
+
+.banda-cta h2 em,
+.seccion-historia h2 em,
+.pie-lema em,
+.portada-carrusel h1 em {
+    color: var(--ocre-claro);
+}
+
+/* sobretítulo: escalón andino a la izquierda, sin rombos a los lados */
+.sobretitulo {
+    letter-spacing: 0.16em;
+    font-size: 0.7rem;
+    color: var(--terracota-oscuro);
+}
+
+.sobretitulo::before {
+    width: 14px !important;
+    height: 10px !important;
+    transform: none !important;
+    background-color: var(--terracota) !important;
+    clip-path: polygon(0 100%, 0 60%, 33% 60%, 33% 30%, 66% 30%, 66% 0, 100% 0, 100% 100%);
+}
+
+.encabezado-seccion:not(.con-flechas) .sobretitulo::after {
+    display: none !important;
+}
+
+/* ---------- botones: rectos, sin brillo ni sombra de color ---------- */
+.btn {
+    border-radius: var(--radio) !important;
+    letter-spacing: 0;
+}
+
+.btn:not(.btn-borde):not(.btn-claro):not(.btn-peligro):not(.btn-externo) {
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+.btn:hover {
+    transform: none;
+    box-shadow: none !important;
+}
+
+.btn::after {
+    display: none !important;
+}
+
+/* ---------- tarjetas y cajas: borde fino, poca sombra ---------- */
+.tarjeta,
+.tarjeta-trabajo,
+.caja,
+.paso,
+.tarjeta-uni,
+.institutos,
+.kpi,
+.auth {
+    border-radius: var(--radio-grande) !important;
+    box-shadow: none !important;
+}
+
+.tarjeta:hover,
+.tarjeta-trabajo:hover,
+.tarjeta-uni:hover,
+.kpi:hover {
+    box-shadow: var(--sombra-fuerte) !important;
+    transform: translateY(-2px) !important;
+}
+
+.caja h2 > .bi:first-child,
+.caja h3 > .bi:first-child {
+    display: none;
+}
+
+.caja h2 {
+    font-size: 1.2rem;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--borde);
+    margin-bottom: 16px;
+}
+
+.etiqueta {
+    border-radius: 4px !important;
+}
+
+/* ---------- menú de los paneles: pestañas con raya abajo ---------- */
+.subnav {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--borde) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    gap: 4px !important;
+}
+
+.subnav a {
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--texto-suave) !important;
+    padding: 12px 14px !important;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+}
+
+.subnav a i {
+    display: none;
+}
+
+.subnav a.activo,
+.subnav a:hover {
+    color: var(--tinta) !important;
+    border-bottom-color: var(--terracota);
+}
+
+/* ---------- saludo de los paneles: piedra oscura + franja de tejido + ilustración ---------- */
+.bienvenida {
+    background: var(--verde-andino) var(--muro) !important;
+    border-radius: var(--radio-grande) !important;
+    padding-bottom: 34px !important;
+    min-height: 150px;
+}
+
+.bienvenida::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 10px;
+    background: var(--tejido) repeat-x;
+    background-size: auto 10px;
+}
+
+.bienvenida::before {
+    display: none !important;
+}
+
+.bienvenida-avatar {
+    border-radius: 10px !important;
+    clip-path: polygon(14% 0, 86% 0, 86% 14%, 100% 14%, 100% 86%, 86% 86%, 86% 100%, 14% 100%, 14% 86%, 0 86%, 0 14%, 14% 14%);
+    background: var(--ocre) !important;
+    color: var(--verde-andino) !important;
+    border: none !important;
+    font-family: var(--serif);
+    font-weight: 700;
+}
+
+.bienvenida-fecha {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.7rem !important;
+    color: var(--ocre-claro) !important;
+}
+
+.bienvenida-fecha i {
+    display: none;
+}
+
+.bienvenida .btn-claro {
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #fff !important;
+}
+
+.bienvenida .btn-claro:hover {
+    background: #fff !important;
+    color: var(--verde-andino) !important;
+}
+
+.bienvenida-ilustracion {
+    position: absolute;
+    right: 18px;
+    bottom: 6px;
+    height: 150px;
+    width: auto;
+    pointer-events: none;
+    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.35));
+}
+
+.bienvenida.con-ilustracion .bienvenida-acciones {
+    margin-right: 190px;
+}
+
+@media (max-width: 991px) {
+    .bienvenida-ilustracion { display: none; }
+    .bienvenida.con-ilustracion .bienvenida-acciones { margin-right: 0; }
+}
+
+/* ---------- números de los paneles: cifra grande y una raya de color arriba ---------- */
+.kpis {
+    gap: 0 !important;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-grande);
+    background: var(--papel);
+    overflow: hidden;
+}
+
+.kpi {
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    padding: 20px 22px 18px !important;
+    position: relative;
+}
+
+.kpi + .kpi {
+    border-left: 1px solid var(--borde) !important;
+}
+
+.kpi::before {
+    content: "";
+    position: absolute;
+    left: 22px;
+    top: 0;
+    width: 28px;
+    height: 4px;
+    background: var(--terracota);
+}
+
+.kpi-verde::before { background: #2e7d5b; }
+.kpi-azul::before { background: #2f6b8a; }
+.kpi-amarillo::before { background: var(--ocre); }
+.kpi-rosa::before { background: #b23b4b; }
+
+.kpi:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    background: var(--adobe) !important;
+}
+
+.kpi-icono {
+    display: none !important;
+}
+
+.kpi-datos b {
+    font-size: 2.1rem !important;
+    line-height: 1.1;
+}
+
+.kpi-datos span {
+    font-size: 0.82rem;
+    color: var(--texto-suave);
+}
+
+@media (max-width: 767px) {
+    .kpi + .kpi { border-left: none !important; }
+    .kpis .kpi:nth-child(2n) { border-left: 1px solid var(--borde) !important; }
+    .kpis .kpi:nth-child(n + 3) { border-top: 1px solid var(--borde) !important; }
+}
+
+/* ---------- pasos de la portada con ilustraciones 3D ---------- */
+.paso {
+    text-align: left;
+    padding: 0 0 24px !important;
+    overflow: hidden;
+    background: var(--papel) !important;
+}
+
+.paso-ilustracion {
+    display: block;
+    width: 100%;
+    aspect-ratio: 35 / 26;
+    object-fit: contain;
+    background: var(--adobe);
+    border-bottom: 1px solid var(--borde);
+    margin-bottom: 18px;
+}
+
+.paso .paso-numero {
+    position: static !important;
+    display: inline-block;
+    font-family: var(--serif);
+    font-style: normal !important;
+    font-size: 0.8rem !important;
+    font-weight: 600;
+    color: var(--terracota) !important;
+    opacity: 1 !important;
+    margin: 0 24px 4px;
+    letter-spacing: 0.1em;
+}
+
+.paso .paso-numero::before {
+    content: "Paso ";
+}
+
+.paso > .bi {
+    display: none !important;
+}
+
+.paso h3,
+.paso p {
+    margin-left: 24px;
+    margin-right: 24px;
+}
+
+/* ---------- llamado final: adobe claro + casita 3D, sin degradado ---------- */
+.banda-cta {
+    background: var(--adobe) !important;
+    color: var(--texto) !important;
+    text-align: left !important;
+    padding: 64px 0 !important;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--borde);
+}
+
+.banda-cta::before,
+.banda-cta::after {
+    display: none !important;
+}
+
+.banda-cta .contenedor {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    gap: 40px;
+}
+
+.banda-cta h2 {
+    color: var(--tinta) !important;
+    font-size: clamp(2rem, 4vw, 2.9rem);
+}
+
+.banda-cta h2 em {
+    color: inherit !important;
+}
+
+.banda-cta p {
+    margin: 16px 0 28px !important;
+    color: var(--texto-suave) !important;
+    max-width: 520px;
+}
+
+.banda-cta .btn-claro {
+    background: var(--terracota) !important;
+    border-color: var(--terracota) !important;
+    color: #fff !important;
+}
+
+.banda-cta .btn-claro:hover {
+    background: var(--terracota-oscuro) !important;
+}
+
+.banda-cta .banda-ilustracion {
+    width: 100%;
+    max-width: 440px;
+    justify-self: end;
+    filter: drop-shadow(0 22px 26px rgba(27, 42, 37, 0.22));
+}
+
+@media (max-width: 767px) {
+    .banda-cta .contenedor { grid-template-columns: 1fr; }
+    .banda-cta .banda-ilustracion { justify-self: center; max-width: 300px; }
+}
+
+/* ---------- secciones oscuras y pie de página con textura de piedra ---------- */
+.seccion-historia,
+footer.pie {
+    background-image: var(--muro) !important;
+}
+
+.pie-lema {
+    font-family: var(--serif) !important;
+    font-weight: 500 !important;
+}
+
+/* ---------- tablas: encabezado con raya, sin fondo de color ---------- */
+.tabla th,
+table th {
+    background-color: transparent !important;
+    border-bottom: 2px solid var(--tinta) !important;
+    color: var(--tinta) !important;
+    font-size: 0.72rem !important;
+}
+
+.horario th {
+    border-bottom: none !important;
+}
+
+/* ---------- gráficos del administrador (barras hechas con HTML) ---------- */
+.barras-distrito {
+    display: grid;
+    gap: 12px;
+}
+
+.barra-fila {
+    display: grid;
+    grid-template-columns: 110px 1fr 74px;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.88rem;
+}
+
+.barra-fila b {
+    font-weight: 600;
+    color: var(--tinta);
+}
+
+.barra-pista {
+    height: 12px;
+    background: var(--adobe);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.barra-pista span {
+    display: block;
+    height: 100%;
+    background: var(--terracota);
+}
+
+.barra-fila .barra-valor {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--texto-suave);
+}
+
+.barra-fila.barra-precio .barra-pista span {
+    background: var(--verde-andino);
+}
+
+.proporcion {
+    display: flex;
+    height: 18px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 6px 0 14px;
+}
+
+.proporcion span {
+    display: block;
+    height: 100%;
+}
+
+.proporcion-leyenda {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.proporcion-leyenda li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.proporcion-leyenda i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex: 0 0 auto;
+}
+
+.proporcion-leyenda b {
+    margin-left: auto;
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--tinta);
+}
+
+.proporcion-total {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: var(--tinta);
+    line-height: 1;
+}
+
+.proporcion-total small {
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--texto-suave);
+    margin-left: 6px;
+}
+
+/* ---------- páginas vacías y errores con el cuarto 3D ---------- */
+.ilustracion-vacia {
+    display: block;
+    width: min(260px, 70%);
+    margin: 0 auto 10px;
+}
+
+/* ---------- detalles ---------- */
+.seccion-numeros .row > div::after {
+    display: none !important;
+}
+
+.migas {
+    font-size: 0.82rem;
+}
+
+.chip-instituto,
+.chip-rapido,
+.distritos-lista a {
+    border-radius: 6px !important;
+}
+
+.foto-lugar {
+    border-radius: 13px 13px 0 0 !important;
+}
+
+.institutos {
+    background: var(--papel);
+}
+
+.portada-carrusel h1 {
+    font-weight: 600;
+}
+
+/* 5 cajas de gráficos: las dos de distritos arriba, las tres de proporciones abajo */
+.graficos {
+    grid-template-columns: repeat(6, 1fr) !important;
+}
+.graficos .caja:nth-child(-n + 2) { grid-column: span 3; }
+.graficos .caja:nth-child(n + 3) { grid-column: span 2; }
+@media (max-width: 991px) {
+    .graficos { grid-template-columns: 1fr !important; }
+    .graficos .caja { grid-column: auto !important; }
+}
+
+/* "Por qué TAMPU": maqueta 3D sobre un panel de adobe, sin globos flotantes */
+.ilustracion-panel {
+    margin: 0;
+    background: var(--adobe);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-grande);
+    overflow: hidden;
+}
+.ilustracion-panel img {
+    display: block;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 18px 18px 0;
+}
+.ilustracion-panel figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--borde);
+    background: var(--papel);
+    font-size: 0.86rem;
+    color: var(--texto);
+}
+.ilustracion-panel figcaption i { color: var(--terracota); margin-right: 4px; }
+
+.lista-ventajas li > .bi {
+    background: transparent !important;
+    border: none !important;
+    color: var(--terracota) !important;
+    width: auto !important;
+    height: auto !important;
+    font-size: 1.25rem !important;
+    padding-top: 2px;
+}
+.lista-ventajas li {
+    border-top: 1px solid var(--borde);
+    padding-top: 12px;
+}
+
+/* el logo se queda con su letra de siempre */
+.logo { font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif !important; }
+
+.marca-punto-trabajo { --tipo: var(--terracota); }
+.chips-filtro a, .chips-filtro button, .chips-distrito a, .filtro-distritos a { border-radius: 6px !important; }
+
+.vacio:has(.ilustracion-vacia) {
+    text-align: center;
+    background: var(--papel);
+    border-style: solid;
+    border-color: var(--borde);
+    padding: 26px 20px;
+    grid-column: 1 / -1;
+}
