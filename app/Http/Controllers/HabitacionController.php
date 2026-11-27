@@ -24,7 +24,7 @@ class HabitacionController extends Controller
             $consulta->where('tipo', $request->tipo);
         }
         if ($request->filled('cerca_de')) {
-            $consulta->whereLike('cerca_de', '%' . $request->cerca_de . '%');
+            \App\Support\Lugares::filtrar($consulta, $request->cerca_de);
         }
 
         $orden = $request->orden === 'mayor' ? 'desc' : 'asc';

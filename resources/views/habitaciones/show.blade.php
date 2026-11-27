@@ -94,9 +94,9 @@
                     <p class="texto-suave">{{ $habitacion->direccion }}, {{ $habitacion->distrito }}. En el mapa también están las universidades más cercanas.</p>
                     <div id="mapa" class="mapa mapa-chico" data-puntos='@json($punto)'></div>
 
-                    <h2>¿Qué tan lejos queda de tu universidad?</h2>
+                    <h2>¿Qué tan lejos queda de donde estudias?</h2>
                     <div class="distancias">
-                        @foreach ($distancias as $u)
+                        @foreach (array_slice($distancias, 0, 6) as $u)
                             <div class="distancia {{ $loop->first ? 'mas-cerca' : '' }}">
                                 <span class="distancia-icono"><i class="bi bi-{{ $u['modo'] === 'a pie' ? 'person-walking' : 'bus-front' }}"></i></span>
                                 <div>
@@ -106,7 +106,7 @@
                             </div>
                         @endforeach
                     </div>
-                    <p class="nota-distancia">Distancia aproximada por calles a partir de la ubicación en OpenStreetMap.</p>
+                    <p class="nota-distancia">Las 6 universidades o institutos más cercanos. Distancia aproximada por calles a partir de la ubicación en OpenStreetMap.</p>
                 @endif
 
                 <h2 id="resenas">Reseñas</h2>

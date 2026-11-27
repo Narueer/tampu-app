@@ -28,6 +28,18 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // asistente virtual: respaldo con IA cuando las reglas no entienden (ver app/Services/AsistenteIA.php)
+    'ia' => [
+        'proveedor' => env('IA_PROVEEDOR', 'gemini'),
+        'clave' => env('IA_CLAVE'),
+        'modelo' => env('IA_MODELO'),
+        'url' => env('IA_URL'),
+        'respaldo_proveedor' => env('IA_RESPALDO_PROVEEDOR', 'groq'),
+        'respaldo_clave' => env('IA_RESPALDO_CLAVE'),
+        'respaldo_modelo' => env('IA_RESPALDO_MODELO'),
+        'tiempo' => env('IA_TIEMPO', 2.5),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

@@ -1,4 +1,19 @@
-<?php $__env->startSection('titulo', 'Inicio'); ?>
+<?php $__env->startSection('titulo', 'Cuartos y trabajos para estudiantes en Cusco'); ?>
+<?php $__env->startSection('descripcion', 'Encuentra habitaciones verificadas cerca de la UNSAAC, la U. Andina y la U. Continental, y trabajos de medio tiempo que respetan tu horario de clases en Cusco.'); ?>
+
+<?php $__env->startPush('meta'); ?>
+    <script type="application/ld+json">
+        <?php echo json_encode([
+            "\x40context" => 'https://schema.org',
+            "\x40type" => 'WebSite',
+            'name' => 'TAMPU',
+            'url' => route('inicio'),
+            'description' => 'Habitaciones verificadas y trabajos de medio tiempo para estudiantes en Cusco.',
+            'inLanguage' => 'es-PE',
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
+
+    </script>
+<?php $__env->stopPush(); ?>
 
 <?php $__env->startPush('estilos'); ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
@@ -47,6 +62,8 @@
             </div>
         </div>
 
+        <a href="#contenido-inicio" class="bajar" aria-label="Bajar al contenido"><span></span></a>
+
         <button class="carousel-control-prev" type="button" data-bs-target="#portada" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Anterior</span>
@@ -82,16 +99,32 @@
                 <label for="bTipo"><i class="bi bi-door-open"></i> Tipo</label>
                 <select id="bTipo" name="tipo">
                     <option value="">Todos</option>
-                    <option value="individual">Individual</option>
-                    <option value="compartida">Compartida</option>
-                    <option value="minidepartamento">Minidepartamento</option>
+                    <?php $__currentLoopData = \App\Models\Habitacion::TIPOS; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $valor => $texto): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($valor); ?>"><?php echo e($texto); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
             <button type="submit" class="btn btn-grande"><i class="bi bi-search"></i> Buscar</button>
         </form>
     </div>
 
-    <main class="sin-espacio">
+    <!-- cinta que se desliza sola -->
+    <div class="cinta" aria-label="Universidades y ventajas">
+        <div class="cinta-pista">
+            <?php $__currentLoopData = [1, 2]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vuelta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="cinta-grupo" <?php if($vuelta === 2): ?> aria-hidden="true" <?php endif; ?>>
+                    <?php $__currentLoopData = $universidades; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $u): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <span><i class="bi bi-mortarboard"></i> <?php echo e($u['nombre']); ?></span>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <span><i class="bi bi-patch-check"></i> Cuartos verificados</span>
+                    <span><i class="bi bi-house-heart"></i> Visita antes de pagar</span>
+                    <span><i class="bi bi-calendar2-week"></i> Trabajos según tu horario</span>
+                </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+    </div>
+
+    <main class="sin-espacio" id="contenido-inicio">
         <!-- numeros -->
         <section class="seccion-numeros">
             <div class="contenedor">
@@ -192,25 +225,71 @@
             <div class="contenedor">
                 <div class="encabezado-seccion revelar">
                     <span class="sobretitulo">Elige por dónde estudias</span>
-                    <h2>Cuartos cerca de <em>tu universidad</em></h2>
+                    <h2>Cuartos cerca de <em>donde estudias</em></h2>
                 </div>
                 <div class="row g-3">
-                    <?php $__currentLoopData = $universidades; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $u): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="col-6 col-lg-3 revelar">
-                            <a href="<?php echo e(route('habitaciones.index', ['cerca_de' => $u['clave']])); ?>" class="tarjeta-uni">
+                    <?php $__currentLoopData = $universidades->where('tipo', 'universidad'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $u): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="col-6 col-lg revelar">
+                            
+                            <a href="<?php echo e($u['total'] > 0 ? route('habitaciones.index', ['cerca_de' => $u['clave']]) : route('habitaciones.index')); ?>" class="tarjeta-uni">
                                 <i class="bi bi-mortarboard"></i>
                                 <b><?php echo e($u['nombre']); ?></b>
                                 <small><?php echo e($u['lugar']); ?></small>
-                                <span><?php echo e($u['total']); ?> <?php echo e($u['total'] === 1 ? 'cuarto' : 'cuartos'); ?> <i class="bi bi-arrow-right"></i></span>
+                                <span><?php if($u['total'] > 0): ?><?php echo e($u['total']); ?> <?php echo e($u['total'] === 1 ? 'cuarto' : 'cuartos'); ?><?php else: ?> Ver cuartos <?php endif; ?> <i class="bi bi-arrow-right"></i></span>
                             </a>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+
+                <!-- institutos: agrupados por tipo, como chips -->
+                <div class="institutos revelar">
+                    <p class="institutos-titulo"><i class="bi bi-buildings"></i> ¿Estudias en un instituto? También te buscamos cuarto cerca</p>
+                    <?php $__currentLoopData = \App\Support\Lugares::TIPOS; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tipo => $titulo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php if($tipo === 'universidad') continue; ?>
+                        <div class="institutos-grupo">
+                            <span class="institutos-tipo"><?php echo e($titulo); ?></span>
+                            <div class="institutos-lista">
+                                <?php $__currentLoopData = $universidades->where('tipo', $tipo); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $u): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <a href="<?php echo e($u['total'] > 0 ? route('habitaciones.index', ['cerca_de' => $u['clave']]) : route('habitaciones.index')); ?>" class="chip-instituto" title="<?php echo e($u['completo']); ?>">
+                                        <?php echo e($u['nombre']); ?>
+
+                                        <?php if($u['total'] > 0): ?><em><?php echo e($u['total']); ?></em><?php endif; ?>
+                                    </a>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
         </section>
 
-        <!-- mapa con todos los cuartos -->
+        <!-- barrios de cusco -->
         <section class="seccion fondo-blanco">
+            <div class="contenedor">
+                <div class="encabezado-seccion con-flechas revelar">
+                    <div>
+                        <span class="sobretitulo">Barrios de Cusco</span>
+                        <h2>¿Dónde te <em>gustaría vivir</em>?</h2>
+                    </div>
+                    <a href="<?php echo e(route('habitaciones.index')); ?>" class="btn btn-borde">Ver todos <i class="bi bi-arrow-right"></i></a>
+                </div>
+                <div class="barrios">
+                    <?php $__currentLoopData = $barrios; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $b): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <a href="<?php echo e(route('habitaciones.index', ['distrito' => $b['nombre']])); ?>" class="barrio revelar" style="--fondo-img: url('<?php echo e($b['foto']); ?>')">
+                            <span class="barrio-numero"><?php echo e(str_pad($loop->iteration, 2, '0', STR_PAD_LEFT)); ?></span>
+                            <div class="barrio-texto">
+                                <h3><?php echo e($b['nombre']); ?></h3>
+                                <p><?php echo e($b['texto']); ?></p>
+                                <span class="barrio-datos"><?php echo e($b['total']); ?> <?php echo e($b['total'] == 1 ? 'cuarto' : 'cuartos'); ?> · desde S/ <?php echo e(number_format($b['desde'], 0)); ?> <i class="bi bi-arrow-up-right"></i></span>
+                            </div>
+                        </a>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            </div>
+        </section>
+
+        <!-- mapa con todos los cuartos -->
+        <section class="seccion">
             <div class="contenedor">
                 <div class="row g-4 align-items-center">
                     <div class="col-lg-4 revelar">
@@ -277,6 +356,42 @@
             </div>
         </section>
 
+        <!-- linea de tiempo: de los tampus incas a hoy -->
+        <section class="seccion seccion-historia">
+            <div class="contenedor">
+                <div class="encabezado-seccion revelar">
+                    <span class="sobretitulo">De dónde viene el nombre</span>
+                    <h2>Del Qhapaq Ñan <em>a tu primer cuarto</em></h2>
+                </div>
+                <ol class="linea-historia">
+                    <li class="revelar">
+                        <span class="hito-fecha">Siglo XV</span>
+                        <i class="bi bi-signpost-split"></i>
+                        <h3>El camino inca</h3>
+                        <p>El Qhapaq Ñan unía el Tawantinsuyu con miles de kilómetros de caminos que salían desde Cusco.</p>
+                    </li>
+                    <li class="revelar">
+                        <span class="hito-fecha">En el camino</span>
+                        <i class="bi bi-house-door"></i>
+                        <h3>Los tampus</h3>
+                        <p>A lo largo de la ruta había tampus: casas de descanso con techo, comida y depósitos para el viajero.</p>
+                    </li>
+                    <li class="revelar">
+                        <span class="hito-fecha">2014</span>
+                        <i class="bi bi-globe-americas"></i>
+                        <h3>Patrimonio mundial</h3>
+                        <p>La UNESCO declaró al Qhapaq Ñan Patrimonio de la Humanidad, compartido por seis países.</p>
+                    </li>
+                    <li class="revelar">
+                        <span class="hito-fecha">Hoy</span>
+                        <i class="bi bi-phone"></i>
+                        <h3>TAMPU</h3>
+                        <p>Una casa de paso digital para el estudiante que llega a Cusco: cuarto seguro y trabajo que respeta sus clases.</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
         <!-- opiniones en carrusel -->
         <?php if($resenas->isNotEmpty()): ?>
             <section class="seccion seccion-opiniones">
@@ -340,6 +455,81 @@
                                 <figcaption>Cuesta de San Blas</figcaption>
                             </figure>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- preguntas frecuentes -->
+        <section class="seccion">
+            <div class="contenedor">
+                <div class="row g-4 g-lg-5">
+                    <div class="col-lg-4 revelar">
+                        <span class="sobretitulo">Preguntas frecuentes</span>
+                        <h2 class="titulo-grande">Lo que todos <em>preguntan</em></h2>
+                        <p class="texto-suave">Si tu duda no está aquí, escríbenos o pregúntale al asistente del botón de abajo.</p>
+                        <a href="<?php echo e(route('contacto')); ?>" class="btn btn-borde mt-3">Escríbenos <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="col-lg-8 revelar">
+                        <div class="accordion preguntas" id="preguntas">
+                            <?php $__currentLoopData = [
+                                ['¿Usar TAMPU cuesta algo?', 'No. Buscar cuartos, postular a trabajos y publicar es gratis para estudiantes, arrendadores y empresas.'],
+                                ['¿Cómo sé que el arrendador es real?', 'Antes de publicar, el administrador revisa el DNI o RUC de cada cuenta. Solo las cuentas verificadas aparecen en la página.'],
+                                ['¿Qué hago si me piden un adelanto sin ver el cuarto?', 'No lo pagues. Pide la visita desde la página y usa el botón "Reportar" en la publicación. El administrador lo revisa.'],
+                                ['¿Cómo funciona el filtro por horario?', 'Marcas en tu panel los turnos en los que tienes clases. En Trabajos puedes ver solo las ofertas que no se cruzan con ellos.'],
+                                ['¿Cuándo veo el celular del arrendador?', 'Cuando el arrendador acepta tu solicitud de visita. Así tus datos y los suyos quedan protegidos.'],
+                                ['¿Puedo instalar TAMPU en mi celular?', 'Sí. Desde el navegador del celular elige "Instalar app" o "Agregar a pantalla de inicio" y se abre como una aplicación.'],
+                            ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$pregunta, $respuesta]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header">
+                                        <button class="accordion-button <?php echo e($loop->first ? '' : 'collapsed'); ?>" type="button" data-bs-toggle="collapse" data-bs-target="#pregunta<?php echo e($loop->index); ?>" aria-expanded="<?php echo e($loop->first ? 'true' : 'false'); ?>">
+                                            <span class="pregunta-numero"><?php echo e(str_pad($loop->iteration, 2, '0', STR_PAD_LEFT)); ?></span> <?php echo e($pregunta); ?>
+
+                                        </button>
+                                    </h3>
+                                    <div id="pregunta<?php echo e($loop->index); ?>" class="accordion-collapse collapse <?php echo e($loop->first ? 'show' : ''); ?>" data-bs-parent="#preguntas">
+                                        <div class="accordion-body"><?php echo e($respuesta); ?></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- boletin y app en el celular -->
+        <section class="seccion seccion-app" id="boletin">
+            <div class="contenedor">
+                <div class="row g-5 align-items-center">
+                    <div class="col-lg-5 revelar">
+                        <div class="celular-escena">
+                            <div class="celular">
+                                <img src="<?php echo e(asset('img/app-celular.jpg')); ?>" alt="TAMPU abierto en un celular">
+                            </div>
+                            <div class="globo-flotante globo-app flotar-lento">
+                                <i class="bi bi-bell-fill"></i>
+                                <div><b>Nuevo cuarto en Wanchaq</b><small>S/ 280 al mes · verificado</small></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 revelar">
+                        <span class="sobretitulo">En tu bolsillo</span>
+                        <h2 class="titulo-grande">Lleva TAMPU <em>en tu celular</em></h2>
+                        <p class="texto-suave">Instálala como app desde el navegador y recibe los avisos de tus visitas y postulaciones. Si quieres, también te avisamos por correo cuando haya cuartos nuevos.</p>
+                        <form action="<?php echo e(route('boletin')); ?>" method="POST" class="form-boletin">
+                            <?php echo csrf_field(); ?>
+                            <label for="correoBoletin" class="visually-hidden">Tu correo</label>
+                            <input type="email" id="correoBoletin" name="email" placeholder="tu correo electrónico" required maxlength="100">
+                            <button type="submit" class="btn">Avísame <i class="bi bi-arrow-right"></i></button>
+                        </form>
+                        <?php echo $__env->make('partials.errores', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                        <div class="app-ventajas">
+                            <span><i class="bi bi-lightning-charge"></i> Abre al instante</span>
+                            <span><i class="bi bi-bell"></i> Avisos de visitas</span>
+                            <span><i class="bi bi-wifi-off"></i> Funciona con mala señal</span>
+                        </div>
+                        <button type="button" class="btn btn-borde mt-4 oculto" data-instalar><i class="bi bi-phone"></i> Instalar la app</button>
                     </div>
                 </div>
             </div>

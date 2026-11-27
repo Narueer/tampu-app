@@ -44,6 +44,13 @@
                             </div>
                         @endforeach
                     </div>
+                    @if ($rapidos)
+                        <div class="chat-rapidos" id="chatRapidos" aria-label="Mensajes rápidos">
+                            @foreach ($rapidos as $r)
+                                <button type="button" class="chip-rapido" data-texto="{{ $r }}">{{ $r }}</button>
+                            @endforeach
+                        </div>
+                    @endif
                     <form id="chatForm" class="chat-form" action="{{ route('mensajes.enviar', $actual) }}" method="POST">
                         @csrf
                         <input type="text" name="texto" id="chatTexto" placeholder="Escribe un mensaje..." maxlength="1000" autocomplete="off" required>

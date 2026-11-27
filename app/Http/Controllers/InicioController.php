@@ -34,7 +34,7 @@ class InicioController extends Controller
         // los numeros y conteos de la portada cambian poco: se guardan 60 segundos en cache
         // para no repetir las mismas consultas agrupadas en cada visita
         ['numeros' => $numeros, 'porDistrito' => $porDistrito, 'mejores' => $mejores, 'porUniversidad' => $porUniversidad] =
-            Cache::remember('inicio.resumen', 60, function () {
+            Cache::remember('inicio.resumen.v2', 60, function () {
                 $numeros = [
                     'habitaciones' => Habitacion::publicadas()->count(),
                     'trabajos' => Trabajo::publicadas()->count(),
@@ -58,8 +58,11 @@ class InicioController extends Controller
                 )->where('puesto', 1)->get()->keyBy('distrito');
 
                 // cuartos cerca de cada universidad: un solo conteo agrupado en vez de uno por universidad
-                $porUniversidad = Habitacion::publicadas()->whereNotNull('cerca_de')
-                    ->selectRaw('cerca_de, count(*) as total')->groupBy('cerca_de')->pluck('total', 'cerca_de');
+                // (se traen solo 3 columnas de cada cuarto y se cuenta en PHP: una consulta para los 30 lugares)
+                $cuartos = Habitacion::publicadas()->get(['lat', 'lng', 'cerca_de']);
+                $porUniversidad = collect(\App\Support\Lugares::UNIVERSIDADES)->map(fn ($u, $clave) => $cuartos
+                    ->filter(fn ($h) => \App\Support\Lugares::estaCerca($h->lat !== null ? (float) $h->lat : null, $h->lng !== null ? (float) $h->lng : null, $h->cerca_de, $clave))
+                    ->count());
 
                 return compact('numeros', 'porDistrito', 'mejores', 'porUniversidad');
             });
@@ -81,7 +84,7 @@ class InicioController extends Controller
         $puntos = Habitacion::publicadas()->whereNotNull('lat')->get(['id', 'titulo', 'precio', 'lat', 'lng'])->map(fn ($h) => [
             'lat' => (float) $h->lat, 'lng' => (float) $h->lng, 'titulo' => $h->titulo,
             'precio' => (int) $h->precio, 'url' => route('habitaciones.show', $h),
-        ])->merge(collect(\App\Support\Lugares::UNIVERSIDADES)->map(fn ($u) => [
+        ])->merge(collect(\App\Support\Lugares::conUbicacion())->map(fn ($u) => [
             'lat' => $u['lat'], 'lng' => $u['lng'], 'titulo' => $u['nombre'], 'tipo' => 'uni',
         ])->values());
 

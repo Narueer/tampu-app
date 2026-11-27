@@ -49,7 +49,12 @@
             <div class="fila">
                 <div>
                     <label for="cerca_de">Cerca de (universidad o instituto)</label>
-                    <input type="text" id="cerca_de" name="cerca_de" value="{{ old('cerca_de', $habitacion->cerca_de) }}" maxlength="80" placeholder="Ej: UNSAAC">
+                    <input type="text" id="cerca_de" name="cerca_de" value="{{ old('cerca_de', $habitacion->cerca_de) }}" maxlength="80" placeholder="Ej: UNSAAC" list="listaLugares">
+                    <datalist id="listaLugares">
+                        @foreach (\App\Support\Lugares::UNIVERSIDADES as $clave => $u)
+                            <option value="{{ $clave }}">{{ $u['completo'] }}</option>
+                        @endforeach
+                    </datalist>
                 </div>
                 <div>
                     <label for="precio">Precio al mes (S/)</label>

@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title><?php echo $__env->yieldContent('titulo', 'Inicio'); ?> - TAMPU</title>
+    <!-- datos para Google y para cuando se comparte el enlace -->
+    <?php ($descripcion = trim($__env->yieldContent('descripcion')) ?: 'TAMPU: habitaciones verificadas y trabajos de medio tiempo para estudiantes universitarios en Cusco. Busca cuartos cerca de tu universidad y visita antes de pagar.'); ?>
+    <?php ($imagenCompartir = trim($__env->yieldContent('imagen')) ?: asset('img/cusco/plaza.jpg')); ?>
+    <meta name="description" content="<?php echo e($descripcion); ?>">
+    <link rel="canonical" href="<?php echo e(url()->current()); ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TAMPU">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="<?php echo $__env->yieldContent('titulo', 'Inicio'); ?> - TAMPU">
+    <meta property="og:description" content="<?php echo e($descripcion); ?>">
+    <meta property="og:url" content="<?php echo e(url()->current()); ?>">
+    <meta property="og:image" content="<?php echo e($imagenCompartir); ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <?php echo $__env->yieldPushContent('meta'); ?>
     <link rel="icon" href="<?php echo e(asset('img/favicon.png')); ?>">
     <!-- para instalarla como app en el celular -->
     <link rel="manifest" href="<?php echo e(asset('manifest.json')); ?>">
@@ -16,7 +30,7 @@
     <!-- fuentes Fraunces y Plus Jakarta Sans, Bootstrap 5 y Bootstrap Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?php echo e(asset('css/estilos.css')); ?>?v=<?php echo e(filemtime(public_path('css/estilos.css'))); ?>">
@@ -24,7 +38,8 @@
     <script>document.documentElement.classList.add('con-js');</script>
     <?php echo $__env->yieldPushContent('estilos'); ?>
 </head>
-<body class="<?php echo e(request()->routeIs('mensajes.ver') ? 'en-chat' : ''); ?>">
+<body class="<?php echo e(request()->routeIs('mensajes.ver') ? 'en-chat' : ''); ?> <?php echo e(request()->routeIs('inicio') ? 'pagina-inicio' : ''); ?>">
+    <div id="progreso" aria-hidden="true"></div>
 
     <!-- menu -->
     <header id="cabecera">
@@ -71,7 +86,7 @@
     </header>
 
     <?php if(session('ok') || session('error')): ?>
-        <div class="contenedor">
+        <div class="contenedor avisos-flash">
             <?php if(session('ok')): ?>
                 <p class="alerta alerta-ok"><i class="bi bi-check-circle"></i> <?php echo e(session('ok')); ?></p>
             <?php endif; ?>
@@ -94,7 +109,7 @@
                         <img src="<?php echo e(asset('img/logo-160.png')); ?>" alt="Logo de Tampu"> Tampu
                     </a>
                     <p class="pie-texto">Habitaciones seguras y trabajos que encajan con tus clases, para estudiantes que llegan a Cusco.</p>
-                    <button type="button" id="btnInstalar" class="btn-instalar oculto"><i class="bi bi-phone"></i> Instalar la app</button>
+                    <button type="button" id="btnInstalar" class="btn-instalar oculto" data-instalar><i class="bi bi-phone"></i> Instalar la app</button>
                 </div>
                 <div class="col-lg-2 col-md-6 col-6">
                     <h4>Explora</h4>

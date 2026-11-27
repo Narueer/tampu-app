@@ -149,8 +149,99 @@ class MensajeController extends Controller
             ->latest('updated_at')->get();
 
         $mensajes = $actual ? $actual->mensajes()->oldest('id')->get() : collect();
+        $rapidos = $actual ? $this->rapidos($yo, $actual, $mensajes) : [];
 
-        return view('mensajes', compact('conversaciones', 'actual', 'mensajes'));
+        return view('mensajes', compact('conversaciones', 'actual', 'mensajes', 'rapidos'));
+    }
+
+    // mensajes predeterminados: se envían con un toque y dependen de quién escribe y de qué trata el chat
+    private function rapidos(Usuario $yo, Conversacion $c, $mensajes): array
+    {
+        $otro = $c->otro($yo);
+        $nombre = explode(' ', $otro->nombre)[0];
+        $vacio = $mensajes->where('usuario_id', $yo->id)->isEmpty();   // todavía no le escribí nada
+
+        if ($c->habitacion) {
+            $titulo = $c->habitacion->titulo;
+            if ($yo->rol === 'estudiante') {
+                return array_values(array_filter([
+                    $vacio ? "Hola, $nombre. Me interesa \"$titulo\". ¿Sigue disponible?" : null,
+                    '¿Puedo visitarlo esta semana?',
+                    '¿Qué día y hora le queda bien para la visita?',
+                    '¿El precio incluye agua, luz e internet?',
+                    '¿Cuánto es la garantía?',
+                    '¿Hay horario para llegar de noche?',
+                    '¿Se puede cocinar?',
+                    '¿Aceptan mascotas?',
+                    'Gracias, lo voy a pensar y le aviso.',
+                ]));
+            }
+
+            return array_values(array_filter([
+                $vacio ? "Hola, $nombre. Gracias por tu interés en \"$titulo\"." : null,
+                'Sí, sigue disponible 🙂',
+                '¿Qué día y hora te queda bien para la visita?',
+                'Te espero en la dirección de la publicación.',
+                'Incluye agua y luz. El internet se paga aparte.',
+                'La garantía es de un mes y se devuelve al dejar el cuarto.',
+                'Se paga el primer mes y la garantía al mudarte.',
+                'Lo siento, el cuarto ya fue alquilado.',
+            ]));
+        }
+
+        if ($c->trabajo) {
+            $titulo = $c->trabajo->titulo;
+            if ($yo->rol === 'estudiante') {
+                return array_values(array_filter([
+                    $vacio ? "Hola, $nombre. Me interesa el puesto de \"$titulo\"." : null,
+                    '¿La oferta sigue vigente?',
+                    '¿Cuál sería el horario exacto?',
+                    'Tengo clases en las mañanas, ¿puedo trabajar en las tardes?',
+                    '¿Puedo trabajar solo fines de semana?',
+                    '¿Cuándo sería la entrevista?',
+                    '¿Qué documentos debo llevar?',
+                    '¿Cada cuánto es el pago?',
+                    'Gracias por la oportunidad 🙌',
+                ]));
+            }
+
+            return array_values(array_filter([
+                $vacio ? "Hola, $nombre. Gracias por postular a \"$titulo\"." : null,
+                '¿Qué días y horas tienes libres?',
+                '¿Puedes venir a una entrevista esta semana?',
+                'Trae tu DNI y tu CV, por favor.',
+                '¿Tienes experiencia en algo parecido?',
+                'Puedes empezar el lunes. ¡Bienvenido/a!',
+                'El pago es semanal.',
+                'Gracias por postular. Por ahora ya cubrimos el puesto.',
+            ]));
+        }
+
+        // chat con el asesor (administrador)
+        if ($yo->rol === 'admin') {
+            return array_values(array_filter([
+                $vacio ? "Hola, $nombre. ¿En qué te puedo ayudar?" : null,
+                '¿Me envías una captura del problema?',
+                'Ya revisamos tu caso, está solucionado ✅',
+                'Tu cuenta ya está verificada ✅',
+                'Estamos revisando la publicación reportada.',
+                'Nunca pagues adelantos sin visitar el cuarto.',
+                'Puedes reportar una publicación desde el botón "Reportar".',
+                'Gracias por escribirnos 🙌',
+            ]));
+        }
+
+        $porRol = [
+            'estudiante' => ['Creo que una publicación es una estafa', '¿Cómo pido una visita?', '¿Cómo registro mi horario de clases?', 'Un arrendador no me responde'],
+            'arrendador' => ['¿Cuánto tarda la verificación de mi cuenta?', '¿Cómo publico una habitación?', 'Quiero editar o pausar una publicación', 'Un estudiante no llegó a la visita'],
+            'empleador' => ['¿Cuánto tarda la verificación de mi cuenta?', '¿Cómo publico una oferta de trabajo?', 'Quiero cerrar una oferta', '¿Cómo veo a los postulantes?'],
+        ];
+
+        return array_merge(
+            ['Hola, necesito ayuda 🙋'],
+            $porRol[$yo->rol] ?? [],
+            ['Tengo un problema con mi cuenta', 'Quiero reportar a un usuario', 'Gracias, ya se solucionó 🙌'],
+        );
     }
 
     private function formato($m, int $yoId): array

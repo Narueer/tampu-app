@@ -36,12 +36,20 @@
                 </select>
 
                 <label for="cerca">Cerca de</label>
-                <input type="text" id="cerca" name="cerca_de" value="{{ request('cerca_de') }}" placeholder="Ej: UNSAAC" list="listaUniversidades">
-                <datalist id="listaUniversidades">
-                    @foreach (array_keys(\App\Support\Lugares::UNIVERSIDADES) as $u)
-                        <option value="{{ $u }}">
+                @php $cercaElegido = request('cerca_de'); $cercaConocido = isset(\App\Support\Lugares::UNIVERSIDADES[$cercaElegido]); @endphp
+                <select id="cerca" name="cerca_de">
+                    <option value="">Cualquiera</option>
+                    @if ($cercaElegido && ! $cercaConocido)
+                        <option value="{{ $cercaElegido }}" selected>{{ $cercaElegido }}</option>
+                    @endif
+                    @foreach (\App\Support\Lugares::porTipo() as $titulo => $lista)
+                        <optgroup label="{{ $titulo }}">
+                            @foreach ($lista as $clave => $u)
+                                <option value="{{ $clave }}" @selected($cercaElegido === $clave)>{{ $u['nombre'] }}</option>
+                            @endforeach
+                        </optgroup>
                     @endforeach
-                </datalist>
+                </select>
 
                 <label for="orden">Ordenar por precio</label>
                 <select id="orden" name="orden">

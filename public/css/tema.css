@@ -3001,3 +3001,105 @@ input[type="file"]:hover::file-selector-button {
     box-shadow: 0 10px 22px rgba(180, 83, 42, 0.25);
 }
 .tarjeta-equipo:hover .avatar-equipo.foto { outline-color: var(--dorado, #c8963e); }
+
+/* AE. Celular: la fila de distritos no debe ensanchar la página */
+.resultados { min-width: 0; width: 100%; }
+
+/* AF. Institutos en la portada y filtro "cerca de" */
+.institutos {
+    margin-top: 28px;
+    background: var(--papel);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-grande);
+    padding: 24px 26px;
+}
+.institutos-titulo {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.02rem;
+    margin: 0 0 16px;
+    color: var(--tinta);
+}
+.institutos-titulo i { color: var(--terracota); margin-right: 6px; }
+.institutos-grupo {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    gap: 6px 16px;
+    align-items: start;
+    padding: 12px 0;
+    border-top: 1px dashed var(--borde);
+}
+.institutos-tipo {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+    padding-top: 7px;
+}
+.institutos-lista { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.chip-instituto {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    background: var(--fondo);
+    border: 1px solid var(--borde);
+    color: var(--texto);
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.chip-instituto em {
+    font-style: normal;
+    font-size: 0.74rem;
+    font-weight: 700;
+    background: var(--ocre-claro);
+    color: var(--terracota-oscuro);
+    border-radius: 999px;
+    padding: 1px 7px;
+}
+.chip-instituto:hover {
+    background: var(--verde-andino);
+    border-color: var(--verde-andino);
+    color: #fff;
+}
+@media (max-width: 767px) {
+    .institutos { padding: 18px 16px; }
+    .institutos-grupo { grid-template-columns: 1fr; }
+    .institutos-tipo { padding-top: 0; }
+    .chip-instituto { font-size: 0.84rem; }
+}
+
+/* AG. Mensajes rápidos en el chat entre usuarios */
+.chat-rapidos {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 10px 12px 2px;
+    border-top: 1px solid var(--borde);
+    scrollbar-width: thin;
+    min-width: 0;
+}
+.chip-rapido {
+    flex: 0 0 auto;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--borde);
+    background: var(--papel);
+    color: var(--texto);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.chip-rapido:hover { background: var(--verde-andino); border-color: var(--verde-andino); color: #fff; }
+.chip-rapido:disabled { opacity: 0.5; cursor: wait; }
+.chip-rapido.usado { opacity: 0.55; }
+.chat-rapidos + .chat-form { border-top: none; }
+.chat-ventana { min-width: 0; }
+.chat-form input { min-width: 0; }

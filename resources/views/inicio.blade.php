@@ -226,17 +226,37 @@
             <div class="contenedor">
                 <div class="encabezado-seccion revelar">
                     <span class="sobretitulo">Elige por dónde estudias</span>
-                    <h2>Cuartos cerca de <em>tu universidad</em></h2>
+                    <h2>Cuartos cerca de <em>donde estudias</em></h2>
                 </div>
                 <div class="row g-3">
-                    @foreach ($universidades as $u)
-                        <div class="col-6 col-lg-3 revelar">
-                            <a href="{{ route('habitaciones.index', ['cerca_de' => $u['clave']]) }}" class="tarjeta-uni">
+                    @foreach ($universidades->where('tipo', 'universidad') as $u)
+                        <div class="col-6 col-lg revelar">
+                            {{-- si todavía no hay cuartos marcados cerca, el enlace lleva a todos los cuartos --}}
+                            <a href="{{ $u['total'] > 0 ? route('habitaciones.index', ['cerca_de' => $u['clave']]) : route('habitaciones.index') }}" class="tarjeta-uni">
                                 <i class="bi bi-mortarboard"></i>
                                 <b>{{ $u['nombre'] }}</b>
                                 <small>{{ $u['lugar'] }}</small>
-                                <span>{{ $u['total'] }} {{ $u['total'] === 1 ? 'cuarto' : 'cuartos' }} <i class="bi bi-arrow-right"></i></span>
+                                <span>@if ($u['total'] > 0){{ $u['total'] }} {{ $u['total'] === 1 ? 'cuarto' : 'cuartos' }}@else Ver cuartos @endif <i class="bi bi-arrow-right"></i></span>
                             </a>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- institutos: agrupados por tipo, como chips -->
+                <div class="institutos revelar">
+                    <p class="institutos-titulo"><i class="bi bi-buildings"></i> ¿Estudias en un instituto? También te buscamos cuarto cerca</p>
+                    @foreach (\App\Support\Lugares::TIPOS as $tipo => $titulo)
+                        @continue($tipo === 'universidad')
+                        <div class="institutos-grupo">
+                            <span class="institutos-tipo">{{ $titulo }}</span>
+                            <div class="institutos-lista">
+                                @foreach ($universidades->where('tipo', $tipo) as $u)
+                                    <a href="{{ $u['total'] > 0 ? route('habitaciones.index', ['cerca_de' => $u['clave']]) : route('habitaciones.index') }}" class="chip-instituto" title="{{ $u['completo'] }}">
+                                        {{ $u['nombre'] }}
+                                        @if ($u['total'] > 0)<em>{{ $u['total'] }}</em>@endif
+                                    </a>
+                                @endforeach
+                            </div>
                         </div>
                     @endforeach
                 </div>
