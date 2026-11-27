@@ -1,7 +1,7 @@
 {{--
     Guía paso a paso con Tampu (la mascota). Cada página tiene sus pasos: [selector, título, texto].
     Si el selector no existe en la página, ese paso se salta solo.
-    La primera vez que alguien entra a su panel la guía empieza sola; después se repite con el botón "?".
+    Con una cuenta nueva, la primera vez que entra a su panel la guía empieza sola; si no, se abre con el botón "Guía".
 --}}
 @php
     $rol = auth()->user()?->rol;
@@ -71,7 +71,9 @@
     ];
     $pasos = $guias[$ruta] ?? null;
     // en los paneles la guía empieza sola la primera vez; en las páginas públicas se ofrece
-    $automatica = in_array($ruta, ['estudiante.panel', 'arrendador.habitaciones.index', 'empleador.trabajos.index', 'admin.panel'], true);
+    // la guía empieza sola solo en cuentas nuevas (creadas hace menos de 3 días); para los demás queda el botón "Guía"
+    $cuentaNueva = auth()->check() && auth()->user()->created_at && auth()->user()->created_at->gt(now()->subDays(3));
+    $automatica = $cuentaNueva && in_array($ruta, ['estudiante.panel', 'arrendador.habitaciones.index', 'empleador.trabajos.index', 'admin.panel'], true);
     $datosGuia = $pasos ? ['clave' => 'guia.' . $ruta . '.' . ($rol ?? 'visita'), 'automatica' => $automatica, 'pasos' => $pasos, 'avatar' => asset('img/asistente/tampu-bot.webp')] : null;
 @endphp
 

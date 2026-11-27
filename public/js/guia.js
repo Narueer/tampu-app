@@ -53,27 +53,49 @@
     const btnGuia = document.getElementById("btnGuia");
     const reducir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // voz: se usa la voz en español del dispositivo (si tiene), a ritmo tranquilo
+    // voz: se elige la voz más natural que tenga el dispositivo. Las voces "neuronales" (Edge: Camila de Perú,
+    // Chrome: Google español, Android: voces de Google) suenan casi humanas; las de escritorio antiguas, a robot.
     const puedeHablar = "speechSynthesis" in window;
     let voz = null;
+    function puntaje(v) {
+        if (!/^es/i.test(v.lang)) return -1;
+        let p = 0;
+        if (/natural|neural|online/i.test(v.name)) p += 50;            // voces neuronales (Edge, Windows 11)
+        if (/google/i.test(v.name)) p += 35;                            // Chrome y Android
+        if (/camila|alex|dalia|jorge|elvira|paloma|ximena|salome|lucia|monica|paulina/i.test(v.name)) p += 10;
+        if (/es[-_]PE/i.test(v.lang)) p += 12; else if (/es[-_](419|MX|US|CO)/i.test(v.lang)) p += 8; else if (/es[-_](AR|CL)/i.test(v.lang)) p += 5;
+        if (/sabina|helena|pablo|raul|laura|desktop|espeak/i.test(v.name)) p -= 30;   // voces robóticas
+        if (v.localService === false) p += 5;                            // las de la nube suelen ser mejores
+        return p;
+    }
     function elegirVoz() {
-        const voces = speechSynthesis.getVoices();
-        voz = voces.find((v) => /es[-_](PE|419|MX|US|CO|AR|CL)/i.test(v.lang)) || voces.find((v) => /^es/i.test(v.lang)) || null;
+        const voces = speechSynthesis.getVoices().filter((v) => puntaje(v) >= 0).sort((a, b) => puntaje(b) - puntaje(a));
+        const guardada = leer("guia.vozNombre");
+        voz = voces.find((v) => v.name === guardada) || voces[0] || null;
     }
     if (puedeHablar) { elegirVoz(); speechSynthesis.onvoiceschanged = elegirVoz; }
     let conVoz = leer("guia.voz") !== "0";
+    // se lee frase por frase, con una pausa corta entre ellas: suena menos a robot que un texto largo de corrido
     function hablar(texto) {
         if (!puedeHablar) return;
         speechSynthesis.cancel();
         if (!conVoz) return;
-        const u = new SpeechSynthesisUtterance(texto);
-        u.lang = voz ? voz.lang : "es-ES";
-        if (voz) u.voice = voz;
-        u.rate = 1.02; u.pitch = 1.08;
-        u.onstart = () => tarjeta?.classList.add("hablando");
-        u.onend = () => tarjeta?.classList.remove("hablando");
-        speechSynthesis.speak(u);
+        const natural = voz && /natural|neural|online|google/i.test(voz.name);
+        const frases = texto.replace(/\s+/g, " ").match(/[^.!?¿¡:]+[.!?:]?/g) || [texto];
+        frases.forEach((f, i) => {
+            const t = f.trim(); if (!t) return;
+            const u = new SpeechSynthesisUtterance(t);
+            u.lang = voz ? voz.lang : "es-PE";
+            if (voz) u.voice = voz;
+            u.rate = natural ? 1.0 : 0.95;
+            u.pitch = 1.0;
+            if (i === 0) u.onstart = () => tarjeta?.classList.add("hablando");
+            if (i === frases.length - 1) u.onend = () => tarjeta?.classList.remove("hablando");
+            speechSynthesis.speak(u);
+        });
     }
+    window.TampuVoz = { voces: () => puedeHablar ? speechSynthesis.getVoices().filter((v) => puntaje(v) >= 0).sort((a, b) => puntaje(b) - puntaje(a)) : [], actual: () => voz,
+        usar: (nombre) => { guardar("guia.vozNombre", nombre); elegirVoz(); } };
 
     let capa = null, foco = null, tarjeta = null, indice = 0, pasos = [];
     const visible = (el) => el && el.getClientRects().length && getComputedStyle(el).visibility !== "hidden";
@@ -89,7 +111,7 @@
         tarjeta.setAttribute("aria-live", "polite");
         tarjeta.innerHTML =
             '<div class="guia-cabeza"><img src="' + datos.avatar + '" alt="" class="guia-avatar"><span class="guia-onda"><i></i><i></i><i></i></span>' +
-            '<span class="guia-paso"></span><button type="button" class="guia-voz" aria-label="Voz"></button><button type="button" class="guia-cerrar" aria-label="Cerrar la guía">&times;</button></div>' +
+            '<span class="guia-paso"></span><button type="button" class="guia-cambiar-voz" aria-label="Probar otra voz" title="Probar otra voz"><i class="bi bi-person-video2"></i></button><button type="button" class="guia-voz" aria-label="Voz"></button><button type="button" class="guia-cerrar" aria-label="Cerrar la guía">&times;</button></div>' +
             '<h3 class="guia-titulo"></h3><p class="guia-texto"></p>' +
             '<div class="guia-pie"><span class="guia-puntos"></span><button type="button" class="btn btn-borde btn-chico guia-atras">Atrás</button><button type="button" class="btn btn-chico guia-sig">Siguiente</button></div>';
         document.body.append(capa, foco, tarjeta);
@@ -101,6 +123,18 @@
         const pintarVoz = () => { bVoz.innerHTML = conVoz ? '<i class="bi bi-volume-up"></i>' : '<i class="bi bi-volume-mute"></i>'; bVoz.title = conVoz ? "Silenciar la voz" : "Activar la voz"; };
         pintarVoz();
         if (!puedeHablar) bVoz.hidden = true;
+        // cambiar de voz: pasa a la siguiente voz en español del dispositivo y la prueba
+        const bCambiar = tarjeta.querySelector(".guia-cambiar-voz");
+        const listaVoces = () => window.TampuVoz.voces();
+        if (!puedeHablar || listaVoces().length < 2) bCambiar.hidden = true;
+        bCambiar.addEventListener("click", () => {
+            const vs = listaVoces(); if (!vs.length) return;
+            const sig = vs[(vs.findIndex((v) => v === voz) + 1) % vs.length];
+            window.TampuVoz.usar(sig.name);
+            conVoz = true; guardar("guia.voz", "1"); pintarVoz();
+            bCambiar.title = "Voz: " + sig.name.replace(/Microsoft |Online |\(Natural\)|- Spanish.*$/g, "").trim() + " · toca para probar otra";
+            hablar("¡Hola! Así sueno yo. " + pasos[indice].titulo + ".");
+        });
         bVoz.addEventListener("click", () => { conVoz = !conVoz; guardar("guia.voz", conVoz ? "1" : "0"); pintarVoz(); conVoz ? hablar(pasos[indice].texto) : speechSynthesis.cancel(); });
         document.addEventListener("keydown", teclas);
         window.addEventListener("resize", ubicar);

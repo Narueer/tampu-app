@@ -161,35 +161,25 @@
                         <a href="{{ route('calculadora') }}" class="btn btn-borde"><i class="bi bi-calculator"></i> ¿Me alcanza? Calcula tu mes</a>
                     </div>
                 </div>
-                <div class="row g-4 pasos">
-                    <div class="col-md-4 revelar">
-                        <div class="paso">
-                            <span class="paso-ilustracion inclinable"><img src="{{ asset('img/3d/paso-registro.webp') }}" alt="Mochila de viaje y carnet verificado" loading="lazy"></span>
-                            <span class="paso-numero">1</span>
-                            <i class="bi bi-person-plus"></i>
-                            <h3>Regístrate</h3>
-                            <p>Crea tu cuenta e indica de dónde vienes. Con tu correo de la universidad quedas como estudiante verificado.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4 revelar">
-                        <div class="paso">
-                            <span class="paso-ilustracion inclinable"><img src="{{ asset('img/3d/paso-horario.webp') }}" alt="Calendario con los turnos de clase marcados" loading="lazy"></span>
-                            <span class="paso-numero">2</span>
-                            <i class="bi bi-calendar-week"></i>
-                            <h3>Marca tu horario</h3>
-                            <p>Te mostramos solo los trabajos que no chocan con tus clases.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4 revelar">
-                        <div class="paso">
-                            <span class="paso-ilustracion inclinable"><img src="{{ asset('img/3d/paso-visita.webp') }}" alt="Casita con su llave" loading="lazy"></span>
-                            <span class="paso-numero">3</span>
-                            <i class="bi bi-house-check"></i>
-                            <h3>Solicita una visita</h3>
-                            <p>Visita la habitación antes de pagar. Nunca des adelantos sin ver el cuarto.</p>
-                        </div>
-                    </div>
-                </div>
+                @php
+                    $pasos = [
+                        ['paso-registro', 'Mochila de viaje y carnet verificado', 'Regístrate', 'Crea tu cuenta e indica de dónde vienes. Con el correo de tu universidad quedas como estudiante verificado.', route('registro'), 'Crear mi cuenta'],
+                        ['paso-horario', 'Calendario con los turnos de clase marcados', 'Marca tu horario', 'Te mostramos solo los trabajos que no chocan con tus clases.', route('trabajos.index'), 'Ver trabajos'],
+                        ['paso-visita', 'Casita con su llave', 'Solicita una visita', 'Visita la habitación antes de pagar. Nunca des adelantos sin ver el cuarto.', route('habitaciones.index'), 'Buscar cuartos'],
+                    ];
+                @endphp
+                <ol class="como-pasos">
+                    @foreach ($pasos as $i => [$img, $alt, $titulo, $texto, $url, $accion])
+                        <li class="como-paso revelar">
+                            <span class="como-num" aria-hidden="true">{{ sprintf('%02d', $i + 1) }}</span>
+                            <div class="como-ilustracion"><img src="{{ asset("img/3d/$img.webp") }}" alt="{{ $alt }}" loading="lazy" width="560" height="390"></div>
+                            <span class="como-etiqueta">Paso {{ $i + 1 }}</span>
+                            <h3>{{ $titulo }}</h3>
+                            <p>{{ $texto }}</p>
+                            <a href="{{ $url }}" class="como-enlace">{{ $accion }} <i class="bi bi-arrow-right"></i></a>
+                        </li>
+                    @endforeach
+                </ol>
             </div>
         </section>
 

@@ -1187,3 +1187,44 @@ p a:not(.btn), .texto-suave a:not(.btn), .calc-resumen a, .leaflet-container .le
     .armar-paso { position: static; opacity: 1; transform: none; pointer-events: auto; }
     .armar-progreso, .armar-scroll { display: none; }
 }
+
+.guia-cambiar-voz { border: 0; background: transparent; color: inherit; opacity: .75; width: 30px; height: 30px; border-radius: 50%; }
+.guia-cambiar-voz:hover { opacity: 1; background: rgba(0, 0, 0, .06); }
+.guia-cambiar-voz[hidden] { display: none; }
+
+/* ================= ¿Cómo funciona? (tres pasos) ================= */
+.como-pasos { list-style: none; padding: 0; margin: 34px 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; position: relative; counter-reset: paso; }
+/* línea punteada que une los pasos, a la altura de las ilustraciones */
+.como-pasos::before { content: ""; position: absolute; left: 16%; right: 16%; top: 118px; border-top: 2px dashed rgba(176, 80, 42, .35); z-index: 0; }
+.como-paso { position: relative; z-index: 1; display: flex; flex-direction: column; background: var(--papel, #fffdf8); border: 1px solid var(--borde, #e9e0d2); border-radius: 22px;
+    padding: 18px 26px 24px; transition: transform .3s ease, box-shadow .3s ease, border-color .3s; }
+.como-paso:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(23, 53, 47, .10); border-color: rgba(176, 80, 42, .35); }
+.como-num { position: absolute; top: 10px; right: 18px; font-family: var(--serif); font-size: 4.2rem; font-weight: 700; line-height: 1; color: transparent;
+    -webkit-text-stroke: 1.5px rgba(176, 80, 42, .28); pointer-events: none; }
+.como-ilustracion { display: grid; place-items: center; height: 200px; margin: 0 -8px 6px; }
+.como-ilustracion img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(23, 53, 47, .10));
+    transition: transform .4s cubic-bezier(.3, 1.4, .5, 1); }
+.como-paso:hover .como-ilustracion img { transform: translateY(-6px) scale(1.04); }
+.como-etiqueta { align-self: flex-start; font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--terracota-oscuro, #8f3f1f);
+    background: #f6e7dc; border-radius: 999px; padding: 4px 11px; margin-bottom: 10px; }
+.como-paso h3 { font-family: var(--serif); font-size: 1.45rem; margin: 0 0 8px; color: var(--tinta); }
+.como-paso p { color: var(--texto-suave, #5b5b5b); margin: 0 0 18px; flex: 1; }
+.como-enlace { align-self: flex-start; font-weight: 600; color: var(--terracota-oscuro, #8f3f1f); text-decoration: none; display: inline-flex; gap: 6px; align-items: center; }
+.como-enlace i { transition: transform .25s; }
+.como-enlace:hover i { transform: translateX(4px); }
+.como-enlace:hover { text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 991px) {
+    .como-pasos { grid-template-columns: 1fr; gap: 18px; max-width: 560px; margin-left: auto; margin-right: auto; }
+    .como-pasos::before { left: 50%; right: auto; top: 40px; bottom: 40px; border-top: 0; border-left: 2px dashed rgba(176, 80, 42, .3); }
+    .como-paso { display: grid; grid-template-columns: 132px 1fr; column-gap: 16px; padding: 16px 18px; align-items: center; }
+    .como-ilustracion { grid-row: 1 / span 4; height: 120px; margin: 0; }
+    .como-num { font-size: 2.2rem; top: 10px; right: 14px; }
+    .como-etiqueta, .como-enlace { justify-self: start; }
+    .como-paso h3 { font-size: 1.2rem; }
+    .como-paso p { margin-bottom: 8px; font-size: .92rem; }
+}
+@media (max-width: 420px) {
+    .como-paso { grid-template-columns: 96px 1fr; }
+    .como-ilustracion { height: 96px; }
+}
+@media (prefers-reduced-motion: reduce) { .como-paso, .como-ilustracion img { transition: none; } .como-paso:hover { transform: none; } }
