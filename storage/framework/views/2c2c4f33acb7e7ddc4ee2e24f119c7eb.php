@@ -5,7 +5,7 @@
         <i class="bi bi-play-circle"></i> <?php echo e($texto ?? 'Ver la guía en video'); ?>
 
     </button>
-    <?php if (! $__env->hasRenderedOnce('e8fd2b9c-f244-46ec-b7bc-676979701ee0')): $__env->markAsRenderedOnce('e8fd2b9c-f244-46ec-b7bc-676979701ee0'); ?>
+    <?php if (! $__env->hasRenderedOnce('66a5b1f7-dbd8-4e7c-b4b8-e04847570c5a')): $__env->markAsRenderedOnce('66a5b1f7-dbd8-4e7c-b4b8-e04847570c5a'); ?>
         <?php $__env->startPush('modales'); ?>
             <div class="modal fade" id="videoGuia" tabindex="-1" aria-label="Video guía" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-xl">
