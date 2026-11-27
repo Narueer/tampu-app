@@ -4,7 +4,7 @@
 @php($ilustracion = ['estudiante' => 'cuarto', 'arrendador' => 'casa', 'empleador' => 'horario', 'admin' => 'casa'][$yo->rol] ?? null)
 <div class="bienvenida {{ $ilustracion ? 'con-ilustracion' : '' }}">
     @if ($ilustracion)
-        <img src="{{ asset("img/3d/$ilustracion.webp") }}" alt="" class="bienvenida-ilustracion" loading="lazy">
+        <img src="{{ asset("img/3d/$ilustracion.webp") }}?v={{ @filemtime(public_path("img/3d/$ilustracion.webp")) }}" alt="" class="bienvenida-ilustracion" loading="lazy">
     @endif
     <div class="bienvenida-quien">
         @if ($yo->foto)
@@ -23,5 +23,9 @@
             <a href="{{ $url }}" class="btn btn-claro"><i class="bi bi-{{ $icono }}"></i> {{ $texto }}</a>
         @endforeach
         @include('partials.video-guia', ['cual' => $yo->rol, 'clase' => 'btn btn-claro', 'texto' => 'Video guía'])
+        @php($pdf = 'guias/guia-' . ($yo->rol === 'admin' ? 'administrador' : $yo->rol) . '.pdf')
+        @if (file_exists(public_path($pdf)))
+            <a href="{{ asset($pdf) }}?v={{ filemtime(public_path($pdf)) }}" class="btn btn-claro btn-pdf" download title="Descarga tu guía (PDF, opcional)"><i class="bi bi-file-earmark-pdf"></i> Guía en PDF</a>
+        @endif
     </div>
 </div>

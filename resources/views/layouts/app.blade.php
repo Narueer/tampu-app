@@ -36,6 +36,7 @@
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ filemtime(public_path('css/estilos.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/tema.css') }}?v={{ filemtime(public_path('css/tema.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/andino.css') }}?v={{ filemtime(public_path('css/andino.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/vivo.css') }}?v={{ filemtime(public_path('css/vivo.css')) }}">
     <script>document.documentElement.classList.add('con-js');</script>
     @stack('estilos')
 </head>
@@ -122,6 +123,7 @@
                     <a href="{{ route('calculadora') }}">¿Me alcanza?</a>
                     <a href="{{ route('nosotros') }}">Nosotros</a>
                     <a href="{{ route('contacto') }}">Contacto</a>
+                    <a href="{{ asset('guias/guia-tampu.pdf') }}" download><i class="bi bi-file-earmark-pdf"></i> Guía del usuario (PDF)</a>
                 </div>
                 <div class="col-lg-3 col-md-6 col-6">
                     <h4>Tu cuenta</h4>

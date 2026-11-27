@@ -86,7 +86,7 @@
                     @forelse ($habitaciones as $h)
                         @include('partials.tarjeta-habitacion')
                     @empty
-                        <p class="vacio"><img src="{{ asset('img/3d/cuarto.webp') }}" alt="" class="ilustracion-vacia">No hay habitaciones con esos filtros. Prueba con otro distrito o un precio mayor.</p>
+                        <p class="vacio"><img src="{{ asset('img/3d/cuarto.webp') }}?v={{ @filemtime(public_path('img/3d/cuarto.webp')) }}" alt="" class="ilustracion-vacia">No hay habitaciones con esos filtros. Prueba con otro distrito o un precio mayor.</p>
                     @endforelse
                 </div>
                 @include('partials.paginacion', ['p' => $habitaciones])

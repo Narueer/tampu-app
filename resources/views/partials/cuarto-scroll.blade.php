@@ -30,7 +30,7 @@
         <div class="armar-modelo">
             <span class="armar-sombra" aria-hidden="true"></span>
             <model-viewer
-                src="{{ asset('modelos/cuarto-animado.glb') }}"
+                src="{{ asset('modelos/cuarto-animado.glb') }}?v={{ @filemtime(public_path('modelos/cuarto-animado.glb')) }}"
                 alt="Maqueta 3D de un cuarto de estudiante que se arma pieza por pieza: piso, paredes, cama, escritorio y mochila"
                 loading="lazy"
                 animation-name="armar"

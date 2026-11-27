@@ -1,0 +1,208 @@
+/* =====================================================================
+   TAMPU · capa "vivo": colores de los tejidos andinos, letras con más peso
+   y tarjetas con carácter. Se carga al final (después de andino.css).
+   ===================================================================== */
+:root {
+    --v-rojo: #c62d3a;        /* rojo cochinilla de los aguayos */
+    --v-magenta: #b4236a;
+    --v-naranja: #e2671b;
+    --v-ocre: #e7a21b;
+    --v-verde: #138a5e;
+    --v-turquesa: #0f8a95;
+    --v-azul: #2152a3;
+    --v-morado: #6b3fa0;
+    --v-tinta: #10231e;
+    --v-crema: #fff8ee;
+    --terracota: #c2471d;
+    --terracota-oscuro: #9c3412;
+    --texto-suave: #4d4a45;
+    --v-sombra: 0 22px 44px -22px rgba(16, 35, 30, .38), 0 2px 6px rgba(16, 35, 30, .06);
+    --v-sombra-hover: 0 30px 60px -24px rgba(16, 35, 30, .45), 0 4px 10px rgba(16, 35, 30, .08);
+    /* franja de tejido de colores (aguayo) */
+    --v-aguayo: repeating-linear-gradient(90deg, var(--v-rojo) 0 22px, var(--v-ocre) 22px 30px, var(--v-verde) 30px 44px, var(--v-tinta) 44px 48px,
+        var(--v-azul) 48px 62px, var(--v-ocre) 62px 68px, var(--v-magenta) 68px 86px, var(--v-naranja) 86px 96px);
+    --v-zigzag: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='12' viewBox='0 0 28 12'%3E%3Cpath d='M0 12 7 2l7 10 7-10 7 10' fill='none' stroke='%23e7a21b' stroke-width='2.4'/%3E%3C/svg%3E");
+}
+
+/* ---------- letras con más carácter ---------- */
+h1, h2, .titulo-pagina, .titulo-grande { font-weight: 800 !important; letter-spacing: -0.025em; }
+h3 { font-weight: 700 !important; }
+.encabezado-seccion h2, h2.titulo-grande, .titulo-grande { font-size: clamp(2.1rem, 4.4vw, 3.4rem) !important; line-height: 1.04 !important; }
+h1 em, h2 em, h3 em { color: var(--terracota); font-style: italic !important; font-weight: 800 !important; }
+.texto-suave { color: var(--texto-suave) !important; }
+b, strong { font-weight: 700; }
+
+/* el "sobretítulo" es ahora una etiqueta de color con un rombo andino */
+.sobretitulo {
+    display: inline-flex !important; align-items: center; gap: 8px;
+    background: #fde6d8; color: var(--terracota-oscuro) !important;
+    padding: 6px 14px 6px 10px; border-radius: 999px;
+    font-size: .74rem !important; font-weight: 800 !important; letter-spacing: .14em !important;
+}
+.sobretitulo::before {
+    content: "" !important; width: 10px !important; height: 10px !important; flex: none;
+    background: var(--v-rojo) !important; transform: rotate(45deg); border-radius: 2px;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--v-ocre);
+    mask: none !important; -webkit-mask: none !important;
+}
+.armar .sobretitulo, .seccion-historia .sobretitulo { background: rgba(255, 255, 255, .12); color: #ffd98a !important; }
+
+/* ---------- botones ---------- */
+.btn:not(.btn-borde):not(.btn-claro):not(.btn-close):not(.btn-texto):not(.btn-link) {
+    background: var(--terracota) !important; border-color: var(--terracota) !important; color: #fff !important;
+    font-weight: 700 !important; box-shadow: 0 10px 22px -10px rgba(194, 71, 29, .7);
+    transition: transform .2s, box-shadow .2s, background-color .2s;
+}
+.btn:not(.btn-borde):not(.btn-claro):not(.btn-close):not(.btn-texto):not(.btn-link):hover {
+    background: var(--terracota-oscuro) !important; transform: translateY(-2px); box-shadow: 0 16px 28px -12px rgba(156, 52, 18, .75);
+}
+.btn-borde { border-width: 2px !important; font-weight: 700 !important; border-color: var(--v-tinta) !important; color: var(--v-tinta) !important; background: #fff !important; }
+.btn-borde:hover { background: var(--v-tinta) !important; color: #fff !important; }
+.armar .btn-borde, .seccion-historia .btn-borde { background: transparent !important; color: #fff !important; border-color: #fff !important; }
+
+/* ---------- números de TAMPU: tarjetas de colores ---------- */
+.seccion-numeros { background: transparent !important; padding-top: 34px !important; }
+.seccion-numeros .row > div { position: relative; }
+.seccion-numeros .row > div::after { display: none !important; }
+.seccion-numeros .contador, .seccion-numeros strong, .seccion-numeros .numero {
+    font-weight: 800 !important; font-family: var(--serif);
+}
+.seccion-numeros .row > div > * { position: relative; }
+.seccion-numeros .row > div {
+    background: #fff; border-radius: 20px; padding: 22px 12px 18px !important; box-shadow: var(--v-sombra);
+    border-top: 6px solid var(--c, var(--v-rojo)); margin-bottom: 8px;
+}
+.seccion-numeros .row { --bs-gutter-x: 1.2rem; }
+.seccion-numeros .row > div:nth-child(1) { --c: var(--v-rojo); }
+.seccion-numeros .row > div:nth-child(2) { --c: var(--v-ocre); }
+.seccion-numeros .row > div:nth-child(3) { --c: var(--v-verde); }
+.seccion-numeros .row > div:nth-child(4) { --c: var(--v-azul); }
+.seccion-numeros .row > div .contador { color: var(--c) !important; }
+
+/* ---------- ¿Cómo funciona? : cada paso con su color ---------- */
+.como-paso { border: 0 !important; box-shadow: var(--v-sombra); padding-top: 0 !important; overflow: hidden; background: #fff !important; }
+.como-paso:nth-child(1) { --c: var(--v-rojo); --c2: #fde3df; }
+.como-paso:nth-child(2) { --c: var(--v-ocre); --c2: #fff1cf; }
+.como-paso:nth-child(3) { --c: var(--v-verde); --c2: #daf3e8; }
+.como-paso::before { content: ""; display: block; height: 10px; margin: 0 -26px; background: var(--v-aguayo); }
+.como-ilustracion { background: radial-gradient(70% 80% at 50% 70%, var(--c2), transparent 72%); margin: 0 -26px 10px !important; padding: 10px 18px 0; height: 214px !important; }
+.como-num { -webkit-text-stroke: 0 !important; color: var(--c) !important; opacity: .18; font-size: 5rem !important; top: 18px !important; }
+.como-etiqueta { background: var(--c) !important; color: #fff !important; box-shadow: 0 6px 14px -6px var(--c); }
+.como-paso:nth-child(2) .como-etiqueta { color: #2b1d00 !important; }
+.como-paso h3 { font-size: 1.6rem !important; }
+.como-enlace { background: var(--c2); color: var(--v-tinta) !important; padding: 9px 16px; border-radius: 999px; text-decoration: none !important; }
+.como-enlace:hover { background: var(--c); color: #fff !important; }
+.como-paso:nth-child(2) .como-enlace:hover { color: #2b1d00 !important; }
+.como-pasos::before { border-top: 3px dotted var(--v-ocre) !important; top: 124px !important; }
+.como-paso:hover { box-shadow: var(--v-sombra-hover); }
+@media (max-width: 991px) {
+    .como-paso::before { position: absolute; top: 0; left: 0; right: 0; margin: 0; height: 6px; }
+    .como-paso { padding-top: 22px !important; }
+    .como-ilustracion { margin: 0 !important; padding: 0; height: 120px !important; background: radial-gradient(closest-side, var(--c2), transparent); }
+    .como-num { font-size: 2.6rem !important; top: 14px !important; }
+}
+
+/* ---------- tarjetas de cuartos y trabajos ---------- */
+.tarjeta, .tarjeta-trabajo {
+    border: 0 !important; border-radius: 20px !important; box-shadow: var(--v-sombra) !important; background: #fff !important; overflow: hidden;
+}
+.tarjeta:hover, .tarjeta-trabajo:hover { box-shadow: var(--v-sombra-hover) !important; transform: translateY(-6px) !important; }
+.tarjeta .info h3, .tarjeta-trabajo h3 { font-size: 1.12rem !important; font-weight: 800 !important; color: var(--v-tinta); }
+.tarjeta .precio-foto {
+    background: var(--terracota) !important; color: #fff !important; font-weight: 800 !important; box-shadow: 0 8px 18px -8px rgba(0, 0, 0, .5);
+}
+.tarjeta .precio-foto small { color: #ffe1cf !important; }
+.tarjeta .tarjeta-foto::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--v-aguayo); }
+.tarjeta .tarjeta-foto { position: relative; }
+.etiqueta.verificado { background: #d9f2e6 !important; color: #0c5c3d !important; font-weight: 700 !important; }
+.etiqueta-visitado { background: #fff0c7 !important; color: #6b4a00 !important; font-weight: 700 !important; }
+.etiqueta-tipo { font-weight: 700 !important; }
+.etiqueta-tipo.tipo-cuarto { background: #fde3df !important; color: #8a1f28 !important; }
+.etiqueta-tipo.tipo-minidepartamento { background: #e0e9fb !important; color: #173c7d !important; }
+.etiqueta-tipo.tipo-compartido { background: #ece0f7 !important; color: #4b2a78 !important; }
+.etiqueta-tipo.tipo-casa { background: #d9f2e6 !important; color: #0c5c3d !important; }
+.etiqueta-tipo.tipo-roomies { background: #fbe0ee !important; color: #7c1849 !important; }
+.tarjeta .btn-borde { border-color: var(--terracota) !important; color: var(--terracota-oscuro) !important; }
+.tarjeta .btn-borde:hover { background: var(--terracota) !important; color: #fff !important; }
+.tarjeta-trabajo { border-top: 6px solid var(--v-turquesa) !important; }
+.tarjeta-trabajo:nth-child(3n+2) { border-top-color: var(--v-magenta) !important; }
+.tarjeta-trabajo:nth-child(3n) { border-top-color: var(--v-ocre) !important; }
+
+/* ---------- universidades ---------- */
+.tarjeta-uni { border: 0 !important; border-radius: 18px !important; box-shadow: var(--v-sombra) !important; overflow: hidden; background: #fff !important; }
+.tarjeta-uni:hover { box-shadow: var(--v-sombra-hover) !important; transform: translateY(-5px); }
+.tarjeta-uni::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--c, var(--v-rojo)); z-index: 2; }
+.col-6:nth-child(5n+1) .tarjeta-uni, .tarjeta-uni:nth-of-type(5n+1) { --c: var(--v-rojo); }
+.col-6:nth-child(5n+2) .tarjeta-uni { --c: var(--v-azul); }
+.col-6:nth-child(5n+3) .tarjeta-uni { --c: var(--v-turquesa); }
+.col-6:nth-child(5n+4) .tarjeta-uni { --c: var(--v-magenta); }
+.col-6:nth-child(5n+5) .tarjeta-uni { --c: var(--v-verde); }
+.tarjeta-uni h3 { font-weight: 800 !important; }
+.institutos { border: 0 !important; box-shadow: var(--v-sombra) !important; border-radius: 20px !important; background: #fff !important; }
+.chip-instituto { font-weight: 600 !important; border-width: 1.5px !important; }
+
+/* ---------- secciones con color de fondo ---------- */
+.seccion.fondo-blanco { background: #fff !important; }
+.seccion-opiniones { background: var(--v-ocre) !important; position: relative; }
+.seccion-opiniones::before, .seccion-opiniones::after { content: ""; position: absolute; left: 0; right: 0; height: 12px; background: var(--v-zigzag) repeat-x; }
+.seccion-opiniones::before { top: 10px; }
+.seccion-opiniones::after { bottom: 10px; transform: scaleY(-1); }
+.seccion-opiniones .sobretitulo { background: #fff; }
+.seccion-opiniones h2, .seccion-opiniones h2 em { color: var(--v-tinta) !important; }
+.seccion-opiniones h2 em { color: #fff !important; text-shadow: 0 2px 0 rgba(0, 0, 0, .15); }
+.seccion-opiniones .opinion { box-shadow: 0 30px 60px -30px rgba(70, 40, 0, .6) !important; border: 0 !important; }
+.opiniones-puntos button { background-color: var(--v-tinta) !important; }
+.seccion-app { background: #e7f3ee !important; }
+.banda-cta { background: var(--terracota) !important; color: #fff !important; }
+.banda-cta h2, .banda-cta p { color: #fff !important; }
+.banda-cta .btn { background: #fff !important; color: var(--terracota-oscuro) !important; border-color: #fff !important; }
+.banda-cta .btn:hover { background: var(--v-tinta) !important; color: #fff !important; }
+.banda-cta .modelo-pista { color: #ffe1cf !important; }
+
+/* franja de tejido entre secciones */
+.seccion-historia { position: relative; }
+.seccion-historia::before, .seccion-opiniones + section::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px; background: var(--v-aguayo); }
+.seccion-historia .hito-fecha { color: #ffd98a !important; font-weight: 700; }
+
+/* ---------- ventajas y lista de "por qué TAMPU" con íconos de color ---------- */
+.lista-ventajas li > i.bi, .lista-ventajas li > .bi {
+    background: var(--c, var(--v-rojo)) !important; color: #fff !important; width: 44px !important; height: 44px !important; border-radius: 14px; padding: 0 !important;
+    display: inline-grid !important; place-items: center; font-size: 1.05rem; flex: none; box-shadow: 0 8px 16px -8px var(--c, var(--v-rojo));
+}
+.lista-ventajas li:nth-child(4n+1) { --c: var(--v-rojo); }
+.lista-ventajas li:nth-child(4n+2) { --c: var(--v-azul); }
+.lista-ventajas li:nth-child(4n+3) { --c: var(--v-verde); }
+.lista-ventajas li:nth-child(4n+4) { --c: var(--v-magenta); }
+.lista-ventajas li { border-top: 0 !important; background: #fff; border-radius: 16px; padding: 14px !important; box-shadow: 0 10px 24px -18px rgba(16, 35, 30, .5); margin-bottom: 10px; gap: 14px; }
+.lista-ventajas strong, .lista-ventajas b, .lista-ventajas h3 { font-weight: 800 !important; }
+
+/* ---------- preguntas frecuentes ---------- */
+.pregunta-numero { background: var(--v-ocre); color: #2b1d00 !important; font-weight: 800 !important; border-radius: 8px; padding: 2px 7px; font-style: normal !important; }
+.accordion-button:not(.collapsed), details[open] > summary { color: var(--terracota-oscuro) !important; }
+
+/* ---------- consejos de la ciudad ---------- */
+.consejos li > span:first-child, .consejos .numero { color: var(--v-rojo) !important; font-weight: 800 !important; }
+
+/* ---------- cabecera ---------- */
+.menu a.activo, nav a.activo, .navegacion a.activo { color: var(--terracota) !important; font-weight: 800 !important; }
+
+/* ---------- cajas y paneles en todo el sitio ---------- */
+.caja { border: 0 !important; box-shadow: var(--v-sombra) !important; border-radius: 20px !important; }
+.kpis .kpi { border-radius: 18px !important; }
+.bienvenida { box-shadow: var(--v-sombra) !important; }
+.bienvenida::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: var(--v-aguayo); }
+.bienvenida { position: relative; overflow: hidden; }
+
+/* calculadora y presupuesto, un poco más vivos */
+.presu-grande b { font-weight: 800 !important; }
+.calc-pestanas button[aria-selected=true] { color: var(--terracota) !important; font-weight: 800; }
+.presu-hoja::before { background: var(--v-aguayo) !important; height: 8px !important; }
+
+/* guía en PDF: botón de descarga */
+.btn-pdf { display: inline-flex; align-items: center; gap: 8px; }
+.btn-pdf .bi { color: var(--v-rojo); }
+.btn-claro.btn-pdf .bi { color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+    .tarjeta:hover, .tarjeta-trabajo:hover, .tarjeta-uni:hover, .btn:hover { transform: none !important; }
+}

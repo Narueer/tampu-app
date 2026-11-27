@@ -2,10 +2,10 @@
     Maqueta 3D que se gira con el mouse o el dedo (model-viewer). Mientras carga se ve la imagen (poster).
     Parámetros: modelo (.glb), poster (.webp), alt, puntos = [[posición "x y z", título, texto], ...]
 --}}
-<figure class="modelo-3d {{ $clase ?? '' }}" style="--poster: url('{{ asset($poster) }}')">
+<figure class="modelo-3d {{ $clase ?? '' }}" style="--poster: url('{{ asset($poster) }}?v={{ @filemtime(public_path($poster)) }}')">
     <model-viewer
-        src="{{ asset($modelo) }}"
-        poster="{{ asset($poster) }}"
+        src="{{ asset($modelo) }}?v={{ @filemtime(public_path($modelo)) }}"
+        poster="{{ asset($poster) }}?v={{ @filemtime(public_path($poster)) }}"
         alt="{{ $alt }}"
         loading="lazy"
         reveal="auto"

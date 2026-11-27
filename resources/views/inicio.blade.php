@@ -172,7 +172,7 @@
                     @foreach ($pasos as $i => [$img, $alt, $titulo, $texto, $url, $accion])
                         <li class="como-paso revelar">
                             <span class="como-num" aria-hidden="true">{{ sprintf('%02d', $i + 1) }}</span>
-                            <div class="como-ilustracion"><img src="{{ asset("img/3d/$img.webp") }}" alt="{{ $alt }}" loading="lazy" width="560" height="390"></div>
+                            <div class="como-ilustracion"><img src="{{ asset("img/3d/$img.webp") }}?v={{ filemtime(public_path("img/3d/$img.webp")) }}" alt="{{ $alt }}" loading="lazy" width="560" height="390"></div>
                             <span class="como-etiqueta">Paso {{ $i + 1 }}</span>
                             <h3>{{ $titulo }}</h3>
                             <p>{{ $texto }}</p>

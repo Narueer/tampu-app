@@ -182,6 +182,12 @@ class ChatbotController extends Controller
             return $this->respuesta('¡De nada! Que te vaya muy bien en tus estudios. Si necesitas algo más, aquí estaré. 👋');
         }
 
+        // guía del usuario en PDF: "guía", "manual", "tutorial", "¿cómo se usa?"
+        if ($this->tiene($texto, ['guia del usuario', 'guia de usuario', 'guia de uso', 'guia en pdf', 'guia pdf', 'manual', 'tutorial', 'instructivo', 'como se usa', 'como usar la pagina', 'como uso tampu', 'como usar tampu', 'como funciona la pagina', 'como funciona tampu', 'pdf'])
+            || preg_match('/^\W*(una |la |mandame la |dame la |quiero la |necesito la |pasame la )?guia\W*$/', $texto)) {
+            return $this->guiaPdf($request);
+        }
+
         // 3. temas especiales: qué es la página, otras ciudades, insultos, preguntas fuera de tema…
         $datos = $this->extraer($texto);
         if (AsistenteIA::activo() && $this->mejorConIA($texto, $datos) && ($r = $this->preguntarIA($request))) {
@@ -1296,6 +1302,21 @@ class ChatbotController extends Controller
             ['que', 'por que', 'tambien', 'por', ' por '], $texto);
 
         return preg_replace('/\s+/', ' ', $texto);
+    }
+
+    // manda la guía en PDF: la de su rol (si inició sesión) y la general
+    private function guiaPdf(Request $request)
+    {
+        $rol = $request->user()?->rol;
+        $archivo = ['estudiante' => 'guia-estudiante', 'arrendador' => 'guia-arrendador', 'empleador' => 'guia-empleador', 'admin' => 'guia-administrador'][$rol] ?? null;
+        $enlaces = [];
+        if ($archivo && file_exists(public_path("guias/$archivo.pdf"))) {
+            $enlaces[] = ['texto' => '📘 Tu guía en PDF (' . ($rol === 'admin' ? 'administrador' : $rol) . ')', 'url' => asset("guias/$archivo.pdf")];
+        }
+        $enlaces[] = ['texto' => '📗 Guía del usuario general (PDF)', 'url' => asset('guias/guia-tampu.pdf')];
+
+        return $this->respuesta('¡Claro! 😊 Aquí tienes la guía en PDF, con dibujos y paso a paso. Descárgala si quieres, o compártela con tus amigos. Y si prefieres verlo en la página, toca el botón «Guía».',
+            $enlaces, ['Buscar cuarto', 'Buscar trabajo', '¿Me alcanza?']);
     }
 
     // "los lunes y martes", "fines de semana", "de lunes a viernes"
