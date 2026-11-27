@@ -9,14 +9,14 @@
         <h1 class="titulo-pagina">Bitácora de seguridad</h1>
         <p class="texto-suave">Aquí queda registrado quién entra, quién falla la contraseña, los bloqueos y los accesos a páginas sin permiso. Cuando alguien falla 5 veces seguidas te llega un aviso.</p>
 
-        <div class="numeros">
-            <div><i class="bi bi-box-arrow-in-right"></i><b>{{ $resumen['login'] }}</b><span>Inicios de sesión (24 h)</span></div>
-            <div><i class="bi bi-x-octagon"></i><b>{{ $resumen['login_fallido'] }}</b><span>Contraseñas incorrectas (24 h)</span></div>
-            <div><i class="bi bi-lock"></i><b>{{ $resumen['bloqueo'] }}</b><span>Bloqueos (24 h)</span></div>
-            <div><i class="bi bi-sign-stop"></i><b>{{ $resumen['acceso_denegado'] }}</b><span>Accesos denegados (24 h)</span></div>
-        </div>
+        @include('partials.kpis', ['kpis' => [
+            ['box-arrow-in-right', $resumen['login'], 'Inicios de sesión (24 h)', 'verde', route('admin.seguridad', ['tipo' => 'login'])],
+            ['x-octagon', $resumen['login_fallido'], 'Contraseñas incorrectas (24 h)', 'amarillo', route('admin.seguridad', ['tipo' => 'login_fallido'])],
+            ['lock', $resumen['bloqueo'], 'Bloqueos (24 h)', 'rosa', route('admin.seguridad', ['tipo' => 'bloqueo'])],
+            ['sign-stop', $resumen['acceso_denegado'], 'Accesos denegados (24 h)', 'terracota', route('admin.seguridad', ['tipo' => 'acceso_denegado'])],
+        ]])
 
-        <form class="barra-filtros" method="GET">
+        <form class="barra-filtros filtros-admin" method="GET">
             <select name="tipo" aria-label="Tipo de evento">
                 <option value="">Todos los eventos</option>
                 <option value="alertas" @selected($tipo === 'alertas')>Solo alertas</option>
@@ -24,9 +24,16 @@
                     <option value="{{ $valor }}" @selected($tipo === $valor)>{{ $t[0] }}</option>
                 @endforeach
             </select>
-            <input type="search" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por correo" aria-label="Buscar por correo">
+            <input type="search" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por correo" aria-label="Buscar por correo" list="sugerenciasCorreos" autocomplete="off">
+            <datalist id="sugerenciasCorreos">
+                @foreach ($correos as $c)<option value="{{ $c }}">@endforeach
+            </datalist>
+            <input type="search" name="ip" value="{{ request('ip') }}" placeholder="IP" aria-label="Buscar por IP" class="campo-ip">
+            @include('partials.rango-fechas')
             <button class="btn">Filtrar</button>
+            @if (request()->query())<a href="{{ route('admin.seguridad') }}" class="limpiar-filtros">Limpiar</a>@endif
         </form>
+        <p class="conteo-resultados">{{ $eventos->total() }} {{ $eventos->total() === 1 ? 'evento' : 'eventos' }}</p>
 
         @if ($eventos->isEmpty())
             <p class="vacio">No hay eventos con ese filtro.</p>
@@ -55,7 +62,7 @@
                                 @endif
                             </td>
                             <td>{{ $e->detalle }}</td>
-                            <td title="{{ $e->navegador }}">{{ $e->ip }}</td>
+                            <td title="{{ $e->navegador }}"><a href="{{ request()->fullUrlWithQuery(['ip' => $e->ip, 'page' => null]) }}" class="enlace-filtro" title="Ver todo lo de esta IP">{{ $e->ip }}</a></td>
                         </tr>
                     @endforeach
                 </table>

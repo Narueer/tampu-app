@@ -28,16 +28,11 @@ h1, h2, h3, .titulo-pagina {
     letter-spacing: -0.01em;
 }
 
-/* la palabra destacada ya no va en cursiva: va subrayada con una franja de tejido */
+/* la palabra destacada: solo cambia de color (nada encima de la letra) */
 h1 em, h2 em, h3 em {
     font-style: normal;
     font-weight: inherit;
-    color: inherit;
-    background-image: var(--tejido);
-    background-repeat: repeat-x;
-    background-size: auto 0.16em;
-    background-position: 0 92%;
-    padding-bottom: 0.06em;
+    color: var(--terracota);
 }
 
 .banda-cta h2 em,
@@ -619,3 +614,44 @@ table th {
     padding: 26px 20px;
     grid-column: 1 / -1;
 }
+
+/* ---------- filtros del administrador: búsqueda, desde/hasta y atajos ---------- */
+.filtros-admin {
+    gap: 10px !important;
+    background: var(--papel) !important;
+    border-radius: var(--radio-grande) !important;
+}
+.filtros-admin input[type="search"] { flex: 1 1 240px; min-width: 200px; }
+.filtros-admin .campo-ip { flex: 0 1 130px !important; min-width: 110px !important; }
+.filtros-admin select { flex: 0 1 auto; }
+.rango-fechas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    padding: 4px 10px;
+    border: 1px dashed var(--borde-input);
+    border-radius: var(--radio);
+}
+.rango-fechas label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--texto-suave);
+}
+.rango-fechas input[type="date"] { width: auto; padding: 6px 8px; font-size: 0.88rem; }
+.rango-atajos { display: inline-flex; gap: 4px; }
+.rango-atajos a {
+    padding: 4px 9px;
+    border-radius: 5px;
+    font-size: 0.78rem;
+    color: var(--texto);
+    background: var(--adobe);
+    text-decoration: none;
+}
+.rango-atajos a.activo, .rango-atajos a:hover { background: var(--verde-andino); color: #fff; }
+.limpiar-filtros { font-size: 0.85rem; color: var(--terracota); }
+.conteo-resultados { margin: -4px 0 12px; font-size: 0.85rem; color: var(--texto-suave); }
+.enlace-filtro { color: inherit; text-decoration: underline dotted; }

@@ -52,15 +52,51 @@ class AdminController extends Controller
         return view('admin.panel', compact('datos', 'pendientes', 'graficos', 'actividad', 'nuevos'));
     }
 
+    // filtro común "desde / hasta" (fechas en formato del calendario, AAAA-MM-DD)
+    private function entreFechas($consulta, Request $request, string $columna = 'created_at')
+    {
+        $fecha = fn ($v) => $v && preg_match('/^\d{4}-\d{2}-\d{2}$/', $v) ? $v : null;
+        if ($desde = $fecha($request->desde)) {
+            $consulta->where($columna, '>=', $desde . ' 00:00:00');
+        }
+        if ($hasta = $fecha($request->hasta)) {
+            $consulta->where($columna, '<=', $hasta . ' 23:59:59');
+        }
+
+        return $consulta;
+    }
+
     public function usuarios(Request $request)
     {
         $consulta = Usuario::where('rol', '!=', 'admin');
         if ($request->filled('rol')) {
             $consulta->where('rol', $request->rol);
         }
-        $usuarios = $consulta->withCount(['habitaciones', 'trabajos'])->latest()->get();
+        // nombre, correo, DNI o celular (sin importar mayúsculas)
+        if ($request->filled('buscar')) {
+            $b = '%' . trim($request->buscar) . '%';
+            $consulta->where(fn ($q) => $q->whereLike('nombre', $b)->orWhereLike('email', $b)->orWhereLike('dni', $b)->orWhereLike('celular', $b)->orWhereLike('procedencia', $b));
+        }
+        if (in_array($request->verificacion, ['verificado', 'pendiente', 'rechazado', 'no_aplica'], true)) {
+            $consulta->where('verificacion', $request->verificacion);
+        }
+        if ($request->cuenta === 'suspendida') {
+            $consulta->where('suspendido', true);
+        } elseif ($request->cuenta === 'activa') {
+            $consulta->where('suspendido', false);
+        }
+        $this->entreFechas($consulta, $request);
+        $orden = match ($request->orden) {
+            'antiguos' => ['created_at', 'asc'],
+            'nombre' => ['nombre', 'asc'],
+            default => ['created_at', 'desc'],
+        };
+        $usuarios = $consulta->withCount(['habitaciones', 'trabajos'])->orderBy(...$orden)->orderBy('id')->get();
 
-        return view('admin.usuarios', compact('usuarios'));
+        // sugerencias para el buscador: nombres y correos de todos los usuarios
+        $sugerencias = Usuario::where('rol', '!=', 'admin')->orderBy('nombre')->get(['nombre', 'email']);
+
+        return view('admin.usuarios', compact('usuarios', 'sugerencias'));
     }
 
     // solo el admin ve el documento
@@ -93,9 +129,10 @@ class AdminController extends Controller
     public function reportes(Request $request)
     {
         $estado = $request->input('estado', 'pendiente');
-        $reportes = Reporte::with(['autor', 'habitacion.arrendador', 'trabajo.empleador'])
+        $consulta = Reporte::with(['autor', 'habitacion.arrendador', 'trabajo.empleador'])
             ->when($estado !== 'todos', fn ($q) => $q->where('estado', $estado))
-            ->latest()->get();
+            ->when($request->filled('motivo'), fn ($q) => $q->where('motivo', $request->motivo));
+        $reportes = $this->entreFechas($consulta, $request)->latest()->get();
 
         return view('admin.reportes', compact('reportes', 'estado'));
     }
@@ -128,9 +165,17 @@ class AdminController extends Controller
         return back()->with('ok', $usuario->nombre . ($usuario->suspendido ? ' fue suspendido.' : ' fue reactivado.'));
     }
 
-    public function contactos()
+    public function contactos(Request $request)
     {
-        $contactos = Contacto::latest()->get();
+        $consulta = Contacto::query()
+            ->when($request->filled('buscar'), function ($q) use ($request) {
+                $b = '%' . trim($request->buscar) . '%';
+                $q->where(fn ($w) => $w->whereLike('nombre', $b)->orWhereLike('email', $b)->orWhereLike('mensaje', $b));
+            })
+            ->when($request->filled('asunto'), fn ($q) => $q->where('asunto', $request->asunto))
+            ->when($request->estado === 'nuevos', fn ($q) => $q->where('leido', false))
+            ->when($request->estado === 'leidos', fn ($q) => $q->where('leido', true));
+        $contactos = $this->entreFechas($consulta, $request)->latest()->get();
 
         return view('admin.contactos', compact('contactos'));
     }
@@ -149,8 +194,10 @@ class AdminController extends Controller
         $eventos = EventoSeguridad::with('usuario')
             ->when($tipo === 'alertas', fn ($q) => $q->whereIn('tipo', collect(EventoSeguridad::TIPOS)->filter(fn ($t) => $t[1])->keys()))
             ->when($tipo && $tipo !== 'alertas', fn ($q) => $q->where('tipo', $tipo))
-            ->when($request->filled('buscar'), fn ($q) => $q->whereLike('email', '%' . $request->buscar . '%'))
-            ->latest('created_at')->latest('id')->paginate(30)->withQueryString();
+            ->when($request->filled('buscar'), fn ($q) => $q->whereLike('email', '%' . trim($request->buscar) . '%'))
+            ->when($request->filled('ip'), fn ($q) => $q->where('ip', trim($request->ip)));
+        $eventos = $this->entreFechas($eventos, $request)->latest('created_at')->latest('id')->paginate(30)->withQueryString();
+        $correos = EventoSeguridad::whereNotNull('email')->distinct()->orderBy('email')->limit(300)->pluck('email');
 
         // resumen de las ultimas 24 horas
         $desde = now()->subDay();
@@ -161,6 +208,6 @@ class AdminController extends Controller
             'acceso_denegado' => EventoSeguridad::where('tipo', 'acceso_denegado')->where('created_at', '>=', $desde)->count(),
         ];
 
-        return view('admin.seguridad', compact('eventos', 'resumen', 'tipo'));
+        return view('admin.seguridad', compact('eventos', 'resumen', 'tipo', 'correos'));
     }
 }

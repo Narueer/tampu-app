@@ -8,17 +8,26 @@
 
         <h1 class="titulo-pagina">Reportes de publicaciones</h1>
 
-        <form class="barra-filtros" method="GET">
+        <form class="barra-filtros filtros-admin" method="GET">
             <select name="estado" aria-label="Estado">
                 @foreach (['pendiente' => 'Pendientes', 'sancionado' => 'Sancionados', 'descartado' => 'Descartados', 'todos' => 'Todos'] as $valor => $texto)
                     <option value="{{ $valor }}" @selected($estado === $valor)>{{ $texto }}</option>
                 @endforeach
             </select>
+            <select name="motivo" aria-label="Motivo">
+                <option value="">Cualquier motivo</option>
+                @foreach (\App\Models\Reporte::MOTIVOS as $m)
+                    <option value="{{ $m }}" @selected(request('motivo') === $m)>{{ $m }}</option>
+                @endforeach
+            </select>
+            @include('partials.rango-fechas')
             <button class="btn">Filtrar</button>
+            @if (request()->query())<a href="{{ route('admin.reportes') }}" class="limpiar-filtros">Limpiar</a>@endif
         </form>
+        <p class="conteo-resultados">{{ $reportes->count() }} {{ $reportes->count() === 1 ? 'reporte' : 'reportes' }}</p>
 
         @if ($reportes->isEmpty())
-            <p class="vacio">No hay reportes {{ $estado === 'todos' ? '' : $estado . 's' }}.</p>
+            <p class="vacio">No hay reportes {{ $estado === 'todos' ? '' : $estado . 's' }}{{ request('desde') || request('hasta') || request('motivo') ? ' con ese filtro' : '' }}.</p>
         @else
             <div class="tabla-scroll">
                 <table class="tabla">

@@ -10,15 +10,40 @@
             <h1 class="titulo-pagina">Usuarios</h1>
         </div>
 
-        <form class="barra-filtros" method="GET">
+        <form class="barra-filtros filtros-admin" method="GET">
+            <input type="search" name="buscar" value="{{ request('buscar') }}" placeholder="Nombre, correo, DNI, celular o ciudad" aria-label="Buscar usuario" list="sugerenciasUsuarios" autocomplete="off">
+            <datalist id="sugerenciasUsuarios">
+                @foreach ($sugerencias as $s)
+                    <option value="{{ $s->nombre }}">{{ $s->email }}</option>
+                @endforeach
+            </datalist>
             <select name="rol" aria-label="Rol">
                 <option value="">Todos los roles</option>
                 @foreach (['estudiante', 'arrendador', 'empleador'] as $r)
                     <option value="{{ $r }}" @selected(request('rol') === $r)>{{ ucfirst($r) }}</option>
                 @endforeach
             </select>
+            <select name="verificacion" aria-label="Verificación">
+                <option value="">Cualquier verificación</option>
+                @foreach (['verificado' => 'Verificados', 'pendiente' => 'Por verificar', 'rechazado' => 'Rechazados', 'no_aplica' => 'Estudiantes (no aplica)'] as $v => $t)
+                    <option value="{{ $v }}" @selected(request('verificacion') === $v)>{{ $t }}</option>
+                @endforeach
+            </select>
+            <select name="cuenta" aria-label="Cuenta">
+                <option value="">Activas y suspendidas</option>
+                <option value="activa" @selected(request('cuenta') === 'activa')>Solo activas</option>
+                <option value="suspendida" @selected(request('cuenta') === 'suspendida')>Solo suspendidas</option>
+            </select>
+            <select name="orden" aria-label="Orden">
+                <option value="">Más nuevos primero</option>
+                <option value="antiguos" @selected(request('orden') === 'antiguos')>Más antiguos primero</option>
+                <option value="nombre" @selected(request('orden') === 'nombre')>Por nombre (A-Z)</option>
+            </select>
+            @include('partials.rango-fechas')
             <button class="btn">Filtrar</button>
+            @if (request()->query())<a href="{{ route('admin.usuarios') }}" class="limpiar-filtros">Limpiar</a>@endif
         </form>
+        <p class="conteo-resultados">{{ $usuarios->count() }} {{ $usuarios->count() === 1 ? 'usuario' : 'usuarios' }}@if (request('desde') || request('hasta')) registrados en ese rango @endif</p>
 
         <div class="tabla-scroll">
             <table class="tabla">

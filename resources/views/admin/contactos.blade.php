@@ -8,8 +8,27 @@
 
         <h1 class="titulo-pagina">Mensajes de contacto</h1>
 
+        <form class="barra-filtros filtros-admin" method="GET">
+            <input type="search" name="buscar" value="{{ request('buscar') }}" placeholder="Nombre, correo o texto del mensaje" aria-label="Buscar mensaje">
+            <select name="asunto" aria-label="Asunto">
+                <option value="">Cualquier asunto</option>
+                @foreach (\App\Models\Contacto::ASUNTOS as $a)
+                    <option value="{{ $a }}" @selected(request('asunto') === $a)>{{ $a }}</option>
+                @endforeach
+            </select>
+            <select name="estado" aria-label="Estado">
+                <option value="">Todos</option>
+                <option value="nuevos" @selected(request('estado') === 'nuevos')>Sin leer</option>
+                <option value="leidos" @selected(request('estado') === 'leidos')>Leídos</option>
+            </select>
+            @include('partials.rango-fechas')
+            <button class="btn">Filtrar</button>
+            @if (request()->query())<a href="{{ route('admin.contactos') }}" class="limpiar-filtros">Limpiar</a>@endif
+        </form>
+        <p class="conteo-resultados">{{ $contactos->count() }} {{ $contactos->count() === 1 ? 'mensaje' : 'mensajes' }}</p>
+
         @if ($contactos->isEmpty())
-            <p class="vacio">Todavía no llegaron mensajes.</p>
+            <p class="vacio">{{ request()->query() ? 'No hay mensajes con ese filtro.' : 'Todavía no llegaron mensajes.' }}</p>
         @else
             <div class="tabla-scroll">
                 <table class="tabla">
