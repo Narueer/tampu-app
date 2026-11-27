@@ -3,12 +3,13 @@ Fotos de las sedes (opcional)
 Si pones aquí una foto con el nombre del lugar, la página la muestra en la tarjeta de la portada
 y en el globito del mapa. Formatos: .webp, .jpg o .png, pequeña (unos 480 px de ancho, menos de 40 KB).
 
-Ya incluidas (fotos libres de Wikimedia Commons, con su crédito en app/Support/Lugares.php):
-  unsaac.webp      -> Ordzonhyd Rudyard Tarco Palomino, CC BY 4.0
-  u-andina.webp    -> Huamani betzabe, CC0
+Incluidas:
+  unsaac.webp            Wikimedia Commons, Ordzonhyd Rudyard Tarco Palomino, CC BY 4.0 (crédito en el ícono ⓘ de la foto)
+  u-andina.webp          Wikimedia Commons, Huamani betzabe, CC0
+  u-andina-qollana.webp, u-continental.webp, utea.webp   aportadas por el equipo
 
 Nombres para las demás:
-  u-andina-qollana   u-continental   utea   ist-tupac-amaru   khipu   antonio-lorena
-  tuinen-star        pukllasunchis   cenfotur   senati   sencico   leandro-alvina
+  ist-tupac-amaru   khipu   antonio-lorena   tuinen-star   pukllasunchis
+  cenfotur          senati  sencico          leandro-alvina
 
-Usa fotos propias o con licencia libre, y agrega su crédito en Lugares::CREDITOS.
+Usa fotos propias o con permiso. Si la licencia pide crédito, agrégalo en Lugares::CREDITOS.

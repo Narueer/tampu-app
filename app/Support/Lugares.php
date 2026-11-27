@@ -102,9 +102,8 @@ class Lugares
     const CREDITOS = [
         'UNSAAC' => ['autor' => 'Ordzonhyd Rudyard Tarco Palomino', 'licencia' => 'CC BY 4.0',
             'url' => 'https://commons.wikimedia.org/wiki/File:Universidad_Nacional_de_San_Antonio_Abad_de_Cusco_01.jpg'],
-        'U. Andina' => ['autor' => 'Huamani betzabe', 'licencia' => 'CC0',
-            'url' => 'https://commons.wikimedia.org/wiki/File:Universidad_Andina_del_Cusco_%E2%80%94_Campus_principal.jpg'],
     ];
+    // u-andina.webp es CC0 (no pide crédito). u-andina-qollana, u-continental y utea las aportó el equipo.
 
     public static function foto(string $clave): ?string
     {

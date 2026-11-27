@@ -235,7 +235,9 @@
                             <a href="{{ $u['total'] > 0 ? route('habitaciones.index', ['cerca_de' => $u['clave']]) : route('habitaciones.index') }}" class="tarjeta-uni {{ $u['foto'] ? 'con-foto' : '' }}">
                                 @if ($u['foto'])
                                     <span class="foto-lugar">
-                                        <img src="{{ $u['foto'] }}" alt="Sede de {{ $u['completo'] }}" loading="lazy" title="{{ $u['credito'] }}">
+                                        <img src="{{ $u['foto'] }}" alt="Sede de {{ $u['completo'] }}" loading="lazy">
+                                        {{-- la licencia CC BY pide nombrar al autor: va en un ícono pequeño sobre la foto --}}
+                                        @if ($u['credito'])<i class="bi bi-info-circle credito-foto" title="{{ $u['credito'] }}" aria-label="{{ $u['credito'] }}"></i>@endif
                                     </span>
                                 @endif
                                 <i class="bi bi-{{ $u['icono'] }}"></i>
@@ -266,10 +268,6 @@
                         </div>
                     @endforeach
                 </div>
-                @php $creditos = $universidades->pluck('credito')->filter(); @endphp
-                @if ($creditos->isNotEmpty())
-                    <p class="creditos-fotos">{{ $creditos->implode(' · ') }}</p>
-                @endif
             </div>
         </section>
 
