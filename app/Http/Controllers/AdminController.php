@@ -116,10 +116,14 @@ class AdminController extends Controller
         $usuario->update(['verificacion' => $request->accion]);
         EventoSeguridad::registrar('verificacion', 'El admin marcó a ' . $usuario->email . ' como ' . $request->accion, $usuario);
 
-        $usuario->notify(new Aviso(
-            $request->accion === 'verificado' ? 'Tu cuenta fue verificada. Ya puedes publicar.' : 'Tu documento fue rechazado por el administrador.',
-            route('panel'), 'patch-check'
-        ));
+        $ok = $request->accion === 'verificado';
+        Aviso::enviar($usuario,
+            $ok ? 'Tu cuenta fue verificada. Ya puedes publicar.' : 'Tu documento fue rechazado por el administrador.',
+            route('panel'), 'patch-check',
+            $ok ? 'Tu cuenta fue verificada' : 'No pudimos verificar tu cuenta',
+            $ok ? ['Revisamos tu documento y tu cuenta ya está verificada.', 'Ya puedes publicar en TAMPU. Las publicaciones con buenas fotos reciben más mensajes.']
+                : ['Revisamos tu documento y no pudimos verificarlo (puede estar borroso o no coincidir con tus datos).', 'Sube una foto clara de tu DNI o RUC desde Mi perfil y lo revisamos de nuevo.'],
+            $ok ? 'Publicar ahora' : 'Ir a mi perfil');
 
         $texto = $request->accion === 'verificado' ? 'verificado. Ya puede publicar.' : 'rechazado.';
 

@@ -192,6 +192,8 @@ class ChatbotController extends Controller
         }
         $pideTrabajo = $this->tiene($texto, ['trabajo', 'empleo', 'chamba', 'cachuelo', 'practica', 'chambear', 'trabajar', 'medio tiempo', 'por horas', 'oferta',
             'ganar plata', 'ganar platita', 'ganar dinero', 'plata extra', 'dinero extra', 'ingresos extra', 'cachuelito']);
+        // "quiero ganar 10 mil al mes": quien habla de sueldo busca trabajo
+        $pideTrabajo = $pideTrabajo || (isset($datos['sueldo']) && ! $this->tiene($texto, ['cuarto', 'habitacion', 'depa', 'alquil', 'vivienda', 'roomie']));
         $pideCuarto = $this->tiene($texto, ['cuarto', 'habitacion', 'alquil', 'vivir', 'vivienda', 'hospedaje', 'donde quedarme', 'roomie', 'rumi', 'minidepa', 'mini depa', 'depa', 'departamento', 'residencia', 'pension', 'casa de estudiantes', 'casa estudiantil', 'donde vivo', 'donde vivir', 'alojarme', 'alojamiento'])
             || (isset($datos['uni']) && ! $pideTrabajo);   // "estudio en el SENATI, ¿dónde me quedo?"
         if ($r = $this->temaEspecial($request, $texto, $datos, $pideCuarto, $pideTrabajo)) {
@@ -200,7 +202,7 @@ class ChatbotController extends Controller
         $quiereCuarto = $this->tiene($texto, ['cuarto', 'habitacion', 'alquil', 'vivir', 'vivienda', 'hospedaje', 'donde quedarme', 'roomie', 'rumi', 'minidepa', 'depa', 'residencia', 'pension', 'casa de estudiantes', 'donde vivo', 'donde vivir', 'alojarme', 'alojamiento'])
             || isset($datos['tipo']) || isset($datos['servicios']) || (isset($datos['uni']) && ! $this->tiene($texto, ['trabajo', 'chamba', 'empleo']));
         $quiereTrabajo = $this->tiene($texto, ['trabajo', 'empleo', 'chamba', 'cachuelo', 'practica', 'chambear', 'trabajar', 'medio tiempo', 'por horas', 'oferta'])
-            || isset($datos['rubro']);
+            || isset($datos['rubro']) || $pideTrabajo;
 
         // 4. precios promedio y cantidades
         if ($this->tiene($texto, ['promedio', 'cuanto cuesta', 'cuanto cuestan', 'precio normal', 'cuanto se paga', 'precios por distrito', 'precio de ', 'precios de', 'cuanto sale'])
@@ -300,8 +302,24 @@ class ChatbotController extends Controller
             }
         }
 
-        // precio: "entre 200 y 300", "hasta 300", "300 soles", "s/ 300"
-        if (preg_match('/entre\s*s?\/?\s*(\d{2,4})\s*y\s*s?\/?\s*(\d{2,4})/', $texto, $m)) {
+        // sueldo que se quiere ganar: "ganar 27000 al dia", "que paguen 15 la hora"
+        if (preg_match('/(?:ganar|gane|ganando|cobrar|paguen|pague|sueldo de|pago de|sueldo)\D{0,14}?(\d[\d.,]*)\s*(?:mil\b)?\s*(?:soles|sol|lucas)?\s*(al dia|por dia|diario|diarios|cada dia|la hora|por hora|cada hora|al mes|por mes|mensual|mensuales|a la semana|por semana|semanal)?/', $texto, $m)) {
+            $n = (float) str_replace([',', ' '], '', $m[1]);
+            if (str_contains($m[0], 'mil')) {
+                $n *= 1000;
+            }
+            $por = $m[2] ?? '';
+            $datos['sueldo'] = $n;
+            $datos['sueldo_por'] = str_contains($por, 'hora') ? 'hora' : (str_contains($por, 'dia') || str_contains($por, 'diario') ? 'dia' : (str_contains($por, 'semana') ? 'semana' : 'mes'));
+        }
+
+        // precio: "100 céntimos", "entre 200 y 300", "hasta 300", "300 soles", "s/ 300"
+        if (preg_match('/(\d+)\s*(?:centimos?|centavos?|centimitos?)/', $texto, $m)) {
+            $datos['centimos'] = (int) $m[1];
+            $datos['precio'] = intdiv((int) $m[1], 100);
+        } elseif (isset($datos['sueldo']) && ! $this->tiene($texto, ['cuarto', 'habitacion', 'depa', 'alquil', 'vivienda', 'roomie'])) {
+            // el número era el sueldo, no el precio de un cuarto
+        } elseif (preg_match('/entre\s*s?\/?\s*(\d{2,4})\s*y\s*s?\/?\s*(\d{2,4})/', $texto, $m)) {
             $datos['precio_min'] = (int) $m[1];
             $datos['precio'] = (int) $m[2];
         } elseif (preg_match('/(?<![\d.,])(\d{3,4})(?![\d.,])/', $texto, $m) && (int) $m[1] >= 100 && (int) $m[1] <= 3000) {
@@ -336,12 +354,21 @@ class ChatbotController extends Controller
         } elseif ($this->tiene($texto, ['noche', 'nocturno'])) {
             $datos['turno'] = 'noche';
         }
-        if ($this->tiene($texto, ['fin de semana', 'fines de semana', 'finde', 'sabado y domingo'])) {
-            $datos['dias'] = ['sabado', 'domingo'];
-        } elseif ($this->tiene($texto, ['sabado'])) {
-            $datos['dias'] = ['sabado'];
-        } elseif ($this->tiene($texto, ['domingo'])) {
-            $datos['dias'] = ['domingo'];
+        // días: todos los que se nombran ("los lunes y los martes", "fines de semana", "entre semana")
+        $dias = [];
+        foreach (['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'] as $d) {
+            if (preg_match('/\b' . $d . 's?\b/', $texto)) {
+                $dias[] = $d;
+            }
+        }
+        if ($this->tiene($texto, ['fin de semana', 'fines de semana', 'finde'])) {
+            $dias = array_merge($dias, ['sabado', 'domingo']);
+        }
+        if ($this->tiene($texto, ['entre semana', 'dias de semana', 'dias habiles', 'de lunes a viernes'])) {
+            $dias = array_merge($dias, ['lunes', 'martes', 'miercoles', 'jueves', 'viernes']);
+        }
+        if ($dias) {
+            $datos['dias'] = array_values(array_unique($dias));
         }
         foreach (self::RUBROS as $clave => $buscar) {
             if ($this->coincide($texto, $clave)) {
@@ -349,6 +376,14 @@ class ChatbotController extends Controller
                 $datos['rubro_texto'] = trim($clave);
                 break;
             }
+        }
+        if (! isset($datos['rubro']) && preg_match('/(?:trabajo|trabajar|chamba|chambear|empleo|puesto|cachuelo)\s+(?:de|como)\s+(?:un |una |el |la )?([a-zn]{4,})/', $texto, $m)
+            && ! in_array($m[1], ['medio', 'tiempo', 'fines', 'semana', 'manana', 'tarde', 'noche', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo', 'practicas', 'practicante', 'horas', 'estudiante', 'verdad', 'todo', 'cualquier', 'cualquiera', 'algo', 'casa', 'aqui'])) {
+            $palabra = $m[1];
+            $raiz = preg_replace('/(os|as|es|o|a|s)$/', '', $palabra);
+            $datos['rubro'] = [strlen($raiz) >= 4 ? $raiz : $palabra];
+            $datos['rubro_texto'] = $palabra;
+            $datos['rubro_libre'] = true;
         }
 
         return $datos;
@@ -544,11 +579,35 @@ class ChatbotController extends Controller
                     $q->whereIn('dia', $datos['dias']);
                 }
             });
-            $partes[] = trim((isset($datos['dias']) ? (count($datos['dias']) > 1 ? 'fines de semana' : 'los ' . $datos['dias'][0] . 's') : '')
+            $partes[] = trim((isset($datos['dias']) ? $this->textoDias($datos['dias']) : '')
                 . (isset($datos['turno']) ? ' en la ' . ['manana' => 'mañana', 'tarde' => 'tarde', 'noche' => 'noche'][$datos['turno']] : ''));
         }
 
-        $trabajos = $consulta->latest()->get();
+        if (isset($datos['sueldo']) && $datos['sueldo'] > 0) {
+            $por = $datos['sueldo_por'];
+            $unidad = $por === 'semana' ? 'dia' : $por;
+            $porDia = ['hora' => 8, 'dia' => 1, 'semana' => 1 / 6, 'mes' => 1 / 26][$por];
+            $alDia = $datos['sueldo'] * $porDia;          // lo que pide, llevado a soles por día
+            $mejor = Trabajo::publicadas()->where('pago_por', $unidad)->max('pago');
+            $soles = 'S/ ' . number_format($datos['sueldo'], 0, '.', ' ');
+            $textoPor = ['hora' => 'la hora', 'dia' => 'al día', 'semana' => 'a la semana', 'mes' => 'al mes'][$por];
+            $tope = ['hora' => 40, 'dia' => 200, 'semana' => 1000, 'mes' => 4000][$por];   // más de esto no es sueldo de estudiante
+            if ($datos['sueldo'] > $tope) {
+                $chiste = $alDia > 1500 ? ' ¡Eso es más de lo que gana un ministro en un mes!' : ' Eso es sueldo de gerente.';
+                $this->prefijo .= "$soles $textoPor 😅$chiste Siendo realistas, un trabajo de estudiante en Cusco paga entre S/ 8 y S/ 15 la hora"
+                    . ($mejor ? ', y la oferta que mejor paga en TAMPU ' . ($unidad === 'mes' ? 'al mes' : ($unidad === 'dia' ? 'por día' : 'por hora')) . ' es de S/ ' . number_format($mejor, 0) : '') . '. ';
+                $consulta->orderByRaw('pago_por = ? desc', [$unidad])->orderByDesc('pago');
+            } else {
+                $consulta->where(function ($q) use ($alDia) {
+                    $q->where(fn ($w) => $w->where('pago_por', 'hora')->where('pago', '>=', $alDia / 8))
+                        ->orWhere(fn ($w) => $w->where('pago_por', 'dia')->where('pago', '>=', $alDia))
+                        ->orWhere(fn ($w) => $w->where('pago_por', 'mes')->where('pago', '>=', $alDia * 26));
+                });
+                $partes[] = "que paguen $soles $textoPor o más";
+            }
+        }
+
+        $trabajos = (isset($datos['sueldo']) ? $consulta : $consulta->latest())->get();
         if ($soloCompatibles) {
             $ocupado = $clases->map(fn ($h) => $h->dia . '-' . $h->turno)->all();
             $trabajos = $trabajos->reject(fn ($t) => $t->horarios->contains(fn ($h) => in_array($h->dia . '-' . $h->turno, $ocupado)));
@@ -556,6 +615,14 @@ class ChatbotController extends Controller
         }
 
         $resumen = $partes ? ' (' . implode(', ', array_filter($partes)) . ')' : '';
+        if ($trabajos->isEmpty() && isset($datos['rubro'])) {
+            $otras = Trabajo::publicadas()->latest()->take(3)->get();
+            $enlaces = $otras->map(fn ($t) => ['texto' => $t->titulo . ' · ' . $t->empresa . ' · ' . $t->pagoTexto(), 'url' => route('trabajos.show', $t)])->values()->all();
+            $enlaces[] = ['texto' => 'Ver todas las ofertas', 'url' => route('trabajos.index')];
+
+            return $this->respuesta('Ahora mismo no hay ofertas de ' . $datos['rubro_texto'] . ($resumen && count($partes) > 1 ? ' con esas condiciones' : '') . ' 😕. Los empleadores publican seguido: activa los avisos por correo en tu perfil. Mientras tanto, estas son las más nuevas:',
+                $enlaces, ['Trabajos por horas', 'Trabajo los fines de semana', 'Prácticas']);
+        }
         if ($trabajos->isEmpty()) {
             return $this->respuesta("No encontré ofertas$resumen" . ($soloCompatibles ? ' que no choquen con tus clases' : '') . '. Prueba con otro horario o rubro.',
                 [['texto' => 'Ver todas las ofertas', 'url' => route('trabajos.index')]], ['Trabajos por horas', 'Prácticas', 'Trabajo los fines de semana']);
@@ -795,9 +862,15 @@ class ChatbotController extends Controller
         $gratis = $this->tiene($texto, ['gratis', 'gratuito', 'regalado', 'sin pagar', 'cero soles']) && ! $this->tiene($texto, ['es gratis', 'cobran', 'cuesta usar', 'tampu']);
         if (($pideCuarto || isset($datos['tipo'])) && ($gratis || (isset($datos['precio']) && $datos['precio'] < 130))) {
             $min = (int) Habitacion::publicadas()->min('precio');
-            $this->prefijo = ($gratis ? 'No hay cuartos gratis 😅' : "A S/ {$datos['precio']} no encontré cuartos 😅") . ", los más económicos en TAMPU empiezan en S/ $min. ";
-            $datos['precio'] = max($min + 100, 250);
-            unset($datos['precio_min']);
+            if (isset($datos['centimos'])) {
+                $soles = $datos['centimos'] / 100;
+                $txt = $datos['centimos'] . ' céntimos son S/ ' . rtrim(rtrim(number_format($soles, 2, '.', ''), '0'), '.') . ' 😄. Con eso alcanza para un pasaje, no para un cuarto';
+            } else {
+                $txt = $gratis ? 'No hay cuartos gratis 😅' : "A S/ {$datos['precio']} no hay cuartos 😅";
+            }
+            $this->prefijo = "$txt. Los más económicos en TAMPU empiezan en S/ $min; te muestro los más baratos" . (isset($datos['tipo']) ? ' de ese tipo' : '') . ': ';
+            unset($datos['precio'], $datos['precio_min'], $datos['centimos']);
+            $datos['orden'] = 'precio';
 
             return $this->buscarHabitaciones($request, $datos);
         }
@@ -1046,6 +1119,10 @@ class ChatbotController extends Controller
         if ($faq && in_array($faq['clave'], ['mascotas', 'publicar', 'registro', 'contrasena', 'dos_pasos', 'precio_tampu', 'pedir_visita', 'postular', 'resena', 'reportar', 'favoritos'])) {
             return false;
         }
+        // sueldos irreales, céntimos, días y oficios: las reglas ya saben responder y con datos reales
+        if (isset($datos['sueldo']) || isset($datos['centimos']) || isset($datos['rubro_libre'])) {
+            return false;
+        }
         if ($problema && $palabras >= 4) {
             return true;
         }
@@ -1219,6 +1296,24 @@ class ChatbotController extends Controller
             ['que', 'por que', 'tambien', 'por', ' por '], $texto);
 
         return preg_replace('/\s+/', ' ', $texto);
+    }
+
+    // "los lunes y martes", "fines de semana", "de lunes a viernes"
+    private function textoDias(array $dias): string
+    {
+        sort($dias);
+        $orden = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+        $dias = array_values(array_intersect($orden, $dias));
+        if ($dias === ['sabado', 'domingo']) {
+            return 'fines de semana';
+        }
+        if ($dias === ['lunes', 'martes', 'miercoles', 'jueves', 'viernes']) {
+            return 'de lunes a viernes';
+        }
+        $nombres = array_map(fn ($d) => ['miercoles' => 'miércoles', 'sabado' => 'sábados', 'domingo' => 'domingos'][$d] ?? $d, $dias);
+        $ultimo = array_pop($nombres);
+
+        return 'los ' . ($nombres ? implode(', ', $nombres) . ' y ' : '') . $ultimo;
     }
 
     private function tiene(string $texto, array $palabras): bool

@@ -92,10 +92,19 @@ class HabitacionController extends Controller
         $solicitud->update(['estado' => $request->estado]);
 
         $texto = $request->estado === 'aceptada' ? 'aceptó' : 'rechazó';
-        $solicitud->estudiante->notify(new Aviso(
+        $acepto = $request->estado === 'aceptada';
+        Aviso::enviar($solicitud->estudiante,
             $request->user()->nombre . ' ' . $texto . ' tu visita a "' . $solicitud->habitacion->titulo . '"',
-            route('estudiante.panel'), 'house-door'
-        ));
+            route('estudiante.panel'), 'house-door',
+            $acepto ? '¡Aceptaron tu visita!' : 'Tu visita no fue aceptada',
+            $acepto ? [
+                $request->user()->nombre . ' aceptó tu visita a «' . $solicitud->habitacion->titulo . '» el ' . $solicitud->fecha_visita->format('d/m/Y') . '.',
+                'Su celular es ' . $request->user()->celular . '. Escríbele para confirmar la hora.',
+                'Recuerda: no pagues ningún adelanto antes de ver el cuarto.',
+            ] : [
+                $request->user()->nombre . ' no pudo aceptar tu visita a «' . $solicitud->habitacion->titulo . '».',
+                'Hay más cuartos esperándote en TAMPU: prueba con otro del mismo distrito.',
+            ], $acepto ? 'Ver mi visita' : 'Buscar otro cuarto');
 
         return back()->with('ok', 'Solicitud ' . $request->estado . '.');
     }

@@ -65,6 +65,12 @@ class Habitacion extends Model
         return $this->hasMany(Solicitud::class);
     }
 
+    // cuántos estudiantes visitaron el cuarto y confirmaron que era como en las fotos
+    public function visitasConfirmadas(): int
+    {
+        return (int) ($this->confirmadas_count ?? $this->solicitudes()->where('confirmacion', 'coincide')->count());
+    }
+
     public function resenas()
     {
         return $this->hasMany(Resena::class);

@@ -29,7 +29,7 @@ if (divMapa) {
             texto += "<br>S/ " + p.precio + " al mes";
             if (p.url) texto += '<br><a href="' + p.url + '">Ver detalle</a>';
             const punto = L.divIcon({ className: "marca-punto tipo-" + (p.clase || "cuarto"), html: '<i class="bi bi-' + (p.icono || "house-fill") + '"></i>', iconSize: [22, 22], iconAnchor: [11, 11] });
-            L.marker([p.lat, p.lng], { icon: punto }).addTo(mapa).bindPopup(texto)
+            L.marker([p.lat, p.lng], { icon: punto, title: p.titulo + " · S/ " + p.precio, alt: p.titulo }).addTo(mapa).bindPopup(texto)
                 .bindTooltip("S/ " + p.precio, { direction: "top", offset: [0, -10] });
             grupo.push([p.lat, p.lng]);
             return;
@@ -39,11 +39,17 @@ if (divMapa) {
             texto += "<br>" + p.empresa + "<br>" + p.pago;
             if (p.url) texto += '<br><a href="' + p.url + '">Ver detalle</a>';
             const punto = L.divIcon({ className: "marca-punto marca-punto-trabajo", html: '<i class="bi bi-briefcase-fill"></i>', iconSize: [22, 22], iconAnchor: [11, 11] });
-            L.marker([p.lat, p.lng], { icon: punto }).addTo(mapa).bindPopup(texto).bindTooltip(p.pago, { direction: "top", offset: [0, -10] });
+            L.marker([p.lat, p.lng], { icon: punto, title: p.titulo + " · " + p.pago, alt: p.titulo }).addTo(mapa).bindPopup(texto).bindTooltip(p.pago, { direction: "top", offset: [0, -10] });
             grupo.push([p.lat, p.lng]);
             return;
         }
         let icono;
+        if (p.tipo === "entorno") {
+            // comisaría, centro de salud o paradero: punto pequeño con su ícono
+            const marca = L.divIcon({ className: "marca-punto marca-entorno entorno-" + p.clase, html: '<i class="bi bi-' + p.icono + '"></i>', iconSize: [20, 20], iconAnchor: [10, 10] });
+            L.marker([p.lat, p.lng], { icon: marca, title: p.grupo + ": " + p.titulo, alt: p.titulo }).addTo(mapa).bindPopup("<b>" + p.titulo + "</b><br>" + p.grupo + " · " + p.detalle);
+            return;   // no cambia el encuadre del mapa
+        }
         if (p.tipo === "uni") {
             // universidad o instituto: ícono y color según su tipo; la foto de la sede va en el globito
             icono = L.divIcon({ className: "marca-uni marca-" + (p.clase || "universidad"), html: '<i class="bi bi-' + (p.icono || "mortarboard-fill") + '"></i>', iconSize: [34, 34], iconAnchor: [17, 17] });
@@ -61,7 +67,7 @@ if (divMapa) {
         if (p.url) {
             texto += '<br><a href="' + p.url + '">Ver detalle</a>';
         }
-        L.marker([p.lat, p.lng], { icon: icono }).addTo(mapa).bindPopup(texto);
+        L.marker([p.lat, p.lng], { icon: icono, title: p.titulo, alt: p.titulo }).addTo(mapa).bindPopup(texto);
         grupo.push([p.lat, p.lng]);
     });
 
@@ -85,7 +91,9 @@ function agregarLeyenda(mapa, puntos, compacto) {
         filas.push('<li>' + muestra + '<span>' + texto + '</span></li>');
     }
     puntos.forEach(function (p) {
-        if (p.tipo === "trabajo") {
+        if (p.tipo === "entorno") {
+            fila("entorno-" + p.clase, '<b class="ley-entorno entorno-' + p.clase + '"><i class="bi bi-' + p.icono + '"></i></b>', p.grupo);
+        } else if (p.tipo === "trabajo") {
             fila("trabajo", '<b class="ley-trabajo"><i class="bi bi-briefcase-fill"></i></b>', compacto ? "Trabajo (pasa el mouse para ver el pago)" : "Trabajo");
         } else if (p.tipo === "uni") {
             fila("uni-" + (p.clase || "universidad"), '<b class="ley-uni marca-' + (p.clase || "universidad") + '"><i class="bi bi-' + (p.icono || "mortarboard-fill") + '"></i></b>', p.grupo || "Universidad");

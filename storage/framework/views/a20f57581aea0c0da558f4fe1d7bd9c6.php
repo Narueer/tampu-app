@@ -30,15 +30,17 @@
     <!-- fuentes Fraunces y Plus Jakarta Sans, Bootstrap 5 y Bootstrap Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?php echo e(asset('css/estilos.css')); ?>?v=<?php echo e(filemtime(public_path('css/estilos.css'))); ?>">
     <link rel="stylesheet" href="<?php echo e(asset('css/tema.css')); ?>?v=<?php echo e(filemtime(public_path('css/tema.css'))); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/andino.css')); ?>?v=<?php echo e(filemtime(public_path('css/andino.css'))); ?>">
     <script>document.documentElement.classList.add('con-js');</script>
     <?php echo $__env->yieldPushContent('estilos'); ?>
 </head>
 <body class="<?php echo e(request()->routeIs('mensajes.ver') ? 'en-chat' : ''); ?> <?php echo e(request()->routeIs('inicio') ? 'pagina-inicio' : ''); ?>">
+    <a href="#contenido" class="saltar-contenido">Saltar al contenido</a>
     <div id="progreso" aria-hidden="true"></div>
 
     <!-- menu -->
@@ -48,11 +50,12 @@
                 <img src="<?php echo e(asset('img/logo-160.png')); ?>" alt="Logo de Tampu">
                 <span>Tampu<small>Cusco · estudiantes</small></span>
             </a>
-            <button id="btnMenu" aria-label="Abrir menú">☰</button>
+            <button id="btnMenu" aria-label="Abrir menú" aria-controls="menu">☰</button>
             <nav id="menu">
                 <a href="<?php echo e(route('inicio')); ?>" class="<?php echo e(request()->routeIs('inicio') ? 'activo' : ''); ?>">Inicio</a>
                 <a href="<?php echo e(route('habitaciones.index')); ?>" class="<?php echo e(request()->routeIs('habitaciones.*') ? 'activo' : ''); ?>">Habitaciones</a>
                 <a href="<?php echo e(route('trabajos.index')); ?>" class="<?php echo e(request()->routeIs('trabajos.*') ? 'activo' : ''); ?>">Trabajos</a>
+                <a href="<?php echo e(route('calculadora')); ?>" class="<?php echo e(request()->routeIs('calculadora') ? 'activo' : ''); ?>">¿Me alcanza?</a>
                 <a href="<?php echo e(route('nosotros')); ?>" class="<?php echo e(request()->routeIs('nosotros') ? 'activo' : ''); ?>">Nosotros</a>
                 <a href="<?php echo e(route('contacto')); ?>" class="<?php echo e(request()->routeIs('contacto') ? 'activo' : ''); ?>">Contacto</a>
                 <?php if(auth()->guard()->check()): ?>
@@ -96,6 +99,7 @@
         </div>
     <?php endif; ?>
 
+    <div id="contenido" tabindex="-1"></div>
     <?php echo $__env->yieldContent('contenido'); ?>
 
     <!-- footer -->
@@ -115,6 +119,7 @@
                     <h4>Explora</h4>
                     <a href="<?php echo e(route('habitaciones.index')); ?>">Habitaciones</a>
                     <a href="<?php echo e(route('trabajos.index')); ?>">Trabajos</a>
+                    <a href="<?php echo e(route('calculadora')); ?>">¿Me alcanza?</a>
                     <a href="<?php echo e(route('nosotros')); ?>">Nosotros</a>
                     <a href="<?php echo e(route('contacto')); ?>">Contacto</a>
                 </div>
@@ -146,6 +151,8 @@
     </footer>
 
     <?php echo $__env->make('partials.asistente', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->make('partials.guia', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->yieldPushContent('modales'); ?>
 
     <?php if(auth()->guard()->check()): ?>
         <a href="<?php echo e(route('notificaciones')); ?>" id="avisoNuevo" class="aviso-nuevo oculto" data-estado="<?php echo e(route('estado')); ?>">
@@ -155,6 +162,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo e(asset('js/script.js')); ?>?v=<?php echo e(filemtime(public_path('js/script.js'))); ?>"></script>
+    <script src="<?php echo e(asset('js/guia.js')); ?>?v=<?php echo e(filemtime(public_path('js/guia.js'))); ?>"></script>
+    <?php if(auth()->guard()->check()): ?>
+        <?php if(auth()->user()->presupuesto): ?>
+            <script>window.TAMPU_PRESU = <?php echo json_encode(auth()->user()->presupuesto, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>;</script>
+        <?php endif; ?>
+    <?php endif; ?>
+    <script src="<?php echo e(asset('js/presupuesto.js')); ?>?v=<?php echo e(filemtime(public_path('js/presupuesto.js'))); ?>"></script>
     <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 </html>

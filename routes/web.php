@@ -26,6 +26,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [InicioController::class, 'inicio'])->name('inicio');
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 Route::get('/nosotros', [InicioController::class, 'nosotros'])->name('nosotros');
+Route::get('/me-alcanza', [\App\Http\Controllers\CalculadoraController::class, 'index'])->name('calculadora');
+Route::post('/me-alcanza/presupuesto', [\App\Http\Controllers\CalculadoraController::class, 'guardar'])->middleware(['auth', 'throttle:30,1'])->name('presupuesto.guardar');
 Route::get('/habitaciones', [HabitacionController::class, 'index'])->name('habitaciones.index');
 Route::get('/habitaciones/{habitacion}', [HabitacionController::class, 'show'])->name('habitaciones.show');
 Route::get('/trabajos', [TrabajoController::class, 'index'])->name('trabajos.index');
@@ -103,6 +105,8 @@ Route::middleware('auth')->group(function () {
             ->middleware('correo')->name('estudiante.solicitar');
         Route::post('/habitaciones/{habitacion}/resena', [EstudianteController::class, 'resenar'])
             ->middleware('correo')->name('estudiante.resenar');
+        Route::post('/estudiante/visitas/{solicitud}/confirmar', [EstudianteController::class, 'confirmarVisita'])
+            ->name('estudiante.confirmar');
         Route::post('/habitaciones/{habitacion}/favorito', [EstudianteController::class, 'favorito'])
             ->name('estudiante.favorito');
         Route::post('/trabajos/{trabajo}/postular', [EstudianteController::class, 'postular'])

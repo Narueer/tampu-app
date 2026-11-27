@@ -23,7 +23,7 @@ class InicioController extends Controller
 
     public function inicio()
     {
-        $destacadas = Habitacion::publicadas()->withAvg('resenas', 'estrellas')->withCount('fotos')->latest()->take(6)->get();
+        $destacadas = Habitacion::publicadas()->withAvg('resenas', 'estrellas')->withCount('fotos')->withCount(['solicitudes as confirmadas_count' => fn ($q) => $q->where('confirmacion', 'coincide')])->latest()->take(6)->get();
         $trabajos = Trabajo::publicadas()->with('horarios')->latest()->take(3)->get();
 
         // opiniones reales que dejaron los estudiantes despues de visitar

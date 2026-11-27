@@ -156,11 +156,15 @@
                 <div class="encabezado-seccion revelar">
                     <span class="sobretitulo">En tres pasos</span>
                     <h2>¿Cómo <em>funciona</em>?</h2>
+                    <div class="pasos-video">
+                        @include('partials.video-guia', ['cual' => 'visitante', 'texto' => 'Míralo en video'])
+                        <a href="{{ route('calculadora') }}" class="btn btn-borde"><i class="bi bi-calculator"></i> ¿Me alcanza? Calcula tu mes</a>
+                    </div>
                 </div>
                 <div class="row g-4 pasos">
                     <div class="col-md-4 revelar">
                         <div class="paso">
-                            <img src="{{ asset('img/3d/paso-registro.webp') }}" alt="Mochila de viaje y carnet verificado" class="paso-ilustracion" loading="lazy">
+                            <span class="paso-ilustracion inclinable"><img src="{{ asset('img/3d/paso-registro.webp') }}" alt="Mochila de viaje y carnet verificado" loading="lazy"></span>
                             <span class="paso-numero">1</span>
                             <i class="bi bi-person-plus"></i>
                             <h3>Regístrate</h3>
@@ -169,7 +173,7 @@
                     </div>
                     <div class="col-md-4 revelar">
                         <div class="paso">
-                            <img src="{{ asset('img/3d/paso-horario.webp') }}" alt="Calendario con los turnos de clase marcados" class="paso-ilustracion" loading="lazy">
+                            <span class="paso-ilustracion inclinable"><img src="{{ asset('img/3d/paso-horario.webp') }}" alt="Calendario con los turnos de clase marcados" loading="lazy"></span>
                             <span class="paso-numero">2</span>
                             <i class="bi bi-calendar-week"></i>
                             <h3>Marca tu horario</h3>
@@ -178,7 +182,7 @@
                     </div>
                     <div class="col-md-4 revelar">
                         <div class="paso">
-                            <img src="{{ asset('img/3d/paso-visita.webp') }}" alt="Casita con su llave" class="paso-ilustracion" loading="lazy">
+                            <span class="paso-ilustracion inclinable"><img src="{{ asset('img/3d/paso-visita.webp') }}" alt="Casita con su llave" loading="lazy"></span>
                             <span class="paso-numero">3</span>
                             <i class="bi bi-house-check"></i>
                             <h3>Solicita una visita</h3>
@@ -189,19 +193,33 @@
             </div>
         </section>
 
+        <!-- el cuarto se arma con el scroll (animación de Blender) -->
+        @include('partials.cuarto-scroll')
+
         <!-- por que tampu, con fotos flotantes -->
         <section class="seccion fondo-blanco">
             <div class="contenedor">
                 <div class="row g-4 g-lg-5 align-items-center">
                     <div class="col-lg-6 revelar">
                         {{-- maqueta 3D de un cuarto de estudiante (hecha en Blender por el equipo) --}}
-                        <figure class="ilustracion-panel">
-                            <img src="{{ asset('img/3d/cuarto.webp') }}" alt="Maqueta 3D de un cuarto de estudiante con cama, escritorio y ventana a los cerros" loading="lazy">
-                            <figcaption>
+                        <div class="ilustracion-panel">
+                            @include('partials.modelo-3d', [
+                                'modelo' => 'modelos/cuarto.glb',
+                                'poster' => 'img/3d/cuarto.webp',
+                                'alt' => 'Maqueta 3D de un cuarto de estudiante con cama, escritorio y ventana a los cerros',
+                                'orbita' => '40deg 60deg 92%',
+                                'puntos' => [
+                                    ['0.55 1.45 -1.25', 'La ventana', 'Pregunta hacia dónde da: con sol de mañana el cuarto es más abrigado.'],
+                                    ['0.75 0.86 -0.6', 'El escritorio', 'Revisa que haya enchufe cerca y buena luz para estudiar de noche.'],
+                                    ['-0.85 0.62 -0.2', 'La cama', 'En Cusco las noches son frías: pregunta si incluyen frazadas.'],
+                                    ['1.2 0.6 0.55', 'Tu mochila', '¿Llegas de provincia? Visita el cuarto antes de pagar cualquier adelanto.'],
+                                ],
+                            ])
+                            <div class="ilustracion-pie">
                                 <span><i class="bi bi-patch-check"></i> Arrendadores con DNI revisado</span>
                                 @if ($numeros['promedio'])<span><i class="bi bi-star"></i> {{ number_format($numeros['promedio'], 1) }} de 5 en reseñas de visitas</span>@endif
-                            </figcaption>
-                        </figure>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-lg-6 revelar">
                         <span class="sobretitulo">Por qué TAMPU</span>
@@ -547,7 +565,18 @@
                     <p>Publica gratis. Verificamos tu cuenta y los estudiantes te escriben directamente.</p>
                     <a href="{{ route('registro') }}" class="btn btn-grande btn-claro">Publicar gratis</a>
                 </div>
-                <img src="{{ asset('img/3d/casa.webp') }}" alt="Casa cusqueña de adobe con balcón y base de piedra inca" class="banda-ilustracion" loading="lazy">
+                @include('partials.modelo-3d', [
+                    'modelo' => 'modelos/casa.glb',
+                    'poster' => 'img/3d/casa.webp',
+                    'alt' => 'Casa cusqueña de adobe con balcón y base de piedra inca',
+                    'clase' => 'banda-ilustracion',
+                    'orbita' => '28deg 64deg 100%',
+                    'puntos' => [
+                        ['-0.6 1.0 0.36', 'Puerta propia', 'Los estudiantes valoran entrar sin depender del horario del dueño.'],
+                        ['0.15 1.72 0.72', 'Fotos reales', 'Sube fotos del cuarto y del balcón: así te escriben más.'],
+                        ['0 0.3 0.66', 'Dirección exacta', 'Marca el punto en el mapa: el estudiante ve qué tan lejos queda su universidad.'],
+                    ],
+                ])
             </div>
         </section>
     </main>
@@ -556,4 +585,6 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="{{ asset('js/mapa.js') }}?v={{ filemtime(public_path('js/mapa.js')) }}"></script>
+    <script src="{{ asset('js/modelos.js') }}?v={{ filemtime(public_path('js/modelos.js')) }}"></script>
+    <script src="{{ asset('js/scroll3d.js') }}?v={{ filemtime(public_path('js/scroll3d.js')) }}"></script>
 @endpush

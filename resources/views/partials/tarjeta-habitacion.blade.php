@@ -1,4 +1,4 @@
-<div class="tarjeta">
+<div class="tarjeta" data-precio-cuarto="{{ (int) $h->precio }}">
     <div class="tarjeta-foto">
         <img src="{{ $h->fotoUrl() }}" alt="{{ $h->titulo }}" loading="lazy">
         <span class="precio-foto">S/ {{ number_format($h->precio, 0) }}<small>/mes</small></span>
@@ -15,8 +15,11 @@
             </form>
         @endif
     </div>
-    <div class="info">
+    <div class="info" data-presu-aqui>
         <span class="etiqueta verificado">✔ Verificado</span>
+        @if (($h->confirmadas_count ?? 0) > 0)
+            <span class="etiqueta etiqueta-visitado" title="{{ $h->confirmadas_count }} {{ $h->confirmadas_count === 1 ? 'estudiante confirmó' : 'estudiantes confirmaron' }} que el cuarto es como en las fotos"><i class="bi bi-patch-check-fill"></i> Visitado y confirmado</span>
+        @endif
         <span class="etiqueta etiqueta-tipo tipo-{{ $h->tipo }}"><i class="bi bi-{{ $h->icono() }}"></i> {{ $h->tipoTexto() }}</span>
         @if ($h->created_at && $h->created_at->gt(now()->subDays(2)))<span class="etiqueta etiqueta-nuevo">Nuevo</span>@endif
         <h3>{{ $h->titulo }}</h3>

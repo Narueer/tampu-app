@@ -1,4 +1,4 @@
-<div class="tarjeta">
+<div class="tarjeta" data-precio-cuarto="<?php echo e((int) $h->precio); ?>">
     <div class="tarjeta-foto">
         <img src="<?php echo e($h->fotoUrl()); ?>" alt="<?php echo e($h->titulo); ?>" loading="lazy">
         <span class="precio-foto">S/ <?php echo e(number_format($h->precio, 0)); ?><small>/mes</small></span>
@@ -15,9 +15,12 @@
             </form>
         <?php endif; ?>
     </div>
-    <div class="info">
+    <div class="info" data-presu-aqui>
         <span class="etiqueta verificado">✔ Verificado</span>
-        <span class="etiqueta"><?php echo e($h->tipoTexto()); ?></span>
+        <?php if(($h->confirmadas_count ?? 0) > 0): ?>
+            <span class="etiqueta etiqueta-visitado" title="<?php echo e($h->confirmadas_count); ?> <?php echo e($h->confirmadas_count === 1 ? 'estudiante confirmó' : 'estudiantes confirmaron'); ?> que el cuarto es como en las fotos"><i class="bi bi-patch-check-fill"></i> Visitado y confirmado</span>
+        <?php endif; ?>
+        <span class="etiqueta etiqueta-tipo tipo-<?php echo e($h->tipo); ?>"><i class="bi bi-<?php echo e($h->icono()); ?>"></i> <?php echo e($h->tipoTexto()); ?></span>
         <?php if($h->created_at && $h->created_at->gt(now()->subDays(2))): ?><span class="etiqueta etiqueta-nuevo">Nuevo</span><?php endif; ?>
         <h3><?php echo e($h->titulo); ?></h3>
         <p><i class="bi bi-geo-alt"></i> <?php echo e($h->distrito); ?><?php if($h->cerca_de): ?> - cerca de <?php echo e($h->cerca_de); ?><?php endif; ?></p>

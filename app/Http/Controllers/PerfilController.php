@@ -33,6 +33,7 @@ class PerfilController extends Controller
             $datos['foto'] = Archivos::guardarFoto($request->file('foto'), 'perfiles');
         }
 
+        $datos['avisos_correo'] = $request->boolean('avisos_correo');
         $usuario->update($datos);
 
         return back()->with('ok', 'Tus datos se guardaron.');

@@ -1,5 +1,6 @@
 # utilidades para las ilustraciones 3D de TAMPU (Blender por bpy)
-import bpy, math, random
+import bpy, math, random, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mathutils import Vector
 
 PAL = {
@@ -13,26 +14,79 @@ PAL = {
 def limpiar():
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
-def mat(nombre, color, rugosidad=0.75, metal=0.0, emision=None, fuerza=3):
+# qué textura lleva cada color de la paleta (ver texturas.py); se puede forzar con tex=
+TEXTURA = {'madera': 'madera', 'adobe': 'yeso', 'adobe2': 'yeso', 'piedra': 'piedra', 'piedra2': 'piedra',
+           'teja': 'teja', 'teja2': 'teja', 'pasto': 'pasto', 'cerro': 'pasto', 'azul': 'pintura', 'crema': 'tela',
+           'terracota': 'arcilla'}
+# cuántas veces se repite la textura por metro
+ESCALA_TEX = {'madera': 2.4, 'yeso': 0.7, 'piedra': 1.5, 'teja': 1.4, 'tela': 1.5, 'aguayo': 1.6, 'pasto': 0.8, 'pintura': 1.0, 'arcilla': 1.5}
+_texturizados = {}
+
+def tipo_textura(color):
+    for k, v in PAL.items():
+        if tuple(color[:3]) == tuple(v):
+            return TEXTURA.get(k)
+    return None
+
+def _imagen(ruta, datos=False):
+    im = bpy.data.images.get(os.path.basename(ruta)) or bpy.data.images.load(ruta)
+    if datos: im.colorspace_settings.name = 'Non-Color'
+    return im
+
+def mat(nombre, color, rugosidad=0.75, metal=0.0, emision=None, fuerza=3, tex='auto'):
     m = bpy.data.materials.get(nombre)
     if m: return m
     m = bpy.data.materials.new(nombre); m.use_nodes = True
     b = m.node_tree.nodes['Principled BSDF']
     b.inputs['Base Color'].default_value = (*[c ** 2.2 for c in color], 1)   # colores en sRGB -> lineal
+    tipo = tipo_textura(color) if tex == 'auto' else tex
+    if tipo and not emision:
+        import texturas
+        rc, rn = texturas.generar(tipo, color)
+        nt = m.node_tree
+        ic = nt.nodes.new('ShaderNodeTexImage'); ic.image = _imagen(rc)
+        nt.links.new(ic.outputs['Color'], b.inputs['Base Color'])
+        inn = nt.nodes.new('ShaderNodeTexImage'); inn.image = _imagen(rn, True)
+        nm = nt.nodes.new('ShaderNodeNormalMap'); nm.inputs['Strength'].default_value = 1.0
+        nt.links.new(inn.outputs['Color'], nm.inputs['Color']); nt.links.new(nm.outputs['Normal'], b.inputs['Normal'])
+        _texturizados[m.name] = ESCALA_TEX.get(tipo, 1.0)
     b.inputs['Roughness'].default_value = rugosidad
     b.inputs['Metallic'].default_value = metal
     if emision:
         b.inputs['Emission Color'].default_value = (*emision, 1); b.inputs['Emission Strength'].default_value = fuerza
     return m
 
-def caja(nombre, loc, dim, color, bisel=0.02, rot=(0, 0, 0)):
+def uv_caja(o, escala):
+    # proyección de caja en coordenadas del mundo: cada cara toma los dos ejes que no mira,
+    # y la "u" va por el lado más largo de la pieza (así la veta de la madera sigue a la tabla)
+    import bmesh
+    me = o.data; bm = bmesh.new(); bm.from_mesh(me)
+    uv = bm.loops.layers.uv.verify()
+    mw = o.matrix_world; dims = o.dimensions
+    for f in bm.faces:
+        n = (mw.to_3x3() @ f.normal); eje = max(range(3), key=lambda i: abs(n[i]))
+        otros = [i for i in range(3) if i != eje]
+        if dims[otros[1]] > dims[otros[0]]: otros = otros[::-1]
+        for l in f.loops:
+            p = mw @ l.vert.co
+            l[uv].uv = (p[otros[0]] * escala, p[otros[1]] * escala)
+    bm.to_mesh(me); bm.free()
+
+def uv_todo():
+    for o in bpy.data.objects:
+        if o.type != 'MESH' or not o.data.materials: continue
+        esc = [_texturizados.get(m.name) for m in o.data.materials if m]
+        esc = [e for e in esc if e]
+        if esc and esc[0] != 'plano': uv_caja(o, esc[0])
+
+def caja(nombre, loc, dim, color, bisel=0.02, rot=(0, 0, 0), tex='auto'):
     bpy.ops.mesh.primitive_cube_add(location=loc, rotation=rot)
     o = bpy.context.object; o.name = nombre
     o.scale = (dim[0] / 2, dim[1] / 2, dim[2] / 2)
     bpy.ops.object.transform_apply(scale=True)
     if bisel:
         md = o.modifiers.new('bisel', 'BEVEL'); md.width = bisel; md.segments = 3
-    o.data.materials.append(color if isinstance(color, bpy.types.Material) else mat(nombre + '_m', color))
+    o.data.materials.append(color if isinstance(color, bpy.types.Material) else mat(nombre + '_m', color, tex=tex))
     bpy.ops.object.shade_smooth()
     return o
 
@@ -98,6 +152,7 @@ def suelo_sombra(tam=30, z=0):
     return o
 
 def render(salida, ancho=1200, alto=900, muestras=96):
+    uv_todo()
     sc = bpy.context.scene
     sc.render.engine = 'CYCLES'; sc.cycles.device = 'CPU'; sc.cycles.samples = muestras; sc.cycles.use_denoising = True
     sc.render.resolution_x = ancho; sc.render.resolution_y = alto; sc.render.film_transparent = True
@@ -105,3 +160,54 @@ def render(salida, ancho=1200, alto=900, muestras=96):
     sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Medium High Contrast'
     sc.render.filepath = salida
     bpy.ops.render.render(write_still=True)
+
+def mat_imagen(nombre, ruta, emision=0.0, rugosidad=0.5):
+    """material con una imagen (paisaje de la ventana, pantalla); si emision > 0 brilla"""
+    m = bpy.data.materials.get(nombre)
+    if m: return m
+    m = bpy.data.materials.new(nombre); m.use_nodes = True; nt = m.node_tree
+    b = nt.nodes['Principled BSDF']; b.inputs['Roughness'].default_value = rugosidad
+    im = nt.nodes.new('ShaderNodeTexImage'); im.image = _imagen(ruta)
+    nt.links.new(im.outputs['Color'], b.inputs['Base Color'])
+    if emision:
+        nt.links.new(im.outputs['Color'], b.inputs['Emission Color']); b.inputs['Emission Strength'].default_value = emision
+    _texturizados[m.name] = 'plano'
+    return m
+
+def plano_imagen(nombre, centro, ancho, alto, material, normal_y=-1):
+    """rectángulo vertical (mirando hacia -y) con la imagen ocupando toda la cara"""
+    import bmesh
+    me = bpy.data.meshes.new(nombre); o = bpy.data.objects.new(nombre, me); bpy.context.collection.objects.link(o)
+    bm = bmesh.new(); a, h = ancho / 2, alto / 2
+    vs = [bm.verts.new(p) for p in [(-a, 0, -h), (a, 0, -h), (a, 0, h), (-a, 0, h)]]
+    f = bm.faces.new(vs); uv = bm.loops.layers.uv.verify()
+    for l, c in zip(f.loops, [(0, 0), (1, 0), (1, 1), (0, 1)]): l[uv].uv = c
+    bm.normal_update(); bm.to_mesh(me); bm.free()
+    o.location = centro; o.data.materials.append(material)
+    return o
+
+def malla_rejilla(nombre, nx, ny, funcion, material):
+    """malla de nx x ny puntos; funcion(i/nx, j/ny) -> (x, y, z). Sirve para telas (frazada, cortinas)"""
+    import bmesh
+    me = bpy.data.meshes.new(nombre); o = bpy.data.objects.new(nombre, me); bpy.context.collection.objects.link(o)
+    bm = bmesh.new()
+    vs = [[bm.verts.new(funcion(i / (nx - 1), j / (ny - 1))) for j in range(ny)] for i in range(nx)]
+    for i in range(nx - 1):
+        for j in range(ny - 1):
+            bm.faces.new([vs[i][j], vs[i + 1][j], vs[i + 1][j + 1], vs[i][j + 1]])
+    bm.normal_update(); bm.to_mesh(me); bm.free()
+    o.data.materials.append(material)
+    for p in me.polygons: p.use_smooth = True
+    return o
+
+def suave(o, niveles=2):
+    md = o.modifiers.new('suave', 'SUBSURF'); md.levels = niveles; md.render_levels = niveles
+    return o
+
+def organico(o, fuerza=0.1, tam=0.4, semilla=1):
+    """deforma la malla con ruido (copas de árbol, cerros) para que no parezca de polígonos"""
+    t = bpy.data.textures.get(f'nubes{semilla}') or bpy.data.textures.new(f'nubes{semilla}', 'CLOUDS')
+    t.noise_scale = tam; t.noise_depth = 3
+    d = o.modifiers.new('relieve', 'DISPLACE'); d.texture = t; d.strength = fuerza; d.mid_level = 0.5
+    d.texture_coords = 'GLOBAL'
+    return o

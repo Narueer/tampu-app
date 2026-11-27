@@ -54,7 +54,7 @@
                     <form id="chatForm" class="chat-form" action="{{ route('mensajes.enviar', $actual) }}" method="POST">
                         @csrf
                         <input type="text" name="texto" id="chatTexto" placeholder="Escribe un mensaje..." maxlength="1000" autocomplete="off" required>
-                        <button type="submit" class="btn"><i class="bi bi-send"></i></button>
+                        <button type="submit" class="btn" aria-label="Enviar mensaje"><i class="bi bi-send" aria-hidden="true"></i></button>
                     </form>
                 @else
                     <p class="vacio chat-vacio"><i class="bi bi-chat-dots"></i><br>Elige una conversación.</p>

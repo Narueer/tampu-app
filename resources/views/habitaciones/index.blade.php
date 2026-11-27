@@ -71,6 +71,7 @@
                     @endforeach
                 </div>
 
+                <p class="presu-aviso" id="presuAviso" data-calc="{{ route('calculadora') }}" hidden></p>
                 <div class="barra-resultados">
                     <p id="total">{{ $habitaciones->total() }} habitación(es) encontrada(s)</p>
                     <div class="cambiar-vista" role="group" aria-label="Forma de ver">

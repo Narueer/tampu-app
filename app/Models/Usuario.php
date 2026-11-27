@@ -15,7 +15,7 @@ class Usuario extends Authenticatable
     protected $fillable = [
         'nombre', 'email', 'dni', 'celular', 'procedencia', 'foto',
         'rol', 'verificacion', 'suspendido', 'documento', 'password',
-        'email_verificado_at', 'correo_institucional',
+        'email_verificado_at', 'correo_institucional', 'avisos_correo',
     ];
 
     protected $hidden = ['password', 'remember_token', 'codigo_correo', 'dos_pasos_secreto', 'dos_pasos_codigos'];
@@ -31,6 +31,7 @@ class Usuario extends Authenticatable
             // el secreto va cifrado con la APP_KEY y los codigos de respaldo solo como hash
             'dos_pasos_secreto' => 'encrypted',
             'dos_pasos_codigos' => 'array',
+            'presupuesto' => 'array',
         ];
     }
 

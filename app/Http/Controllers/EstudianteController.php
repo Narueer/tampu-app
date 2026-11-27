@@ -63,10 +63,14 @@ class EstudianteController extends Controller
             'mensaje' => $request->mensaje,
         ]);
 
-        $habitacion->arrendador->notify(new Aviso(
+        Aviso::enviar($habitacion->arrendador,
             $request->user()->nombre . ' quiere visitar "' . $habitacion->titulo . '"',
-            route('arrendador.solicitudes'), 'house-door'
-        ));
+            route('arrendador.solicitudes'), 'house-door',
+            'Nueva solicitud de visita', [
+                $request->user()->nombre . ' quiere visitar tu cuarto «' . $habitacion->titulo . '».',
+                'Fecha propuesta: ' . \Illuminate\Support\Carbon::parse($request->fecha_visita)->translatedFormat('l d \\d\\e F') . '.',
+                'Acepta o rechaza la visita desde tu panel. Cuando aceptas, el estudiante ve tu celular para coordinar.',
+            ], 'Ver la solicitud');
 
         return redirect()->route('estudiante.panel')->with('ok', 'Solicitud enviada. El arrendador te responderá pronto.');
     }
@@ -83,10 +87,13 @@ class EstudianteController extends Controller
 
         $trabajo->postulaciones()->create(['usuario_id' => $usuario->id, 'mensaje' => $request->mensaje]);
 
-        $trabajo->empleador->notify(new Aviso(
+        Aviso::enviar($trabajo->empleador,
             $usuario->nombre . ' postuló a "' . $trabajo->titulo . '"',
-            route('empleador.postulaciones'), 'briefcase'
-        ));
+            route('empleador.postulaciones'), 'briefcase',
+            'Nueva postulación', [
+                $usuario->nombre . ' postuló a tu oferta «' . $trabajo->titulo . '».',
+                'Su horario de clases es compatible con los turnos que indicaste. Revisa su perfil y respóndele desde tu panel.',
+            ], 'Ver la postulación');
 
         return back()->with('ok', 'Postulación enviada. Te avisaremos cuando la empresa responda.');
     }
@@ -113,6 +120,34 @@ class EstudianteController extends Controller
         return back()->with('ok', 'Gracias por tu reseña.');
     }
 
+    // "¿El cuarto era como en las fotos?": sí suma al sello de confianza; no crea un reporte para el administrador
+    public function confirmarVisita(Request $request, \App\Models\Solicitud $solicitud)
+    {
+        abort_unless($solicitud->usuario_id === $request->user()->id, 403);
+        abort_unless($solicitud->puedeConfirmar(), 403, 'Solo puedes confirmar una visita aceptada que ya pasó, y una sola vez.');
+        $datos = $request->validate([
+            'coincide' => 'required|in:si,no',
+            'detalle' => 'nullable|string|max:500',
+        ]);
+
+        $solicitud->update(['confirmacion' => $datos['coincide'] === 'si' ? 'coincide' : 'no_coincide', 'confirmado_at' => now()]);
+
+        if ($datos['coincide'] === 'no') {
+            \App\Models\Reporte::create([
+                'usuario_id' => $request->user()->id,
+                'habitacion_id' => $solicitud->habitacion_id,
+                'motivo' => 'Fotos o datos falsos',
+                'detalle' => 'Después de la visita del ' . $solicitud->fecha_visita->format('d/m/Y') . ' el estudiante indicó que el cuarto no coincide con la publicación. '
+                    . ($datos['detalle'] ?? ''),
+                'estado' => 'pendiente',
+            ]);
+
+            return back()->with('ok', 'Gracias por avisar. El administrador revisará la publicación.');
+        }
+
+        return back()->with('ok', '¡Gracias! Tu confirmación ayuda a otros estudiantes a confiar en este cuarto.');
+    }
+
     public function favorito(Request $request, Habitacion $habitacion)
     {
         $cambio = $request->user()->favoritos()->toggle($habitacion->id);
@@ -127,7 +162,7 @@ class EstudianteController extends Controller
 
     public function favoritos(Request $request)
     {
-        $habitaciones = $request->user()->favoritos()->publicadas()->withAvg('resenas', 'estrellas')->withCount('fotos')->get();
+        $habitaciones = $request->user()->favoritos()->publicadas()->withAvg('resenas', 'estrellas')->withCount('fotos')->withCount(['solicitudes as confirmadas_count' => fn ($q) => $q->where('confirmacion', 'coincide')])->get();
 
         return view('estudiante.favoritos', compact('habitaciones'));
     }

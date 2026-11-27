@@ -40,6 +40,7 @@
     @stack('estilos')
 </head>
 <body class="{{ request()->routeIs('mensajes.ver') ? 'en-chat' : '' }} {{ request()->routeIs('inicio') ? 'pagina-inicio' : '' }}">
+    <a href="#contenido" class="saltar-contenido">Saltar al contenido</a>
     <div id="progreso" aria-hidden="true"></div>
 
     <!-- menu -->
@@ -49,11 +50,12 @@
                 <img src="{{ asset('img/logo-160.png') }}" alt="Logo de Tampu">
                 <span>Tampu<small>Cusco · estudiantes</small></span>
             </a>
-            <button id="btnMenu" aria-label="Abrir menú">☰</button>
+            <button id="btnMenu" aria-label="Abrir menú" aria-controls="menu">☰</button>
             <nav id="menu">
                 <a href="{{ route('inicio') }}" class="{{ request()->routeIs('inicio') ? 'activo' : '' }}">Inicio</a>
                 <a href="{{ route('habitaciones.index') }}" class="{{ request()->routeIs('habitaciones.*') ? 'activo' : '' }}">Habitaciones</a>
                 <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.*') ? 'activo' : '' }}">Trabajos</a>
+                <a href="{{ route('calculadora') }}" class="{{ request()->routeIs('calculadora') ? 'activo' : '' }}">¿Me alcanza?</a>
                 <a href="{{ route('nosotros') }}" class="{{ request()->routeIs('nosotros') ? 'activo' : '' }}">Nosotros</a>
                 <a href="{{ route('contacto') }}" class="{{ request()->routeIs('contacto') ? 'activo' : '' }}">Contacto</a>
                 @auth
@@ -97,6 +99,7 @@
         </div>
     @endif
 
+    <div id="contenido" tabindex="-1"></div>
     @yield('contenido')
 
     <!-- footer -->
@@ -116,6 +119,7 @@
                     <h4>Explora</h4>
                     <a href="{{ route('habitaciones.index') }}">Habitaciones</a>
                     <a href="{{ route('trabajos.index') }}">Trabajos</a>
+                    <a href="{{ route('calculadora') }}">¿Me alcanza?</a>
                     <a href="{{ route('nosotros') }}">Nosotros</a>
                     <a href="{{ route('contacto') }}">Contacto</a>
                 </div>
@@ -147,6 +151,8 @@
     </footer>
 
     @include('partials.asistente')
+    @include('partials.guia')
+    @stack('modales')
 
     @auth
         <a href="{{ route('notificaciones') }}" id="avisoNuevo" class="aviso-nuevo oculto" data-estado="{{ route('estado') }}">
@@ -156,6 +162,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/script.js') }}?v={{ filemtime(public_path('js/script.js')) }}"></script>
+    <script src="{{ asset('js/guia.js') }}?v={{ filemtime(public_path('js/guia.js')) }}"></script>
+    @auth
+        @if (auth()->user()->presupuesto)
+            <script>window.TAMPU_PRESU = {!! json_encode(auth()->user()->presupuesto, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!};</script>
+        @endif
+    @endauth
+    <script src="{{ asset('js/presupuesto.js') }}?v={{ filemtime(public_path('js/presupuesto.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

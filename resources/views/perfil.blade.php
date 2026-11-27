@@ -34,12 +34,12 @@
 
                 <div class="fila">
                     <div>
-                        <label>Correo</label>
-                        <input type="email" value="{{ $usuario->email }}" disabled>
+                        <label for="correoActual">Correo</label>
+                        <input type="email" id="correoActual" value="{{ $usuario->email }}" disabled>
                     </div>
                     <div>
-                        <label>DNI</label>
-                        <input type="text" value="{{ $usuario->dni }}" disabled>
+                        <label for="dniActual">DNI</label>
+                        <input type="text" id="dniActual" value="{{ $usuario->dni }}" disabled>
                     </div>
                 </div>
 
@@ -55,6 +55,12 @@
                         </div>
                     @endif
                 </div>
+
+                <label class="interruptor">
+                    <input type="checkbox" name="avisos_correo" value="1" @checked(old('avisos_correo', $usuario->avisos_correo ?? true))>
+                    <span class="interruptor-pista" aria-hidden="true"></span>
+                    <span><b>Avisos por correo</b> Te escribimos cuando acepten tu visita o postulación, cuando te pidan una visita o cuando verifiquen tu cuenta.</span>
+                </label>
 
                 <p class="texto-suave">Cuenta de {{ $usuario->rol }} · @include('partials.estado', ['estado' => $usuario->verificacion]) @include('partials.insignia-uni')</p>
                 <button type="submit" class="btn">Guardar cambios</button>

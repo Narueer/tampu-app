@@ -30,7 +30,7 @@
             </form>
         </div>
 
-        <div class="caja">
+        <div class="caja" id="misVisitas">
             <h2><i class="bi bi-house-door"></i> Mis solicitudes de visita</h2>
             @if ($solicitudes->isEmpty())
                 <p class="vacio">Aún no solicitaste visitas. <a href="{{ route('habitaciones.index') }}">Busca una habitación</a>.</p>
@@ -61,6 +61,17 @@
                                         <a href="{{ route('constancia.visita', $s) }}" class="btn btn-borde btn-chico"><i class="bi bi-file-earmark-pdf"></i> Constancia</a>
                                         @if ($s->fecha_visita->isPast() || $s->fecha_visita->isToday())
                                             <a href="{{ route('habitaciones.show', $s->habitacion) }}#resenas" class="btn btn-borde btn-chico"><i class="bi bi-star"></i> Reseña</a>
+                                        @endif
+                                        @if ($s->puedeConfirmar())
+                                            {{-- ¿el cuarto era como en las fotos? --}}
+                                            <form method="POST" action="{{ route('estudiante.confirmar', $s) }}" class="confirmar-visita">
+                                                @csrf
+                                                <span>¿Era como en las fotos?</span>
+                                                <button name="coincide" value="si" class="btn btn-chico"><i class="bi bi-hand-thumbs-up"></i> Sí</button>
+                                                <button name="coincide" value="no" class="btn btn-borde btn-chico" onclick="return confirm('Vamos a avisar al administrador para que revise esta publicación. ¿Continuar?')"><i class="bi bi-hand-thumbs-down"></i> No</button>
+                                            </form>
+                                        @elseif ($s->confirmacion)
+                                            <span class="confirmado-{{ $s->confirmacion }}"><i class="bi bi-{{ $s->confirmacion === 'coincide' ? 'patch-check-fill' : 'flag-fill' }}"></i> {{ $s->confirmacion === 'coincide' ? 'Confirmaste la visita' : 'Reportado' }}</span>
                                         @endif
                                     @endif
                                 </td>

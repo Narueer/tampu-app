@@ -51,11 +51,16 @@ caja('farol', (1.75, -0.95, 1.55), (0.16, 0.16, 0.22), mat('farol', (1, 0.85, 0.
 # eucalipto
 cil('tronco', (-2.05, 0.1, 0.5), 0.06, 1.0, PAL['madera'])
 for (dx, dz, r) in [(0, 1.15, 0.42), (0.18, 1.45, 0.3), (-0.15, 1.4, 0.28)]:
-    bpy.ops.mesh.primitive_ico_sphere_add(radius=r, subdivisions=2, location=(-2.05 + dx, 0.1, dz)); bpy.context.object.data.materials.append(mat('copa', PAL['verde2']))
+    bpy.ops.mesh.primitive_ico_sphere_add(radius=r, subdivisions=4, location=(-2.05 + dx, 0.1, dz)); o = bpy.context.object
+    o.data.materials.append(mat('copa', (0.33, 0.47, 0.30), 0.8, tex='pasto')); organico(o, 0.16, 0.18, 3); bpy.ops.object.shade_smooth()
 # cerros con nieve (Apus) al fondo
 for (x, y, r, h) in [(-1.3, 2.0, 0.95, 1.7), (0.4, 2.15, 1.15, 2.3), (1.85, 1.95, 0.75, 1.3)]:
-    bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=r, depth=h, location=(x, y, h / 2)); bpy.context.object.data.materials.append(mat(f'cerro{x}', PAL['cerro'], 0.95))
-    bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=r * 0.32, depth=h * 0.32, location=(x, y, h - h * 0.16 + 0.01)); bpy.context.object.data.materials.append(mat('nieve', PAL['blanco'], 0.6))
+    bpy.ops.mesh.primitive_cone_add(vertices=48, radius1=r, depth=h, location=(x, y, h / 2)); o = bpy.context.object
+    bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.subdivide(number_cuts=10); bpy.ops.object.mode_set(mode='OBJECT')
+    o.data.materials.append(mat(f'cerro{x}', PAL['cerro'], 0.95)); organico(o, 0.22, 0.35, 5); bpy.ops.object.shade_smooth()
+    bpy.ops.mesh.primitive_cone_add(vertices=48, radius1=r * 0.34, depth=h * 0.34, location=(x, y, h - h * 0.17 + 0.02)); o = bpy.context.object
+    bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.subdivide(number_cuts=6); bpy.ops.object.mode_set(mode='OBJECT')
+    o.data.materials.append(mat('nieve', PAL['blanco'], 0.6)); organico(o, 0.12, 0.25, 5); bpy.ops.object.shade_smooth()
 suelo_sombra(z=-0.24)
 luces(3.6, 0.8, (50, 6, 30))
 camara_iso((0.3, 0.3, 1.0), dist=14, alt_grados=26, az_grados=30, escala=7.3)

@@ -18,11 +18,10 @@
             <p>{{ $subtitulo ?? '' }}</p>
         </div>
     </div>
-    @if (! empty($acciones))
-        <div class="bienvenida-acciones">
-            @foreach ($acciones as [$url, $icono, $texto])
-                <a href="{{ $url }}" class="btn btn-claro"><i class="bi bi-{{ $icono }}"></i> {{ $texto }}</a>
-            @endforeach
-        </div>
-    @endif
+    <div class="bienvenida-acciones">
+        @foreach ($acciones ?? [] as [$url, $icono, $texto])
+            <a href="{{ $url }}" class="btn btn-claro"><i class="bi bi-{{ $icono }}"></i> {{ $texto }}</a>
+        @endforeach
+        @include('partials.video-guia', ['cual' => $yo->rol, 'clase' => 'btn btn-claro', 'texto' => 'Video guía'])
+    </div>
 </div>

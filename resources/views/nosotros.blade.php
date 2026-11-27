@@ -79,5 +79,23 @@
                 @endforeach
             </div>
         </section>
+
+        {{-- cómo está hecho: diagramas en public/img/diagramas (se generan con recursos/diagramas.py) --}}
+        <section class="seccion pt-0" id="como-esta-hecho">
+            <span class="sobretitulo">Para los curiosos</span>
+            <h2>Cómo está <em>hecho</em> TAMPU</h2>
+            <p class="texto-suave">Laravel 12 con PHP 8.2 en Render, base de datos PostgreSQL en Supabase, mapas y transporte de OpenStreetMap,
+                y un asistente que combina reglas propias con IA. Toca un diagrama para verlo en grande.</p>
+            <div class="diagramas">
+                <figure>
+                    <a href="{{ asset('img/diagramas/arquitectura.svg') }}" target="_blank" rel="noopener"><img src="{{ asset('img/diagramas/arquitectura.svg') }}" alt="Diagrama de arquitectura: usuarios, servidor Laravel en Render con rutas, controladores, servicios, modelos y vistas; y los servicios externos Supabase, IA, OpenStreetMap y correo" loading="lazy"></a>
+                    <figcaption>Arquitectura</figcaption>
+                </figure>
+                <figure>
+                    <a href="{{ asset('img/diagramas/base-de-datos.svg') }}" target="_blank" rel="noopener"><img src="{{ asset('img/diagramas/base-de-datos.svg') }}" alt="Diagrama de la base de datos: usuarios se relaciona con habitaciones, trabajos, conversaciones, horarios, reportes y eventos de seguridad; habitaciones con fotos, favoritos, solicitudes y reseñas; trabajos con horarios y postulaciones" loading="lazy"></a>
+                    <figcaption>Base de datos</figcaption>
+                </figure>
+            </div>
+        </section>
     </main>
 @endsection

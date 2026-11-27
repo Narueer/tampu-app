@@ -77,10 +77,18 @@ class TrabajoController extends Controller
         $postulacion->update(['estado' => $request->estado]);
 
         $texto = $request->estado === 'aceptada' ? 'aceptó' : 'no aceptó';
-        $postulacion->estudiante->notify(new Aviso(
+        $acepto = $request->estado === 'aceptada';
+        Aviso::enviar($postulacion->estudiante,
             $postulacion->trabajo->empresa . ' ' . $texto . ' tu postulación a "' . $postulacion->trabajo->titulo . '"',
-            route('estudiante.panel'), 'briefcase'
-        ));
+            route('estudiante.panel'), 'briefcase',
+            $acepto ? '¡Aceptaron tu postulación!' : 'Respuesta a tu postulación',
+            $acepto ? [
+                $postulacion->trabajo->empresa . ' aceptó tu postulación a «' . $postulacion->trabajo->titulo . '».',
+                'Te escribirán por el chat de TAMPU para coordinar. Revisa tus mensajes.',
+            ] : [
+                $postulacion->trabajo->empresa . ' no continuará con tu postulación a «' . $postulacion->trabajo->titulo . '».',
+                'No te desanimes: hay más trabajos compatibles con tu horario.',
+            ], $acepto ? 'Ver mi panel' : 'Ver más trabajos');
 
         return back()->with('ok', 'Postulación ' . $request->estado . '.');
     }

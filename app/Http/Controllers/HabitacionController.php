@@ -12,7 +12,8 @@ class HabitacionController extends Controller
     // filtros
     public function index(Request $request)
     {
-        $consulta = Habitacion::publicadas()->with('arrendador')->withAvg('resenas', 'estrellas')->withCount('fotos')->withCount('resenas');
+        $consulta = Habitacion::publicadas()->with('arrendador')->withAvg('resenas', 'estrellas')->withCount('fotos')->withCount('resenas')
+            ->withCount(['solicitudes as confirmadas_count' => fn ($q) => $q->where('confirmacion', 'coincide')]);
 
         if ($request->filled('distrito')) {
             $consulta->where('distrito', $request->distrito);
@@ -75,6 +76,7 @@ class HabitacionController extends Controller
 
         // primero las del mismo distrito, luego las de precio parecido
         $similares = Habitacion::publicadas()->withAvg('resenas', 'estrellas')->withCount('fotos')
+            ->withCount(['solicitudes as confirmadas_count' => fn ($q) => $q->where('confirmacion', 'coincide')])
             ->where('id', '!=', $habitacion->id)
             ->orderByRaw('case when distrito = ? then 0 else 1 end', [$habitacion->distrito])
             ->orderByRaw('abs(precio - ?)', [$habitacion->precio])

@@ -26,6 +26,11 @@
         <div class="cabecera-detalle">
             <div>
                 <h1>{{ $habitacion->titulo }}</h1>
+                @php $confirmadas = $habitacion->visitasConfirmadas(); @endphp
+                @if ($confirmadas > 0)
+                    <p class="sello-visitado"><i class="bi bi-patch-check-fill"></i>
+                        <span><b>Visitado y confirmado</b> {{ $confirmadas }} {{ $confirmadas === 1 ? 'estudiante visitó este cuarto y confirmó' : 'estudiantes visitaron este cuarto y confirmaron' }} que es como en las fotos.</span></p>
+                @endif
                 <p class="texto-suave">
                     <i class="bi bi-geo-alt"></i> {{ $habitacion->direccion }}, {{ $habitacion->distrito }}
                     @if ($habitacion->resenas->isNotEmpty())
@@ -89,9 +94,34 @@
                         foreach (array_slice($distancias, 0, 2) as $u) {
                             $punto[] = \App\Support\Lugares::marcador($u['clave']);
                         }
+                        // alrededor del cuarto: comisarías, centros de salud y paraderos (OpenStreetMap)
+                        $entorno = \App\Support\Entorno::puntosMapa((float) $habitacion->lat, (float) $habitacion->lng);
+                        $punto = array_merge($punto, $entorno);
+                        $llegar = \App\Support\Entorno::comoLlegar((float) $habitacion->lat, (float) $habitacion->lng);
+                        $alrededor = [
+                            ['paradero', 'bus-front', 'Paradero más cercano', \App\Support\Entorno::cercanos((float) $habitacion->lat, (float) $habitacion->lng, 'paradero', 0.8, 1)],
+                            ['policia', 'shield-check', 'Comisaría', \App\Support\Entorno::cercanos((float) $habitacion->lat, (float) $habitacion->lng, 'policia', 2.5, 1)],
+                            ['salud', 'heart-pulse', 'Centro de salud', \App\Support\Entorno::cercanos((float) $habitacion->lat, (float) $habitacion->lng, 'salud', 2.5, 1)],
+                        ];
                     @endphp
                     <h2>Ubicación</h2>
-                    <p class="texto-suave">{{ $habitacion->direccion }}, {{ $habitacion->distrito }}. En el mapa también están las universidades más cercanas.</p>
+                    <p class="texto-suave">{{ $habitacion->direccion }}, {{ $habitacion->distrito }}. En el mapa están las universidades más cercanas y, alrededor, comisarías, centros de salud y paraderos.</p>
+                    <div class="alrededor">
+                        @foreach ($alrededor as [$tipo, $icono, $titulo, $lista])
+                            <div class="alrededor-item alrededor-{{ $tipo }}">
+                                <i class="bi bi-{{ $icono }}"></i>
+                                <div>
+                                    <span>{{ $titulo }}</span>
+                                    @if ($lista)
+                                        <b>{{ $lista[0]['nombre'] === 'Paradero' ? 'Paradero de bus' : $lista[0]['nombre'] }}</b>
+                                        <small>{{ $lista[0]['km'] < 1 ? round($lista[0]['km'] * 1000) . ' m' : number_format($lista[0]['km'], 1) . ' km' }} · {{ $lista[0]['min'] }} min a pie</small>
+                                    @else
+                                        <b>No hay uno registrado cerca</b>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                     <div id="mapa" class="mapa mapa-chico" data-puntos='@json($punto)'></div>
 
                     <h2>¿Qué tan lejos queda de donde estudias?</h2>
@@ -102,11 +132,23 @@
                                 <div>
                                     <b>{{ $u['nombre'] }}</b>
                                     <small>{{ $u['km'] }} km · unos {{ $u['minutos'] }} min {{ $u['modo'] }}</small>
+                                    @php $ruta = $llegar[$u['clave']] ?? null; @endphp
+                                    @if ($ruta && ! $ruta['caminar'])
+                                        @if ($ruta['lineas'])
+                                            <span class="lineas-bus">
+                                                @foreach ($ruta['lineas'] as $l)
+                                                    <span class="linea-bus" title="Línea {{ $l['ref'] }} {{ $l['nombre'] }}: unos {{ $l['caminar'] }} min caminando hasta y desde el paradero"><b>{{ $l['ref'] }}</b> {{ $l['nombre'] }}</span>
+                                                @endforeach
+                                            </span>
+                                        @else
+                                            <span class="lineas-bus sin-linea">Sin línea directa: toca hacer transbordo</span>
+                                        @endif
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
                     </div>
-                    <p class="nota-distancia">Las 6 universidades o institutos más cercanos. Distancia aproximada por calles a partir de la ubicación en OpenStreetMap.</p>
+                    <p class="nota-distancia">Las 6 universidades o institutos más cercanos. Distancia aproximada por calles; las líneas de bus son las que pasan a menos de 350 m del cuarto y de la sede. Datos de {{ \App\Support\Entorno::fuente() }}.</p>
                 @endif
 
                 <h2 id="resenas">Reseñas</h2>
@@ -139,6 +181,7 @@
 
             <aside id="reservar" data-caja-reserva>
                 <p class="precio">S/ {{ number_format($habitacion->precio, 0) }} <small>al mes</small></p>
+                <div class="presu-detalle" data-precio-cuarto="{{ (int) $habitacion->precio }}"></div>
                 @if ($habitacion->garantia)
                     <p class="texto-suave garantia">Garantía de S/ {{ number_format($habitacion->garantia, 0) }}, se paga recién al mudarte.</p>
                 @endif
@@ -190,6 +233,7 @@
                 @endauth
 
                 <p class="aviso">Nunca pagues adelantos sin haber visitado la habitación. El celular del arrendador se muestra cuando acepta tu visita.</p>
+                <a href="{{ route('calculadora', ['cuarto' => $habitacion->id]) }}" class="calc-enlace"><i class="bi bi-calculator"></i> <span><b>¿Me alcanza?</b> Calcula cuánto te quedaría al mes con este cuarto</span></a>
             </aside>
         </div>
         <!-- barra con el precio que aparece al bajar -->
