@@ -78,15 +78,13 @@ class InicioController extends Controller
         $universidades = collect(\App\Support\Lugares::UNIVERSIDADES)->map(fn ($u, $clave) => $u + [
             'clave' => $clave,
             'total' => (int) ($porUniversidad[$clave] ?? 0),
+            'icono' => \App\Support\Lugares::icono($clave),
+            'foto' => \App\Support\Lugares::foto($clave),
+            'credito' => \App\Support\Lugares::credito($clave),
         ]);
 
         // para el mapa solo hacen falta 5 columnas, no todas
-        $puntos = Habitacion::publicadas()->whereNotNull('lat')->get(['id', 'titulo', 'precio', 'lat', 'lng'])->map(fn ($h) => [
-            'lat' => (float) $h->lat, 'lng' => (float) $h->lng, 'titulo' => $h->titulo,
-            'precio' => (int) $h->precio, 'url' => route('habitaciones.show', $h),
-        ])->merge(collect(\App\Support\Lugares::conUbicacion())->map(fn ($u) => [
-            'lat' => $u['lat'], 'lng' => $u['lng'], 'titulo' => $u['nombre'], 'tipo' => 'uni',
-        ])->values());
+        $puntos = Habitacion::publicadas()->whereNotNull('lat')->get(['id', 'titulo', 'precio', 'lat', 'lng', 'tipo'])->map(fn ($h) => $h->puntoMapa())->merge(collect(\App\Support\Lugares::conUbicacion())->keys()->map(fn ($clave) => \App\Support\Lugares::marcador($clave)));
 
         return view('inicio', [
             'porDistrito' => $porDistrito,

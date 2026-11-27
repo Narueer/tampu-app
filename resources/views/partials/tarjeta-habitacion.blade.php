@@ -17,7 +17,7 @@
     </div>
     <div class="info">
         <span class="etiqueta verificado">✔ Verificado</span>
-        <span class="etiqueta">{{ $h->tipoTexto() }}</span>
+        <span class="etiqueta etiqueta-tipo tipo-{{ $h->tipo }}"><i class="bi bi-{{ $h->icono() }}"></i> {{ $h->tipoTexto() }}</span>
         @if ($h->created_at && $h->created_at->gt(now()->subDays(2)))<span class="etiqueta etiqueta-nuevo">Nuevo</span>@endif
         <h3>{{ $h->titulo }}</h3>
         <p><i class="bi bi-geo-alt"></i> {{ $h->distrito }}@if ($h->cerca_de) - cerca de {{ $h->cerca_de }}@endif</p>

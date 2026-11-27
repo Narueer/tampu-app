@@ -30,20 +30,14 @@ class HabitacionController extends Controller
         $orden = $request->orden === 'mayor' ? 'desc' : 'asc';
 
         // el mapa muestra todos los resultados, pero solo con las columnas que usa
-        $paraMapa = (clone $consulta)->setEagerLoads([])->select('habitaciones.id', 'titulo', 'precio', 'lat', 'lng')
+        $paraMapa = (clone $consulta)->setEagerLoads([])->select('habitaciones.id', 'titulo', 'precio', 'lat', 'lng', 'tipo')
             ->whereNotNull('lat')->get();
 
         // la lista se muestra de 12 en 12 (paginacion)
         $habitaciones = $consulta->orderBy('precio', $orden)->orderBy('habitaciones.id')->paginate(12)->withQueryString();
 
         // datos para el mapa
-        $puntos = $paraMapa->map(fn ($h) => [
-            'lat' => (float) $h->lat,
-            'lng' => (float) $h->lng,
-            'titulo' => $h->titulo,
-            'precio' => (int) $h->precio,
-            'url' => route('habitaciones.show', $h),
-        ])->values();
+        $puntos = $paraMapa->map(fn ($h) => $h->puntoMapa())->values();
 
         return view('habitaciones.index', [
             'habitaciones' => $habitaciones,

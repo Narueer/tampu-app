@@ -56,7 +56,7 @@
             <div class="principal">
                 <!-- datos rapidos -->
                 <div class="datos-rapidos">
-                    <div><i class="bi bi-door-open"></i><span>Tipo</span><b>{{ $habitacion->tipoTexto() }}</b></div>
+                    <div><i class="bi bi-{{ $habitacion->icono() }}"></i><span>Tipo</span><b>{{ $habitacion->tipoTexto() }}</b></div>
                     @if ($habitacion->metros)
                         <div><i class="bi bi-arrows-angle-expand"></i><span>Tamaño</span><b>{{ $habitacion->metros }} m²</b></div>
                     @endif
@@ -85,9 +85,9 @@
 
                 @if ($habitacion->lat)
                     @php
-                        $punto = [['lat' => (float) $habitacion->lat, 'lng' => (float) $habitacion->lng, 'titulo' => $habitacion->titulo, 'precio' => (int) $habitacion->precio]];
+                        $punto = [array_merge($habitacion->puntoMapa(), ['url' => null])];
                         foreach (array_slice($distancias, 0, 2) as $u) {
-                            $punto[] = ['lat' => $u['lat'], 'lng' => $u['lng'], 'titulo' => $u['nombre'], 'tipo' => 'uni'];
+                            $punto[] = \App\Support\Lugares::marcador($u['clave']);
                         }
                     @endphp
                     <h2>Ubicación</h2>

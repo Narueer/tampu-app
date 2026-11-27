@@ -3103,3 +3103,77 @@ input[type="file"]:hover::file-selector-button {
 .chat-rapidos + .chat-form { border-top: none; }
 .chat-ventana { min-width: 0; }
 .chat-form input { min-width: 0; }
+
+/* AH. Íconos de universidades e institutos, logos opcionales y leyenda de los mapas */
+.tarjeta-uni:hover { background: var(--verde-andino); }   /* el degradado de estilos.css tapaba el color */
+.logo-lugar { width: 44px; height: 44px; object-fit: contain; border-radius: 10px; background: #fff; padding: 3px; margin-bottom: 6px; }
+.logo-lugar-mini { width: 18px; height: 18px; object-fit: contain; border-radius: 4px; }
+.chip-instituto > i { color: var(--terracota); font-size: 0.95em; }
+.chip-instituto:hover > i { color: #fff; }
+
+.marca-uni img { width: 24px; height: 24px; object-fit: contain; border-radius: 50%; }
+.marca-tecnologico { color: #1f6f78 !important; border-color: #1f6f78 !important; }
+.marca-pedagogico { color: #6b4fa0 !important; border-color: #6b4fa0 !important; }
+.marca-gastronomia { color: #b7791f !important; border-color: #b7791f !important; }
+.marca-tecnica { color: #2f6b3a !important; border-color: #2f6b3a !important; }
+
+.leyenda-mapa {
+    background: rgba(255, 253, 248, 0.96);
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    padding: 6px 10px 8px;
+    font-size: 0.78rem;
+    color: var(--texto);
+    max-width: 220px;
+}
+.leyenda-boton {
+    border: none;
+    background: none;
+    padding: 2px 0;
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--tinta);
+    cursor: pointer;
+}
+.leyenda-mapa ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 5px; }
+.leyenda-mapa.cerrada ul { display: none; }
+.leyenda-mapa li { display: flex; align-items: center; gap: 8px; }
+.leyenda-mapa li b {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+}
+.ley-trabajo { background: var(--terracota); color: #fff; }
+.ley-uni { background: #fff; color: var(--terracota); border: 2px solid var(--terracota); }
+
+/* AI. Fotos de sedes e íconos por tipo de cuarto */
+.tarjeta-uni.con-foto { padding-top: 0; overflow: hidden; }
+.tarjeta-uni .foto-lugar { display: block; position: relative; padding: 0; flex: 0 0 auto; margin: 0 -22px 14px; height: 110px; overflow: hidden; border-radius: 21px 21px 0 0; }
+.foto-lugar img { position: absolute; inset: 0; width: 100%; height: 100% !important; max-width: none; margin: 0; object-fit: cover; transition: transform 0.4s; }
+.tarjeta-uni:hover .foto-lugar img { transform: scale(1.05); }
+.tarjeta-uni .foto-lugar + i { display: none; }
+.creditos-fotos { margin: 10px 4px 0; font-size: 0.7rem; color: var(--texto-suave); text-align: right; }
+.foto-globito { display: block; width: 180px; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; }
+
+/* colores por tipo de cuarto (marcadores, leyenda y etiqueta de la tarjeta) */
+.tipo-individual { --tipo: #17352f; }
+.tipo-compartida { --tipo: #2f6b8a; }
+.tipo-minidepartamento { --tipo: #8a4b1f; }
+.tipo-roomies { --tipo: #a23d6b; }
+.tipo-residencia { --tipo: #5b6b1f; }
+.marca-precio[class*="tipo-"] { background-color: var(--tipo, var(--verde-andino)); }
+.marca-precio i { font-size: 0.8em; margin-right: 1px; }
+.marca-punto {
+    display: flex !important; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--tipo, #b4532a); color: #fff; border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); font-size: 11px;
+}
+.leyenda-mapa li b.ley-cuarto { background: var(--tipo, var(--verde-andino)); color: #fff; font-size: 0.68rem; }
+.leyenda-mapa li.ley-nota { color: var(--texto-suave); font-size: 0.72rem; }
+.etiqueta-tipo i { color: var(--tipo, var(--terracota)); margin-right: 2px; }

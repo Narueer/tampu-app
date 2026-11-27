@@ -93,6 +93,30 @@ class Habitacion extends Model
             ->whereHas('arrendador', fn ($q) => $q->where('verificacion', 'verificado')->where('suspendido', false));
     }
 
+    // ícono de Bootstrap Icons de cada tipo (tarjetas, ficha y mapas)
+    const ICONOS = [
+        'individual' => 'door-closed-fill',
+        'compartida' => 'people-fill',
+        'minidepartamento' => 'building-fill',
+        'roomies' => 'person-hearts',
+        'residencia' => 'house-door-fill',
+    ];
+
+    public function icono(): string
+    {
+        return self::ICONOS[$this->tipo] ?? 'house-fill';
+    }
+
+    // datos de este cuarto para mapa.js
+    public function puntoMapa(): array
+    {
+        return [
+            'lat' => (float) $this->lat, 'lng' => (float) $this->lng, 'titulo' => $this->titulo,
+            'precio' => (int) $this->precio, 'url' => route('habitaciones.show', $this),
+            'clase' => $this->tipo, 'icono' => $this->icono(), 'grupo' => $this->tipoTexto(),
+        ];
+    }
+
     public function tipoTexto(): string
     {
         return self::TIPOS[$this->tipo] ?? ucfirst($this->tipo);

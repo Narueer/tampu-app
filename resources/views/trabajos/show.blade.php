@@ -101,7 +101,7 @@
                     @php
                         $punto = [['lat' => (float) $trabajo->lat, 'lng' => (float) $trabajo->lng, 'titulo' => $trabajo->empresa, 'empresa' => $trabajo->direccion, 'pago' => $trabajo->pagoTexto(), 'tipo' => 'trabajo']];
                         foreach (array_slice($distancias, 0, 2) as $u) {
-                            $punto[] = ['lat' => $u['lat'], 'lng' => $u['lng'], 'titulo' => $u['nombre'], 'tipo' => 'uni'];
+                            $punto[] = \App\Support\Lugares::marcador($u['clave']);
                         }
                     @endphp
                     <h2>¿Dónde queda?</h2>

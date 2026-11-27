@@ -232,8 +232,13 @@
                     @foreach ($universidades->where('tipo', 'universidad') as $u)
                         <div class="col-6 col-lg revelar">
                             {{-- si todavía no hay cuartos marcados cerca, el enlace lleva a todos los cuartos --}}
-                            <a href="{{ $u['total'] > 0 ? route('habitaciones.index', ['cerca_de' => $u['clave']]) : route('habitaciones.index') }}" class="tarjeta-uni">
-                                <i class="bi bi-mortarboard"></i>
+                            <a href="{{ $u['total'] > 0 ? route('habitaciones.index', ['cerca_de' => $u['clave']]) : route('habitaciones.index') }}" class="tarjeta-uni {{ $u['foto'] ? 'con-foto' : '' }}">
+                                @if ($u['foto'])
+                                    <span class="foto-lugar">
+                                        <img src="{{ $u['foto'] }}" alt="Sede de {{ $u['completo'] }}" loading="lazy" title="{{ $u['credito'] }}">
+                                    </span>
+                                @endif
+                                <i class="bi bi-{{ $u['icono'] }}"></i>
                                 <b>{{ $u['nombre'] }}</b>
                                 <small>{{ $u['lugar'] }}</small>
                                 <span>@if ($u['total'] > 0){{ $u['total'] }} {{ $u['total'] === 1 ? 'cuarto' : 'cuartos' }}@else Ver cuartos @endif <i class="bi bi-arrow-right"></i></span>
@@ -252,6 +257,7 @@
                             <div class="institutos-lista">
                                 @foreach ($universidades->where('tipo', $tipo) as $u)
                                     <a href="{{ $u['total'] > 0 ? route('habitaciones.index', ['cerca_de' => $u['clave']]) : route('habitaciones.index') }}" class="chip-instituto" title="{{ $u['completo'] }}">
+                                        <i class="bi bi-{{ $u['icono'] }}"></i>
                                         {{ $u['nombre'] }}
                                         @if ($u['total'] > 0)<em>{{ $u['total'] }}</em>@endif
                                     </a>
@@ -260,6 +266,10 @@
                         </div>
                     @endforeach
                 </div>
+                @php $creditos = $universidades->pluck('credito')->filter(); @endphp
+                @if ($creditos->isNotEmpty())
+                    <p class="creditos-fotos">{{ $creditos->implode(' · ') }}</p>
+                @endif
             </div>
         </section>
 

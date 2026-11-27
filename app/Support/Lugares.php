@@ -32,7 +32,10 @@ class Lugares
             'palabras' => ['unsaac', 'san antonio abad', 'la san antonio', 'la nacional', 'perayoc']],
         'U. Andina' => ['nombre' => 'U. Andina (Larapa)', 'completo' => 'Universidad Andina del Cusco', 'tipo' => 'universidad',
             'lugar' => 'Campus Larapa, San Jerónimo', 'lat' => -13.537127, 'lng' => -71.9040268,
-            'palabras' => ['andina', 'uac', 'larapa']],
+            'palabras' => ['larapa', 'andina larapa', 'andina', 'uac']],
+        'U. Andina Qollana' => ['nombre' => 'U. Andina (Qollana)', 'completo' => 'Universidad Andina del Cusco – Campus Qollana (Ciencias de la Salud)', 'tipo' => 'universidad',
+            'lugar' => 'Qollana, San Jerónimo', 'lat' => -13.5504908, 'lng' => -71.8658934,
+            'palabras' => ['qollana', 'collana', 'andina qollana', 'andina de qollana', 'andina collana']],
         'U. Continental' => ['nombre' => 'U. Continental (Angostura)', 'completo' => 'Universidad Continental – Campus Cusco', 'tipo' => 'universidad',
             'lugar' => 'Angostura, Saylla', 'lat' => -13.5563057, 'lng' => -71.8563072,
             'palabras' => ['continental', 'ucontinental']],
@@ -71,10 +74,67 @@ class Lugares
         'SENCICO' => ['nombre' => 'SENCICO Cusco', 'completo' => 'SENCICO – Cusco', 'tipo' => 'tecnica',
             'lugar' => 'Av. Tomasa Tito Condemayta 411, Wanchaq', 'lat' => -13.525228, 'lng' => -71.961971,
             'palabras' => ['sencico']],
-        'Leandro Alviña' => ['nombre' => 'Instituto de Música Leandro Alviña', 'completo' => 'Instituto Superior de Música Leandro Alviña Miranda', 'tipo' => 'tecnica',
+        'Leandro Alviña' => ['nombre' => 'Instituto de Música Leandro Alviña', 'completo' => 'Instituto Superior de Música Leandro Alviña Miranda', 'tipo' => 'tecnica', 'icono' => 'music-note-beamed',
             'lugar' => 'Calle Tocuyeros, San Blas', 'lat' => -13.515625, 'lng' => -71.975073,
             'palabras' => ['leandro alvina', 'alvina', 'conservatorio', 'escuela de musica']],
     ];
+
+    // ícono de Bootstrap Icons por tipo (cada lugar puede tener el suyo con 'icono')
+    const ICONOS = [
+        'universidad' => 'mortarboard-fill',
+        'tecnologico' => 'cpu-fill',
+        'pedagogico' => 'book-fill',
+        'gastronomia' => 'cup-hot-fill',
+        'tecnica' => 'tools',
+    ];
+
+    public static function icono(string $clave): string
+    {
+        $u = self::UNIVERSIDADES[$clave];
+
+        return $u['icono'] ?? self::ICONOS[$u['tipo']] ?? 'geo-alt-fill';
+    }
+
+    /**
+     * Foto opcional de la sede: public/img/lugares/<slug>.webp (o .jpg/.png). Si no hay, se usa el ícono.
+     * Las fotos con licencia libre necesitan su crédito en CREDITOS.
+     */
+    const CREDITOS = [
+        'UNSAAC' => ['autor' => 'Ordzonhyd Rudyard Tarco Palomino', 'licencia' => 'CC BY 4.0',
+            'url' => 'https://commons.wikimedia.org/wiki/File:Universidad_Nacional_de_San_Antonio_Abad_de_Cusco_01.jpg'],
+        'U. Andina' => ['autor' => 'Huamani betzabe', 'licencia' => 'CC0',
+            'url' => 'https://commons.wikimedia.org/wiki/File:Universidad_Andina_del_Cusco_%E2%80%94_Campus_principal.jpg'],
+    ];
+
+    public static function foto(string $clave): ?string
+    {
+        $slug = \Illuminate\Support\Str::slug($clave);
+        foreach (['webp', 'jpg', 'png'] as $ext) {
+            if (file_exists(public_path("img/lugares/$slug.$ext"))) {
+                return asset("img/lugares/$slug.$ext");
+            }
+        }
+
+        return null;
+    }
+
+    public static function credito(string $clave): ?string
+    {
+        $c = self::CREDITOS[$clave] ?? null;
+
+        return $c ? "Foto: {$c['autor']} ({$c['licencia']}, Wikimedia Commons)" : null;
+    }
+
+    // datos para dibujar el lugar en un mapa (mapa.js arma la leyenda con 'grupo')
+    public static function marcador(string $clave): array
+    {
+        $u = self::UNIVERSIDADES[$clave];
+        $grupos = ['universidad' => 'Universidad', 'tecnologico' => 'Instituto tecnológico', 'pedagogico' => 'Instituto pedagógico',
+            'gastronomia' => 'Gastronomía y turismo', 'tecnica' => 'Formación técnica'];
+
+        return ['lat' => $u['lat'], 'lng' => $u['lng'], 'titulo' => $u['completo'], 'tipo' => 'uni', 'clase' => $u['tipo'],
+            'grupo' => $grupos[$u['tipo']] ?? 'Centro de estudios', 'icono' => self::icono($clave), 'foto' => self::foto($clave)];
+    }
 
     // las que tienen ubicación confirmada (para mapas y distancias)
     public static function conUbicacion(): array
@@ -102,17 +162,21 @@ class Lugares
         if (isset(self::UNIVERSIDADES[$texto])) {
             return $texto;
         }
+        // gana la coincidencia más larga ("andina qollana" le gana a "andina")
         $t = ' ' . strtolower(\Illuminate\Support\Str::ascii($texto)) . ' ';
+        $mejor = null;
+        $largo = 0;
         foreach (self::UNIVERSIDADES as $clave => $u) {
             $variantes = array_merge($u['palabras'], [strtolower(\Illuminate\Support\Str::ascii($clave)), strtolower(\Illuminate\Support\Str::ascii($u['completo']))]);
             foreach ($variantes as $p) {
-                if (preg_match('/(?<![a-z])' . preg_quote($p, '/') . '(?![a-z])/', $t)) {
-                    return $clave;
+                if (strlen($p) > $largo && preg_match('/(?<![a-z])' . preg_quote($p, '/') . '(?![a-z])/', $t)) {
+                    $mejor = $clave;
+                    $largo = strlen($p);
                 }
             }
         }
 
-        return null;
+        return $mejor;
     }
 
     /**

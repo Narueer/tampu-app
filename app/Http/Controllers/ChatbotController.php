@@ -972,6 +972,7 @@ class ChatbotController extends Controller
             $nombrados = match ($datos['uni'] ?? null) {
                 'UNSAAC' => ['Wanchaq', 'Cusco', 'Santiago'],
                 'U. Andina' => ['San Jerónimo', 'San Sebastián'],
+                'U. Andina Qollana' => ['San Jerónimo', 'Saylla', 'San Sebastián'],
                 'U. Continental' => ['Saylla', 'San Jerónimo'],
                 default => array_keys(self::ZONAS),
             };
@@ -983,7 +984,7 @@ class ChatbotController extends Controller
 
             return "• $d: " . self::ZONAS[$d] . ($p ? '. Promedio S/ ' . (int) round($p->promedio) . " ({$p->total} opciones)" : '') . '.';
         })->implode("\n");
-        $intro = $compara ? 'Así se comparan:' : (isset($datos['uni']) ? "Si estudias en la {$datos['uni']}, te convienen estas zonas:" : 'Así es cada distrito donde hay cuartos en TAMPU:');
+        $intro = $compara ? 'Así se comparan:' : (isset($datos['uni']) ? 'Si estudias en ' . Lugares::UNIVERSIDADES[$datos['uni']]['nombre'] . ', te convienen estas zonas:' : 'Así es cada distrito donde hay cuartos en TAMPU:');
         $sug = collect($nombrados)->take(3)->map(fn ($d) => "Cuartos en $d")->all();
 
         return $this->respuesta("$intro\n$lineas\nLo más importante: que quede cerca de tu universidad o con un bus directo.", [], $sug);
