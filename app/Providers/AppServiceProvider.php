@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
+
+        // correos por la API de Brevo (MAIL_MAILER=brevo), porque Render gratis bloquea SMTP
+        Mail::extend('brevo', fn (array $config) => new \App\Mail\BrevoTransport((string) ($config['key'] ?? '')));
 
         // limites propios para que no se mezclen con los de otras rutas
         RateLimiter::for('dos-pasos', fn (Request $r) => Limit::perMinute(5)->by('dos-pasos|' . $r->session()->get('dos_pasos.id') . '|' . $r->ip()));
