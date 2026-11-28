@@ -49,14 +49,20 @@
                     @if (\App\Support\Acceso::esInstitucional($externo['email'])) Como es tu correo de la universidad, tu cuenta de estudiante quedará verificada. @endif
                 </small>
             @else
-                <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+                <input type="email" id="email" name="email" value="{{ old('email') }}" autocomplete="email" data-sugerir-correo required>
 
                 <label for="clave">Contraseña</label>
-                <input type="password" id="clave" name="password" minlength="8" required>
-                <small class="ayuda">Mínimo 8 caracteres, con letras y números.</small>
+                <input type="password" id="clave" name="password" minlength="8" autocomplete="new-password" required data-fuerza>
+                <div class="fuerza" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                <ul class="requisitos" aria-live="polite">
+                    <li data-regla="largo"><i class="bi bi-circle"></i> Mínimo 8 caracteres</li>
+                    <li data-regla="letra"><i class="bi bi-circle"></i> Al menos una letra</li>
+                    <li data-regla="numero"><i class="bi bi-circle"></i> Al menos un número</li>
+                    <li data-regla="igual"><i class="bi bi-circle"></i> Las dos coinciden</li>
+                </ul>
 
                 <label for="clave2">Repetir contraseña</label>
-                <input type="password" id="clave2" name="password_confirmation" required>
+                <input type="password" id="clave2" name="password_confirmation" autocomplete="new-password" required data-repetir>
             @endif
 
             <p class="error" id="mensajeRegistro"></p>
@@ -66,3 +72,7 @@
         </form>
     </main>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/acceso.js') }}?v={{ filemtime(public_path('js/acceso.js')) }}"></script>
+@endpush

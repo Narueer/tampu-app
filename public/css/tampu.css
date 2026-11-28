@@ -328,3 +328,103 @@ table td { border-color: #e7e6df !important; }
 /* "¿Cómo funciona?": la ilustración siempre entra completa en su recuadro */
 .como-ilustracion { display: flex !important; align-items: center; justify-content: center; overflow: hidden; }
 .como-ilustracion img { height: 100% !important; width: auto !important; max-width: 100% !important; object-fit: contain; }
+
+/* ==========================================================================
+   Pantallas de cuenta (recuperar contraseña, confirmar correo, dos pasos)
+   ========================================================================== */
+.acceso-columna { display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 24px 0; }
+.acceso-columna .formulario { margin: 0 auto !important; }
+.formulario.acceso { position: relative; }
+.acceso h2 { margin-bottom: .35rem !important; }
+.acceso-volver {
+    display: flex; width: fit-content; align-items: center; gap: 6px; margin-bottom: 18px;
+    font-size: .88rem; font-weight: 600; color: var(--t-suave, #5f665f); text-decoration: none;
+}
+.acceso-volver:hover { color: var(--molle); }
+.acceso-icono {
+    display: inline-grid; place-items: center; width: 54px; height: 54px; margin-bottom: 14px;
+    border-radius: 16px; background: var(--lana); color: var(--molle); font-size: 1.55rem;
+    box-shadow: inset 0 0 0 1px rgba(70, 85, 72, .12);
+}
+.acceso-icono-ok { background: #e3e9df; }
+.acceso-icono-error { background: #f2e3df; color: var(--cochinilla); }
+.acceso-correo {
+    display: inline-block; margin: 2px 0 18px; padding: 6px 12px; border-radius: 999px;
+    background: var(--marfil); border: 1px solid var(--piedra);
+    font-weight: 700; color: var(--carbon); letter-spacing: .01em; word-break: break-all;
+}
+.acceso-enviar { width: 100%; margin-top: 18px; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px !important; }
+.acceso-enviar .bi { transition: transform .2s ease; }
+.acceso-enviar:hover .bi-arrow-right { transform: translateX(3px); }
+.acceso-pie { margin: 18px 0 0; text-align: center; font-size: .92rem; }
+.acceso-nota { margin: 10px 0 0; text-align: center; font-size: .85rem; color: var(--t-suave, #5f665f); }
+.acceso-ayuda {
+    margin: 20px 0 0; padding: 12px 14px; border-radius: var(--radio);
+    background: var(--marfil); border-left: 3px solid var(--ocre, #b58a4a);
+    font-size: .88rem; line-height: 1.55; color: var(--t-general, #4f5650);
+}
+.acceso-reenviar { display: inline; }
+.acceso-reenviar-caja { margin: 0 auto !important; }
+
+/* aviso de error dentro del formulario */
+.acceso-aviso { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 14px; padding: 12px 14px; border-radius: var(--radio); font-size: .9rem; line-height: 1.45; }
+.acceso-aviso .bi { font-size: 1.1rem; line-height: 1.2; }
+.acceso-aviso a { font-weight: 700; margin-left: 2px; white-space: nowrap; }
+.acceso-aviso-error { background: #f7ebe8; color: #7a3f3a; border: 1px solid #e6cdc7; }
+.acceso-aviso-error a { color: #7a3f3a; }
+.formulario input[aria-invalid="true"] { border-color: var(--cochinilla) !important; box-shadow: 0 0 0 3px rgba(150, 92, 87, .12) !important; }
+
+/* campo con icono a la izquierda */
+.campo-con-icono { position: relative; }
+.campo-con-icono > .bi { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #8a908a; pointer-events: none; }
+.campo-con-icono input { padding-left: 42px !important; width: 100%; }
+
+/* ojito de la contraseña */
+.campo-clave { position: relative; }
+.campo-clave input { width: 100%; padding-right: 46px !important; }
+.ver-clave {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    width: 36px; height: 36px; border: 0; border-radius: 8px; background: transparent;
+    color: #6f756f; font-size: 1.1rem; display: grid; place-items: center; cursor: pointer;
+}
+.ver-clave:hover, .ver-clave:focus-visible { background: var(--marfil); color: var(--molle); }
+
+/* sugerencia de correo */
+.sugerencia-correo { margin: 6px 0 0; font-size: .86rem; color: var(--anil); }
+.btn-enlace {
+    border: 0; padding: 0; background: none; font: inherit; font-weight: 700;
+    color: var(--molle); text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.btn-enlace:disabled { color: #8a908a; text-decoration: none; cursor: default; font-weight: 600; }
+
+/* fuerza de la contraseña */
+.fuerza { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 8px 0 10px; }
+.fuerza span { height: 5px; border-radius: 3px; background: var(--piedra); transition: background .25s ease; }
+.requisitos { list-style: none; margin: 0 0 6px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: .84rem; color: #6f756f; }
+.requisitos li { display: flex; align-items: center; gap: 6px; transition: color .2s ease; }
+.requisitos li.cumple { color: var(--molle); font-weight: 600; }
+.requisitos li.cumple .bi { color: var(--molle); }
+
+/* pasos de "revisa tu correo" */
+.acceso-pasos { list-style: none; margin: 4px 0 6px; padding: 0; display: grid; gap: 10px; }
+.acceso-pasos li { display: flex; gap: 10px; align-items: flex-start; font-size: .93rem; line-height: 1.45; }
+.acceso-pasos .bi { font-size: 1.15rem; color: var(--cochinilla); line-height: 1.2; }
+
+/* código en casillas */
+.codigo-real { position: absolute !important; opacity: 0; pointer-events: none; width: 1px !important; height: 1px !important; }
+.codigo-cajas { position: relative; }
+.codigo-fila { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 6px 0 4px; }
+.codigo-casilla {
+    width: 48px !important; height: 58px; padding: 0 !important; text-align: center;
+    font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace; font-size: 1.6rem !important; font-weight: 700; color: var(--molle);
+    border: 2px solid var(--piedra) !important; border-radius: 12px !important; background: var(--marfil) !important;
+    transition: border-color .15s ease, transform .15s ease, background .15s ease;
+}
+.codigo-casilla:focus { outline: none; border-color: var(--molle) !important; background: #fff !important; box-shadow: 0 0 0 4px rgba(70, 85, 72, .14) !important; transform: translateY(-2px); }
+.codigo-casilla.llena { border-color: var(--arena) !important; background: #fff !important; }
+.codigo-guion { color: #a9ada6; font-weight: 700; padding: 0 2px; }
+@media (max-width: 420px) {
+    .codigo-fila { gap: 5px; }
+    .codigo-casilla { width: 40px !important; height: 50px; font-size: 1.35rem !important; }
+    .requisitos { grid-template-columns: 1fr; }
+}

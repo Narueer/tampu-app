@@ -45,6 +45,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/registro', [AuthController::class, 'registro']);
     Route::get('/olvide', [ClaveController::class, 'formOlvide'])->name('clave.olvide');
     Route::post('/olvide', [ClaveController::class, 'enviarEnlace'])->middleware('throttle:5,1');
+    Route::get('/olvide/enviado', [ClaveController::class, 'enviado'])->name('clave.enviado');
     Route::get('/restablecer/{token}', [ClaveController::class, 'formReset'])->name('clave.reset');
     Route::post('/restablecer', [ClaveController::class, 'restablecer'])->name('clave.guardar');
 

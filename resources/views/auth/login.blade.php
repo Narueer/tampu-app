@@ -12,10 +12,10 @@
             @include('partials.errores')
 
             <label for="correo">Correo</label>
-            <input type="email" id="correo" name="email" value="{{ old('email') }}" placeholder="correo@ejemplo.com" required>
+            <input type="email" id="correo" name="email" value="{{ old('email') }}" placeholder="correo@ejemplo.com" required data-sugerir-correo autocomplete="email">
 
             <label for="clave">Contraseña</label>
-            <input type="password" id="clave" name="password" required>
+            <input type="password" id="clave" name="password" autocomplete="current-password" required>
 
             <div class="fila-login">
                 <label class="checkbox"><input type="checkbox" name="recordar"> Recordarme</label>
@@ -31,3 +31,7 @@
         </form>
     </main>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/acceso.js') }}?v={{ filemtime(public_path('js/acceso.js')) }}"></script>
+@endpush
