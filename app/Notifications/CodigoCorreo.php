@@ -19,10 +19,14 @@ class CodigoCorreo extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Tu código de TAMPU: ' . $this->codigo)
-            ->greeting('Hola, ' . $notifiable->nombre)
-            ->line('Este es tu código para confirmar tu correo en TAMPU:')
-            ->line('**' . $this->codigo . '**')
-            ->line('Vence en 15 minutos. Si no creaste una cuenta en TAMPU, ignora este mensaje.');
+            ->subject($this->codigo . ' es tu código de TAMPU')
+            ->view(['html' => 'emails.codigo', 'text' => 'emails.codigo-texto'], [
+                'titulo' => 'Confirma tu correo',
+                'saludo' => 'Hola, ' . explode(' ', trim($notifiable->nombre))[0],
+                'etiqueta' => 'Bienvenida',
+                'resumen' => 'Tu código es ' . $this->codigo . '. Vence en 15 minutos.',
+                'codigo' => $this->codigo,
+                'url' => route('correo.verificar'),
+            ]);
     }
 }

@@ -31,7 +31,7 @@ class Aviso extends Notification
             return;
         }
         try {
-            $usuario->notify(new AvisoCorreo($asunto, $lineas, $url, $boton));
+            $usuario->notify(new AvisoCorreo($asunto, $lineas, $url, $boton, $icono));
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('No se pudo enviar el aviso por correo a ' . $usuario->email . ': ' . $e->getMessage());
         }

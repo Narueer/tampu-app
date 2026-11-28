@@ -34,8 +34,15 @@ class ContactoController extends Controller
 
         // copia al correo del equipo; si no hay correo configurado no pasa nada
         try {
-            Mail::raw("De: {$contacto->nombre} <{$contacto->email}>\nAsunto: {$contacto->asunto}\n\n{$contacto->mensaje}", function ($m) use ($contacto) {
-                $m->to(config('tampu.correo'))->replyTo($contacto->email)->subject('[TAMPU] ' . $contacto->asunto);
+            Mail::send(['html' => 'emails.contacto', 'text' => 'emails.contacto-texto'], [
+                'contacto' => $contacto,
+                'titulo' => 'Nuevo mensaje de contacto',
+                'etiqueta' => 'Contacto',
+                'resumen' => $contacto->nombre . ': ' . \Illuminate\Support\Str::limit($contacto->mensaje, 90),
+                'porque' => 'Este mensaje llegó desde el formulario de contacto de TAMPU.',
+                'sinFirma' => true,
+            ], function ($m) use ($contacto) {
+                $m->to(config('tampu.correo'))->replyTo($contacto->email, $contacto->nombre)->subject('[TAMPU] ' . $contacto->asunto . ' · ' . $contacto->nombre);
             });
         } catch (\Throwable $e) {
             Log::warning('No se pudo enviar el correo de contacto: ' . $e->getMessage());

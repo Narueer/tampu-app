@@ -32,7 +32,7 @@ class ClaveController extends Controller
 
             // si no hay correo configurado (MAIL_MAILER=log) el mensaje queda en storage/logs/laravel.log
             try {
-                $usuario->notify(new RestablecerClave($enlace));
+                $usuario->notify(new RestablecerClave($enlace, RestablecerClave::describir($request->userAgent())));
             } catch (\Throwable $e) {
                 Log::warning('No se pudo enviar el correo: ' . $e->getMessage());
                 Log::info('Enlace para restablecer la contraseña de ' . $usuario->email . ': ' . $enlace);
