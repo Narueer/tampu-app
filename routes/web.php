@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Arrendador\HabitacionController as ArrendadorHabitacion;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalendarioController;
+use App\Http\Controllers\PlanificadorController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ClaveController;
 use App\Http\Controllers\ConstanciaController;
@@ -103,6 +104,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/estudiante/horario', [EstudianteController::class, 'guardarHorario'])
             ->name('estudiante.horario');
         Route::get('/estudiante/favoritos', [EstudianteController::class, 'favoritos'])->name('estudiante.favoritos');
+        // planificador (exámenes, entregas, pagos y estudio en el calendario)
+        Route::post('/planificador', [PlanificadorController::class, 'guardar'])->middleware('throttle:60,1')->name('planificador.guardar');
+        Route::get('/planificador/proximas', [PlanificadorController::class, 'proximas'])->name('planificador.proximas');
+        Route::get('/planificador/exportar', [PlanificadorController::class, 'exportar'])->name('planificador.exportar');
+        Route::put('/planificador/{actividad}', [PlanificadorController::class, 'actualizar'])->name('planificador.actualizar');
+        Route::patch('/planificador/{actividad}/mover', [PlanificadorController::class, 'mover'])->name('planificador.mover');
+        Route::post('/planificador/{actividad}/hecha', [PlanificadorController::class, 'marcar'])->name('planificador.marcar');
+        Route::delete('/planificador/{actividad}', [PlanificadorController::class, 'borrar'])->name('planificador.borrar');
         Route::post('/habitaciones/{habitacion}/solicitar', [EstudianteController::class, 'solicitar'])
             ->middleware('correo')->name('estudiante.solicitar');
         Route::post('/habitaciones/{habitacion}/resena', [EstudianteController::class, 'resenar'])

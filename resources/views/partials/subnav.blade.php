@@ -17,7 +17,7 @@
         <a href="{{ route('admin.seguridad') }}" class="{{ request()->routeIs('admin.seguridad') ? 'activo' : '' }}"><i class="bi bi-shield-lock"></i> Seguridad</a>
     @endif
     @if ($rol !== 'admin')
-        <a href="{{ route('calendario') }}" class="{{ request()->routeIs('calendario') ? 'activo' : '' }}"><i class="bi bi-calendar3"></i> Calendario</a>
+        <a href="{{ route('calendario') }}" class="{{ request()->routeIs('calendario') ? 'activo' : '' }}"><i class="bi bi-calendar3"></i> {{ $rol === 'estudiante' ? 'Planificador' : 'Calendario' }}</a>
     @endif
     <a href="{{ route('perfil') }}" class="{{ request()->routeIs('perfil') ? 'activo' : '' }}"><i class="bi bi-person-gear"></i> Mi perfil</a>
 </nav>

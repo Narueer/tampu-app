@@ -60,6 +60,11 @@ class Usuario extends Authenticatable
         return $this->hasMany(Horario::class);
     }
 
+    public function actividades()
+    {
+        return $this->hasMany(Actividad::class);
+    }
+
     public function solicitudes()
     {
         return $this->hasMany(Solicitud::class);
