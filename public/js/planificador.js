@@ -129,6 +129,7 @@
         calendario.refetchEvents();
         fetch(P.rutas.proximas, { headers: { Accept: 'application/json' } }).then(function (r) { return r.json(); }).then(function (d) {
             resumen.hidden = false;
+            avisarHoy(d.lista);
             resumen.querySelector('[data-r="examenes"]').textContent = d.resumen.examenes;
             resumen.querySelector('[data-r="entregas"]').textContent = d.resumen.entregas;
             resumen.querySelector('[data-r="pagos"]').textContent = d.resumen.pagos;
@@ -263,6 +264,45 @@
             refrescar();
         });
     });
+
+    // ---------------------------------------------------------------- armar mi semana
+    var btnArmar = document.getElementById('btnArmar');
+    if (btnArmar) {
+        btnArmar.addEventListener('click', function () {
+            btnArmar.disabled = true;
+            pedir(P.rutas.armar, 'POST', { bloques: document.getElementById('bloquesSemana').value })
+                .then(function (r) { aviso(r.mensaje); refrescar(); })
+                .catch(function () { aviso('No se pudo armar tu semana.'); })
+                .finally(function () { btnArmar.disabled = false; });
+        });
+    }
+
+    // ---------------------------------------------------------------- avisos del navegador
+    // si la persona lo permite, al abrir el planificador le recordamos lo de hoy con una notificación
+    function avisarHoy(lista) {
+        if (!('Notification' in window)) return;
+        var hoy = lista.filter(function (x) { return x.cuando === 'Hoy' && !x.hecha && ['examen', 'entrega', 'pago'].indexOf(x.tipo) !== -1; });
+        if (!hoy.length) return;
+        var clave = 'tampu-aviso-' + hoy[0].fecha;
+        try { if (sessionStorage.getItem(clave)) return; sessionStorage.setItem(clave, '1'); } catch (e) {}
+        var mostrar = function () {
+            new Notification('TAMPU · Hoy tienes ' + hoy.length + (hoy.length === 1 ? ' pendiente' : ' pendientes'), {
+                body: hoy.map(function (x) { return x.titulo + (x.hora ? ' (' + x.hora + ')' : ''); }).join('\n'),
+                icon: '/img/icono-192.png',
+            });
+        };
+        if (Notification.permission === 'granted') mostrar();
+    }
+    var btnAvisos = document.getElementById('btnAvisos');
+    if (btnAvisos && 'Notification' in window && Notification.permission === 'default') {
+        btnAvisos.hidden = false;
+        btnAvisos.addEventListener('click', function () {
+            Notification.requestPermission().then(function (p) {
+                btnAvisos.hidden = true;
+                aviso(p === 'granted' ? 'Listo: te avisaremos en este navegador.' : 'Sin problema, igual te llegan al correo y a la campanita.');
+            });
+        });
+    }
 
     // ---------------------------------------------------------------- pago del cuarto
     var btnAlquiler = document.getElementById('btnAlquiler');

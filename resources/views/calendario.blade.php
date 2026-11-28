@@ -13,9 +13,12 @@
                 <div>
                     <span class="sobretitulo">Tu semana en orden</span>
                     <h1 class="titulo-pagina">Mi <em>planificador</em></h1>
-                    <p class="texto-suave">Tus clases, turnos y visitas ya están aquí. Anota tus exámenes, entregas y pagos para que nada te tome por sorpresa.</p>
+                    <p class="texto-suave">Tus clases, turnos y visitas ya están aquí. Anota tus exámenes, entregas y pagos: te avisamos <b>un día antes</b> por la campanita y por correo, y cada domingo te mandamos el plan de tu semana.</p>
                 </div>
-                <a href="{{ route('planificador.exportar') }}" class="btn btn-borde plan-exportar"><i class="bi bi-phone"></i> Llevar a mi celular</a>
+                <div class="plan-acciones">
+                    <button type="button" class="btn btn-borde" id="btnAvisos" hidden><i class="bi bi-bell"></i> Activar avisos</button>
+                    <a href="{{ route('planificador.exportar') }}" class="btn btn-borde plan-exportar"><i class="bi bi-phone"></i> Llevar a mi celular</a>
+                </div>
             </div>
 
             <div class="plan-grid">
@@ -31,6 +34,20 @@
                             @endforeach
                         </div>
                         <p class="plan-pista"><i class="bi bi-hand-index"></i> También puedes tocar o arrastrar sobre el calendario.</p>
+                        <div class="plan-armar">
+                            <div>
+                                <b><i class="bi bi-magic"></i> Armar mi semana</b>
+                                <span>Ponemos bloques de estudio en tus turnos libres{{ ' ' }}(y si tienes examen, te ayudamos a prepararte).</span>
+                            </div>
+                            <div class="plan-armar-form">
+                                <select id="bloquesSemana" aria-label="Cuántos bloques">
+                                    <option value="3">3 bloques</option>
+                                    <option value="5" selected>5 bloques</option>
+                                    <option value="7">7 bloques</option>
+                                </select>
+                                <button type="button" class="btn btn-chico" id="btnArmar">Armar</button>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- resumen de la semana --}}
@@ -173,6 +190,7 @@
             window.TAMPU_PLAN = {
                 rutas: {
                     guardar: @json(route('planificador.guardar')),
+                    armar: @json(route('planificador.armar')),
                     proximas: @json(route('planificador.proximas')),
                     base: @json(url('planificador')),
                 },

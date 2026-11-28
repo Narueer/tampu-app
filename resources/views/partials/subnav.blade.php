@@ -14,6 +14,7 @@
         <a href="{{ route('admin.usuarios') }}" class="{{ request()->routeIs('admin.usuarios') ? 'activo' : '' }}"><i class="bi bi-people"></i> Usuarios</a>
         <a href="{{ route('admin.reportes') }}" class="{{ request()->routeIs('admin.reportes') ? 'activo' : '' }}"><i class="bi bi-flag"></i> Reportes</a>
         <a href="{{ route('admin.contactos') }}" class="{{ request()->routeIs('admin.contactos') ? 'activo' : '' }}"><i class="bi bi-envelope"></i> Contacto</a>
+        <a href="{{ route('admin.documentos') }}" class="{{ request()->routeIs('admin.documentos') ? 'activo' : '' }}"><i class="bi bi-qr-code"></i> Constancias</a>
         <a href="{{ route('admin.seguridad') }}" class="{{ request()->routeIs('admin.seguridad') ? 'activo' : '' }}"><i class="bi bi-shield-lock"></i> Seguridad</a>
     @endif
     @if ($rol !== 'admin')

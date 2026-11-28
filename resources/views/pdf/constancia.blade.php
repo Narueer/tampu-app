@@ -4,7 +4,6 @@
     $logo = public_path('img/logo-160.png');
     $molle = '#34483e';
     $aceptada = $esVisita ? $solicitud->updated_at : $postulacion->updated_at;
-    $verificar = route('constancia.verificar', $codigo);
     $tejido = ['#b58a4a', '#965c57', '#D8CBB5', '#53677a', '#965c57', '#465548'];
 @endphp
 <!DOCTYPE html>
@@ -78,7 +77,11 @@
     /* verificación */
     .verifica { width: 100%; border: 1px solid #d8cbb5; border-radius: 10px; }
     .verifica td { padding: 10px 14px; vertical-align: middle; font-size: 9px; color: #4f5650; }
-    .verifica .icono { width: 30px; font-family: 'DejaVu Sans', sans-serif; font-size: 20px; color: #465548; }
+    .verifica .qr { width: 96px; padding: 8px !important; }
+    .verifica .qr img { width: 92px; height: 92px; }
+    .verifica .v-tit { font-weight: bold; color: #343936; font-size: 10.5px; margin-bottom: 2px; }
+    .verifica .v-cod { margin: 5px 0 2px; font-size: 9px; }
+    .verifica .v-cod b { font-family: 'DejaVu Sans Mono', monospace; font-size: 11px; color: #34483e; letter-spacing: 1px; }
     .verifica .url { font-family: 'DejaVu Sans Mono', monospace; font-size: 9px; color: #53677a; }
     .firma { text-align: right; width: 190px; }
     .firma .linea { border-top: 1px solid #343936; padding-top: 4px; font-size: 8.5px; color: #4f5650; }
@@ -118,7 +121,7 @@
             <td class="codigo-caja">
                 <div class="etq">CONSTANCIA N.º</div>
                 <div class="num">{{ $codigo }}</div>
-                <div class="fecha">Emitida el {{ now('America/Lima')->translatedFormat('j \d\e F \d\e Y') }}</div>
+                <div class="fecha">Emitida el {{ $emitida->timezone('America/Lima')->translatedFormat('j \d\e F \d\e Y') }}</div>
             </td>
         </tr></table>
     </div>
@@ -201,13 +204,15 @@
             @endif
         </tr></table>
 
-        {{-- verificación y firma --}}
+        {{-- verificación con QR y firma --}}
         <table width="100%" cellpadding="0" cellspacing="0"><tr>
             <td style="vertical-align: bottom; padding-right: 20px;">
                 <table class="verifica" cellpadding="0" cellspacing="0"><tr>
-                    <td class="icono">&#10003;</td>
+                    <td class="qr"><img src="{{ $qr }}" alt="QR" width="92" height="92"></td>
                     <td>
-                        <b style="color: #343936;">¿Es auténtica?</b> Cualquiera puede comprobarla en:<br>
+                        <div class="v-tit">Constancia verificable</div>
+                        Escanea el código QR con la cámara del celular para comprobar que la emitió TAMPU y que sigue vigente.
+                        <div class="v-cod">Código único: <b>{{ $codigo }}</b></div>
                         <span class="url">{{ $verificar }}</span>
                     </td>
                 </tr></table>

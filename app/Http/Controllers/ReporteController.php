@@ -31,11 +31,20 @@ class ReporteController extends Controller
         }
 
         $datos['usuario_id'] = $request->user()->id;
-        Reporte::create($datos);
+        $reporte = Reporte::create($datos)->load(['habitacion', 'trabajo']);
 
         foreach (Usuario::where('rol', 'admin')->get() as $admin) {
             $admin->notify(new Aviso('Nuevo reporte: ' . $datos['motivo'], route('admin.reportes'), 'flag'));
         }
+
+        // y al correo del equipo, para enterarse aunque no entre al panel
+        $sobre = $reporte->habitacion ? 'Cuarto: ' . $reporte->habitacion->titulo : ($reporte->trabajo ? 'Trabajo: ' . $reporte->trabajo->titulo : '—');
+        \App\Support\CorreoAdmin::enviar('Nuevo reporte: ' . $datos['motivo'], 'Reporte', [
+            'Motivo' => $datos['motivo'],
+            'Sobre' => $sobre,
+            'Lo reporta' => $request->user()->nombre . ' (' . $request->user()->email . ')',
+            'Cuándo' => now('America/Lima')->format('d/m/Y H:i'),
+        ], $datos['detalle'] ?? null, route('admin.reportes'), 'Revisar el reporte');
 
         return back()->with('ok', 'Gracias. El administrador revisará tu reporte.');
     }

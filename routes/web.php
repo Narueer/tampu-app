@@ -34,7 +34,12 @@ Route::get('/habitaciones/{habitacion}', [HabitacionController::class, 'show'])-
 Route::get('/trabajos', [TrabajoController::class, 'index'])->name('trabajos.index');
 Route::get('/trabajos/{trabajo}', [TrabajoController::class, 'show'])->whereNumber('trabajo')->name('trabajos.show');
 Route::get('/contacto', [ContactoController::class, 'formulario'])->name('contacto');
-Route::get('/verificar/{codigo}', [ConstanciaController::class, 'verificar'])->middleware('throttle:30,1')->name('constancia.verificar');
+// tareas automáticas (recordatorios, resumen semanal y copias de seguridad) que dispara cron-job.org
+Route::get('/tareas/{clave}', [\App\Http\Controllers\TareasController::class, 'ejecutar'])->middleware('throttle:20,1')->name('tareas');
+
+// verificar una constancia: el QR del PDF lleva a /v/CODIGO
+Route::get('/v/{codigo}', [ConstanciaController::class, 'verificar'])->middleware('throttle:30,1')->where('codigo', '[A-Za-z0-9-]{6,24}')->name('documento.verificar');
+Route::get('/verificar/{codigo?}', [ConstanciaController::class, 'buscar'])->middleware('throttle:30,1')->name('constancia.verificar');
 Route::post('/contacto', [ContactoController::class, 'enviar'])->middleware('throttle:5,1');
 Route::post('/boletin', [ContactoController::class, 'boletin'])->middleware('throttle:5,1')->name('boletin');
 Route::post('/asistente', [ChatbotController::class, 'responder'])->middleware('throttle:30,1')->name('asistente');
@@ -106,6 +111,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/estudiante/favoritos', [EstudianteController::class, 'favoritos'])->name('estudiante.favoritos');
         // planificador (exámenes, entregas, pagos y estudio en el calendario)
         Route::post('/planificador', [PlanificadorController::class, 'guardar'])->middleware('throttle:60,1')->name('planificador.guardar');
+        Route::post('/planificador/armar-semana', [PlanificadorController::class, 'armarSemana'])->middleware('throttle:10,1')->name('planificador.armar');
         Route::get('/planificador/proximas', [PlanificadorController::class, 'proximas'])->name('planificador.proximas');
         Route::get('/planificador/exportar', [PlanificadorController::class, 'exportar'])->name('planificador.exportar');
         Route::put('/planificador/{actividad}', [PlanificadorController::class, 'actualizar'])->name('planificador.actualizar');
@@ -153,5 +159,12 @@ Route::middleware('auth')->group(function () {
         Route::get('contactos', [AdminController::class, 'contactos'])->name('contactos');
         Route::patch('contactos/{contacto}', [AdminController::class, 'leerContacto'])->name('contactos.leer');
         Route::get('seguridad', [AdminController::class, 'seguridad'])->name('seguridad');
+        Route::delete('usuarios/{usuario}', [AdminController::class, 'eliminarUsuario'])->name('usuarios.eliminar');
+        Route::get('documentos', [AdminController::class, 'documentos'])->name('documentos');
+        Route::patch('documentos/{documento}', [AdminController::class, 'anularDocumento'])->name('documentos.anular');
+        Route::delete('documentos/{documento}', [AdminController::class, 'eliminarDocumento'])->name('documentos.eliminar');
+        Route::post('respaldos', [AdminController::class, 'crearRespaldo'])->middleware('throttle:5,1')->name('respaldos.crear');
+        Route::get('respaldos/{archivo}', [AdminController::class, 'descargarRespaldo'])->name('respaldos.descargar');
+        Route::post('respaldos/{archivo}/restaurar', [AdminController::class, 'restaurarRespaldo'])->middleware('throttle:3,10')->name('respaldos.restaurar');
     });
 });

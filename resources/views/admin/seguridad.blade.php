@@ -16,6 +16,47 @@
             ['sign-stop', $resumen['acceso_denegado'], 'Accesos denegados (24 h)', 'terracota', route('admin.seguridad', ['tipo' => 'acceso_denegado'])],
         ]])
 
+        {{-- copias de seguridad --}}
+        <section class="caja respaldos">
+            <div class="respaldos-cabecera">
+                <div>
+                    <h2><i class="bi bi-cloud-arrow-up"></i> Copias de seguridad</h2>
+                    <p class="texto-suave">Se crea una copia de toda la base de datos cada día (y antes de eliminar una cuenta). Se guardan las últimas {{ \App\Support\Respaldo::GUARDAR }} en la carpeta privada.</p>
+                </div>
+                <form action="{{ route('admin.respaldos.crear') }}" method="POST">
+                    @csrf
+                    <button class="btn" data-cargando="Creando…"><i class="bi bi-plus-lg"></i> Crear copia ahora</button>
+                </form>
+            </div>
+            @if ($respaldos === null)
+                <p class="alerta alerta-aviso">No se pudo leer la carpeta de copias. Revisa que <b>ARCHIVOS</b> y las claves de Supabase estén bien en Render.</p>
+            @elseif (! $respaldos)
+                <p class="texto-suave">Todavía no hay copias. Crea la primera con el botón.</p>
+            @else
+                <ul class="respaldos-lista">
+                    @foreach (array_slice($respaldos, 0, 6) as $r)
+                        <li>
+                            <i class="bi bi-file-earmark-zip"></i>
+                            <span>{{ \Illuminate\Support\Str::of($r['nombre'])->after('tampu-')->before('.json')->replaceMatches('/^(\d{4})-(\d{2})-(\d{2})-(\d{2})(\d{2})(\d{2})$/', '$3/$2/$1 $4:$5') }}</span>
+                            <small>{{ number_format($r['peso'] / 1024, 0) }} KB</small>
+                            <a href="{{ route('admin.respaldos.descargar', \Illuminate\Support\Str::before($r['nombre'], '.json')) }}" title="Descargar"><i class="bi bi-download"></i></a>
+                            <details class="eliminar-cuenta">
+                                <summary title="Volver a esta copia"><i class="bi bi-arrow-counterclockwise"></i> Volver</summary>
+                                <form action="{{ route('admin.respaldos.restaurar', \Illuminate\Support\Str::before($r['nombre'], '.json')) }}" method="POST">
+                                    @csrf
+                                    <p><b>Volver los datos a esta fecha.</b> Lo que se hizo después se pierde (antes se guarda una copia de lo actual, por si acaso).</p>
+                                    <label>Escribe <b>RESTAURAR</b>
+                                        <input name="confirmar" autocomplete="off" required pattern="RESTAURAR">
+                                    </label>
+                                    <button class="btn btn-chico btn-peligro-lleno">Restaurar</button>
+                                </form>
+                            </details>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </section>
+
         <form class="barra-filtros filtros-admin" method="GET">
             <select name="tipo" aria-label="Tipo de evento">
                 <option value="">Todos los eventos</option>

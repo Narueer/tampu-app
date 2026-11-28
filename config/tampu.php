@@ -7,6 +7,8 @@ return [
 
     // texto del pie de la página y de los documentos. Para quitar lo del curso, en Render pon TAMPU_CREDITO vacío
     'credito' => env('TAMPU_CREDITO', 'Proyecto del curso Programación Web · Universidad Continental'),
+    // clave para que cron-job.org dispare los recordatorios y las copias de seguridad (/tareas/CLAVE)
+    'tareas_clave' => env('TAREAS_CLAVE', ''),
     'pie_documentos' => env('TAMPU_PIE_DOCUMENTOS', 'TAMPU · Cuartos y trabajos para estudiantes en Cusco'),
 
     // los correos que terminan en este dominio son de estudiantes de la universidad

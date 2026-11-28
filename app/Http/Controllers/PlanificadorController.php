@@ -62,6 +62,94 @@ class PlanificadorController extends Controller
         return response()->json(['ok' => true, 'mensaje' => 'Eliminado.']);
     }
 
+    // "Armar mi semana": pone bloques de estudio en los turnos libres de lo que queda de la semana.
+    // Si hay un examen o una entrega, los bloques de antes llevan su nombre.
+    public function armarSemana(Request $request)
+    {
+        $yo = $request->user();
+        $cuantos = (int) $request->validate(['bloques' => ['required', 'integer', 'in:3,5,7']])['bloques'];
+        $hoy = now('America/Lima');
+        $inicio = $hoy->isSunday() ? $hoy->copy()->addDay()->startOfDay() : $hoy->copy()->startOfDay();
+        $fin = $inicio->copy()->next(Carbon::SATURDAY)->endOfDay();
+        if ($inicio->isSaturday()) {
+            $fin = $inicio->copy()->endOfDay();
+        }
+
+        $nombres = [1 => 'lunes', 2 => 'martes', 3 => 'miercoles', 4 => 'jueves', 5 => 'viernes', 6 => 'sabado'];
+        $horas = ['tarde' => ['15:00', '17:00'], 'noche' => ['19:00', '21:00'], 'manana' => ['09:00', '11:00']];
+        $ocupados = $yo->horarios->map(fn ($h) => $h->dia . '-' . $h->turno)->all();
+        foreach ($yo->postulaciones()->where('estado', 'aceptada')->with('trabajo.horarios')->get() as $p) {
+            foreach ($p->trabajo->horarios as $h) {
+                $ocupados[] = $h->dia . '-' . $h->turno;
+            }
+        }
+        $yaTiene = [];
+        $metas = [];
+        foreach ($yo->actividades as $a) {
+            foreach ($a->fechasEntre($inicio, $fin->copy()->addDays(7)) as $dia) {
+                if ($a->hora_inicio) {
+                    $yaTiene[] = $dia->toDateString() . '-' . substr($a->hora_inicio, 0, 2);
+                }
+                if (in_array($a->tipo, ['examen', 'entrega'])) {
+                    $metas[] = [$dia->copy(), $a->titulo];
+                }
+            }
+        }
+        usort($metas, fn ($x, $y) => $x[0] <=> $y[0]);
+
+        // turnos libres de lo que queda de la semana (los de hoy, solo si todavía no pasaron)
+        $libres = [];
+        for ($dia = $inicio->copy(); $dia->lte($fin); $dia->addDay()) {
+            if (! isset($nombres[$dia->dayOfWeekIso])) {
+                continue;
+            }
+            foreach ($horas as $turno => [$desde, $hasta]) {
+                $clave = $nombres[$dia->dayOfWeekIso] . '-' . $turno;
+                $empieza = $dia->copy()->setTimeFromTimeString($desde);
+                if (in_array($clave, $ocupados) || in_array($dia->toDateString() . '-' . substr($desde, 0, 2), $yaTiene) || $empieza->lt($hoy)) {
+                    continue;
+                }
+                $libres[] = [$dia->copy(), $desde, $hasta, $turno];
+            }
+        }
+        // primero tarde y noche, repartidos en días distintos
+        usort($libres, fn ($x, $y) => [array_search($x[3], array_keys($horas)), $x[0]] <=> [array_search($y[3], array_keys($horas)), $y[0]]);
+        $elegidos = [];
+        $dias = [];
+        foreach ($libres as $l) {
+            if (count($elegidos) >= $cuantos) {
+                break;
+            }
+            if (! in_array($l[0]->toDateString(), $dias) || count($dias) >= count(array_unique(array_map(fn ($x) => $x[0]->toDateString(), $libres)))) {
+                $elegidos[] = $l;
+                $dias[] = $l[0]->toDateString();
+            }
+        }
+        foreach ($libres as $l) {   // si faltan, se completa con lo que quede
+            if (count($elegidos) >= $cuantos) {
+                break;
+            }
+            if (! in_array($l, $elegidos, true)) {
+                $elegidos[] = $l;
+            }
+        }
+
+        foreach ($elegidos as [$dia, $desde, $hasta]) {
+            $meta = collect($metas)->first(fn ($m) => $m[0]->gt($dia));
+            $yo->actividades()->create([
+                'titulo' => $meta ? 'Estudiar para: ' . \Illuminate\Support\Str::limit($meta[1], 60, '') : 'Bloque de estudio',
+                'tipo' => 'estudio', 'fecha' => $dia->toDateString(), 'hora_inicio' => $desde, 'hora_fin' => $hasta, 'repetir' => 'no',
+                'nota' => 'Lo armó TAMPU en un turno libre. Cámbialo o muévelo si quieres.',
+            ]);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'creados' => count($elegidos),
+            'mensaje' => count($elegidos) ? 'Listo: agregamos ' . count($elegidos) . ' bloques de estudio en tus turnos libres.' : 'No encontramos turnos libres esta semana. ¡Estás a full!',
+        ]);
+    }
+
     // lo que viene en los próximos 14 días, para la columna del planificador
     public function proximas(Request $request)
     {

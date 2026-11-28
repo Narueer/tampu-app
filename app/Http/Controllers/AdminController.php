@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contacto;
+use App\Models\Documento;
 use App\Models\EventoSeguridad;
 use App\Models\Habitacion;
 use App\Models\Postulacion;
@@ -13,6 +14,7 @@ use App\Models\Usuario;
 use App\Notifications\Aviso;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Support\Respaldo;
 
 class AdminController extends Controller
 {
@@ -212,6 +214,113 @@ class AdminController extends Controller
             'acceso_denegado' => EventoSeguridad::where('tipo', 'acceso_denegado')->where('created_at', '>=', $desde)->count(),
         ];
 
-        return view('admin.seguridad', compact('eventos', 'resumen', 'tipo', 'correos'));
+        try {
+            $respaldos = Respaldo::lista();
+        } catch (\Throwable $e) {
+            report($e);
+            $respaldos = null;   // no se pudo leer la carpeta (por ejemplo, Supabase sin configurar)
+        }
+
+        return view('admin.seguridad', compact('eventos', 'resumen', 'tipo', 'correos', 'respaldos'));
+    }
+
+    // eliminar una cuenta para siempre (solo el admin; nunca a otro admin ni a sí mismo)
+    public function eliminarUsuario(Request $request, Usuario $usuario)
+    {
+        abort_if($usuario->rol === 'admin' || $usuario->id === $request->user()->id, 403);
+        $request->validate(['confirmar' => 'required|in:ELIMINAR'], ['confirmar.in' => 'Escribe ELIMINAR en mayúsculas para confirmar.']);
+
+        // antes de borrar, una copia de seguridad por si fue un error
+        try {
+            Respaldo::crear('antes de eliminar a ' . $usuario->email);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        EventoSeguridad::registrar('usuario_eliminado', $usuario->nombre . ' <' . $usuario->email . '> (' . $usuario->rol . ')', $request->user());
+
+        // sus archivos privados (DNI o RUC)
+        if ($usuario->documento) {
+            Storage::disk('documentos')->delete($usuario->documento);
+        }
+        $nombre = $usuario->nombre;
+        $usuario->delete();   // sus cuartos, trabajos, mensajes, etc. se borran en cascada
+
+        return redirect()->route('admin.usuarios')->with('ok', 'La cuenta de ' . $nombre . ' fue eliminada. Se guardó una copia de seguridad antes, por si acaso.');
+    }
+
+    // constancias emitidas
+    public function documentos(Request $request)
+    {
+        $consulta = Documento::with('usuario')
+            ->when($request->filled('buscar'), fn ($q) => $q->where(fn ($q) => $q->whereLike('codigo', '%' . strtoupper(trim($request->buscar)) . '%')
+                ->orWhereHas('usuario', fn ($u) => $u->whereLike('nombre', '%' . trim($request->buscar) . '%'))))
+            ->when($request->estado === 'anuladas', fn ($q) => $q->whereNotNull('revocado_at'))
+            ->when($request->estado === 'vigentes', fn ($q) => $q->whereNull('revocado_at'));
+        $documentos = $this->entreFechas($consulta, $request)->latest()->paginate(25)->withQueryString();
+
+        return view('admin.documentos', compact('documentos'));
+    }
+
+    public function anularDocumento(Request $request, Documento $documento)
+    {
+        if ($documento->revocado_at) {
+            $documento->update(['revocado_at' => null, 'motivo_revocacion' => null]);
+            EventoSeguridad::registrar('documento_reactivado', $documento->codigo);
+
+            return back()->with('ok', 'La constancia ' . $documento->codigo . ' vuelve a estar vigente.');
+        }
+        $datos = $request->validate(['motivo' => 'nullable|string|max:200']);
+        $documento->update(['revocado_at' => now(), 'motivo_revocacion' => $datos['motivo'] ?? 'anulada por el administrador']);
+        EventoSeguridad::registrar('documento_anulado', $documento->codigo . ' · ' . ($datos['motivo'] ?? ''));
+
+        return back()->with('ok', 'Constancia ' . $documento->codigo . ' anulada. Si alguien escanea su QR verá que ya no es válida.');
+    }
+
+    public function eliminarDocumento(Documento $documento)
+    {
+        EventoSeguridad::registrar('documento_eliminado', $documento->codigo);
+        $documento->delete();
+
+        return back()->with('ok', 'Constancia eliminada. Si el estudiante la vuelve a descargar, saldrá con un código nuevo.');
+    }
+
+    public function crearRespaldo()
+    {
+        $ruta = Respaldo::crear('manual, desde el panel');
+        EventoSeguridad::registrar('respaldo', basename($ruta) . ' (manual)');
+
+        return back()->with('ok', 'Copia de seguridad creada: ' . basename($ruta));
+    }
+
+    public function descargarRespaldo(string $archivo)
+    {
+        abort_unless(preg_match('/^tampu-[0-9-]+$/', $archivo), 404);
+        $archivo .= '.json.gz';
+        $ruta = Respaldo::CARPETA . '/' . $archivo;
+        abort_unless(Storage::disk('documentos')->exists($ruta), 404);
+        EventoSeguridad::registrar('respaldo_descargado', $archivo);
+
+        return Storage::disk('documentos')->download($ruta, $archivo);
+    }
+
+    // volver a una copia (Render gratis no tiene consola, por eso se hace desde aquí)
+    public function restaurarRespaldo(Request $request, string $archivo)
+    {
+        abort_unless(preg_match('/^tampu-[0-9-]+$/', $archivo), 404);
+        $archivo .= '.json.gz';
+        $request->validate(['confirmar' => 'required|in:RESTAURAR'], ['confirmar.in' => 'Escribe RESTAURAR en mayúsculas para confirmar.']);
+        $ruta = Respaldo::CARPETA . '/' . $archivo;
+        abort_unless(Storage::disk('documentos')->exists($ruta), 404);
+
+        $antes = Respaldo::crear('antes de restaurar ' . $archivo);
+        $admin = $request->user()->email;
+        $resumen = Respaldo::restaurar($ruta);
+        EventoSeguridad::create(['tipo' => 'respaldo_restaurado', 'email' => $admin, 'detalle' => $archivo . ' (copia previa: ' . basename($antes) . ')', 'ip' => $request->ip()]);
+
+        // la sesión puede haber cambiado con los datos viejos: se vuelve a entrar
+        auth()->logout();
+        $request->session()->invalidate();
+
+        return redirect()->route('login')->with('ok', 'Datos restaurados desde ' . $archivo . ' (' . array_sum($resumen) . ' filas). Antes se guardó una copia de lo que había. Vuelve a iniciar sesión.');
     }
 }

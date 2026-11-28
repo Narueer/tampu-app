@@ -36,6 +36,13 @@ class EventoSeguridad extends Model
         'dos_pasos_desactivado' => ['Desactivó la verificación en dos pasos', true],
         'dos_pasos_fallido' => ['Código de dos pasos incorrecto', true],
         'codigo_respaldo' => ['Entró con un código de respaldo', true],
+        'respaldo' => ['Copia de seguridad creada', false],
+        'respaldo_descargado' => ['Descargó una copia de seguridad', true],
+        'respaldo_restaurado' => ['Restauró una copia de seguridad', true],
+        'usuario_eliminado' => ['Cuenta eliminada por el admin', true],
+        'documento_anulado' => ['Constancia anulada', true],
+        'documento_reactivado' => ['Constancia reactivada', false],
+        'documento_eliminado' => ['Constancia eliminada', true],
     ];
 
     public function usuario()
@@ -73,5 +80,14 @@ class EventoSeguridad extends Model
     {
         Usuario::where('rol', 'admin')->get()
             ->each(fn ($admin) => $admin->notify(new Aviso($texto, route('admin.seguridad'), 'shield-exclamation')));
+
+        // también al correo del equipo, como mucho uno cada 10 minutos por el mismo motivo
+        if (\Illuminate\Support\Facades\Cache::add('alerta-correo:' . md5($texto), 1, now()->addMinutes(10))) {
+            \App\Support\CorreoAdmin::enviar('Alerta de seguridad', 'Seguridad', [
+                'Qué pasó' => $texto,
+                'IP' => request()->ip(),
+                'Cuándo' => now('America/Lima')->format('d/m/Y H:i'),
+            ], 'Revisa la bitácora de seguridad por si se repite.', route('admin.seguridad'), 'Ver la bitácora');
+        }
     }
 }

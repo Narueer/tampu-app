@@ -78,6 +78,20 @@
                                     <button class="btn btn-borde btn-chico btn-alerta">Suspender</button>
                                 @endif
                             </form>
+                            @unless ($u->rol === 'admin' || $u->id === auth()->id())
+                            <details class="eliminar-cuenta">
+                                <summary class="btn btn-borde btn-chico btn-peligro"><i class="bi bi-trash"></i> Eliminar</summary>
+                                <form action="{{ route('admin.usuarios.eliminar', $u) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <p>Se borra la cuenta con sus publicaciones, mensajes y solicitudes. Antes se guarda una copia de seguridad.</p>
+                                    <label>Escribe <b>ELIMINAR</b> para confirmar
+                                        <input name="confirmar" autocomplete="off" required pattern="ELIMINAR" aria-label="Escribe ELIMINAR">
+                                    </label>
+                                    <button class="btn btn-chico btn-peligro-lleno">Eliminar para siempre</button>
+                                </form>
+                            </details>
+                            @endunless
                         </td>
                     </tr>
                 @endforeach

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Documento;
 use App\Models\Postulacion;
 use App\Models\Solicitud;
+use App\Support\Qr;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -15,16 +17,24 @@ class ConstanciaController extends Controller
         abort_unless($solicitud->estado === 'aceptada', 404);
         abort_unless(in_array($yo->id, [$solicitud->usuario_id, $solicitud->habitacion->usuario_id]), 403);
 
-        $pdf = Pdf::setOption(['isFontSubsettingEnabled' => true])->loadView('pdf.constancia', [
-            'tipo' => 'visita',
-            'codigo' => 'TMP-V-' . str_pad($solicitud->id, 5, '0', STR_PAD_LEFT),
-            'estudiante' => $solicitud->estudiante,
-            'contraparte' => $solicitud->habitacion->arrendador,
-            'solicitud' => $solicitud,
-            'habitacion' => $solicitud->habitacion,
+        $h = $solicitud->habitacion;
+        $documento = $this->emitir('visita', $solicitud->id, $solicitud->usuario_id, [
+            'estudiante' => $solicitud->estudiante->nombre,
+            'dni' => $solicitud->estudiante->dni,
+            'contraparte' => $h->arrendador->nombre,
+            'que' => $h->titulo,
+            'donde' => $h->distrito,
+            'aceptada' => $solicitud->updated_at->toIso8601String(),
+            'extra' => 'Visita para el ' . $solicitud->fecha_visita->translatedFormat('j \d\e F \d\e Y'),
         ]);
 
-        return $pdf->download('constancia-visita-' . $solicitud->id . '.pdf');
+        return $this->pdf($documento, 'constancia-visita-' . $solicitud->id . '.pdf', [
+            'tipo' => 'visita',
+            'estudiante' => $solicitud->estudiante,
+            'contraparte' => $h->arrendador,
+            'solicitud' => $solicitud,
+            'habitacion' => $h,
+        ]);
     }
 
     public function postulacion(Request $request, Postulacion $postulacion)
@@ -33,54 +43,92 @@ class ConstanciaController extends Controller
         abort_unless($postulacion->estado === 'aceptada', 404);
         abort_unless(in_array($yo->id, [$postulacion->usuario_id, $postulacion->trabajo->usuario_id]), 403);
 
-        $pdf = Pdf::setOption(['isFontSubsettingEnabled' => true])->loadView('pdf.constancia', [
-            'tipo' => 'postulacion',
-            'codigo' => 'TMP-P-' . str_pad($postulacion->id, 5, '0', STR_PAD_LEFT),
-            'estudiante' => $postulacion->estudiante,
-            'contraparte' => $postulacion->trabajo->empleador,
-            'postulacion' => $postulacion,
-            'trabajo' => $postulacion->trabajo,
+        $t = $postulacion->trabajo;
+        $documento = $this->emitir('postulacion', $postulacion->id, $postulacion->usuario_id, [
+            'estudiante' => $postulacion->estudiante->nombre,
+            'dni' => $postulacion->estudiante->dni,
+            'contraparte' => $t->empresa,
+            'que' => $t->titulo,
+            'donde' => $t->empresa,
+            'aceptada' => $postulacion->updated_at->toIso8601String(),
+            'extra' => ucfirst($t->modalidad) . ' · ' . $t->horarioTexto(),
         ]);
 
-        return $pdf->download('constancia-postulacion-' . $postulacion->id . '.pdf');
+        return $this->pdf($documento, 'constancia-postulacion-' . $postulacion->id . '.pdf', [
+            'tipo' => 'postulacion',
+            'estudiante' => $postulacion->estudiante,
+            'contraparte' => $t->empleador,
+            'postulacion' => $postulacion,
+            'trabajo' => $t,
+        ]);
     }
 
-    // página pública para comprobar que una constancia es real (el código está impreso en el PDF)
-    public function verificar(string $codigo)
+    // página que abre el QR: dice si la constancia es auténtica y sigue vigente
+    public function verificar(Request $request, string $codigo)
     {
         $codigo = strtoupper(trim($codigo));
+        $documento = Documento::where('codigo', $codigo)->first();
         $datos = null;
 
-        if (preg_match('/^TMP-([VP])-(\d{1,9})$/', $codigo, $m)) {
-            $id = (int) $m[2];
-            if ($m[1] === 'V' && ($s = Solicitud::with('habitacion', 'estudiante')->find($id)) && $s->estado === 'aceptada') {
-                $datos = [
-                    'tipo' => 'Visita aceptada',
-                    'estudiante' => $s->estudiante,
-                    'que' => $s->habitacion->titulo,
-                    'donde' => $s->habitacion->distrito,
-                    'fecha' => $s->updated_at,
-                    'extra' => 'Visita programada para el ' . $s->fecha_visita->translatedFormat('j \d\e F \d\e Y'),
-                ];
-            }
-            if ($m[1] === 'P' && ($p = Postulacion::with('trabajo', 'estudiante')->find($id)) && $p->estado === 'aceptada') {
-                $datos = [
-                    'tipo' => 'Postulación aceptada',
-                    'estudiante' => $p->estudiante,
-                    'que' => $p->trabajo->titulo,
-                    'donde' => $p->trabajo->empresa,
-                    'fecha' => $p->updated_at,
-                    'extra' => ucfirst($p->trabajo->modalidad),
-                ];
-            }
+        if ($documento) {
+            $documento->increment('verificaciones');
+            $d = $documento->datos;
+            // del estudiante solo el primer nombre y la inicial; el DNI con asteriscos
+            $partes = preg_split('/\s+/', trim($d['estudiante'] ?? ''));
+            $datos = [
+                'tipo' => $documento->tipo === 'visita' ? 'Visita aceptada' : 'Postulación aceptada',
+                'nombre' => $partes[0] . (isset($partes[1]) ? ' ' . mb_substr($partes[1], 0, 1) . '.' : ''),
+                'dni' => isset($d['dni']) ? '••••' . substr($d['dni'], -4) : '—',
+                'que' => $d['que'] ?? '—',
+                'donde' => $d['donde'] ?? '—',
+                'extra' => $d['extra'] ?? '',
+                'fecha' => \Illuminate\Support\Carbon::parse($d['aceptada'] ?? $documento->created_at),
+                'emitida' => $documento->created_at,
+                'vigente' => $documento->vigente() && $this->sigueAceptada($documento),
+                'motivo' => $documento->motivo_revocacion,
+            ];
         }
 
-        // del estudiante solo se muestra el primer nombre y la inicial del apellido
-        if ($datos) {
-            $partes = preg_split('/\s+/', trim($datos['estudiante']->nombre));
-            $datos['nombre'] = $partes[0] . (isset($partes[1]) ? ' ' . mb_substr($partes[1], 0, 1) . '.' : '');
-        }
+        return view('constancia-verificar', ['codigo' => $codigo, 'datos' => $datos, 'documento' => $documento]);
+    }
 
-        return view('constancia-verificar', ['codigo' => $codigo, 'datos' => $datos]);
+    // el formulario "verificar otro código" y los enlaces viejos
+    public function buscar(Request $request, ?string $codigo = null)
+    {
+        $codigo = strtoupper(trim($codigo ?? (string) $request->query('codigo')));
+
+        return $codigo ? redirect()->route('documento.verificar', $codigo) : redirect()->route('inicio');
+    }
+
+    private function emitir(string $tipo, int $id, int $usuarioId, array $datos): Documento
+    {
+        $documento = Documento::firstOrCreate(
+            ['tipo' => $tipo, 'referencia_id' => $id],
+            ['codigo' => Documento::nuevoCodigo($tipo), 'usuario_id' => $usuarioId, 'datos' => $datos]
+        );
+        $documento->increment('descargas');
+
+        return $documento;
+    }
+
+    private function pdf(Documento $documento, string $archivo, array $vista)
+    {
+        abort_if($documento->revocado_at, 410, 'Esta constancia fue anulada por el administrador.');
+
+        $pdf = Pdf::setOption(['isFontSubsettingEnabled' => true])->loadView('pdf.constancia', $vista + [
+            'codigo' => $documento->codigo,
+            'verificar' => $documento->url(),
+            'qr' => Qr::dataUri($documento->url(), '#1f2a24'),
+            'emitida' => $documento->created_at,
+        ]);
+
+        return $pdf->download($archivo);
+    }
+
+    private function sigueAceptada(Documento $documento): bool
+    {
+        $modelo = $documento->tipo === 'visita' ? Solicitud::find($documento->referencia_id) : Postulacion::find($documento->referencia_id);
+
+        return $modelo && $modelo->estado === 'aceptada';
     }
 }

@@ -23,6 +23,9 @@ class AvisoCorreo extends Notification
             'house-door' => 'Visitas',
             'briefcase' => 'Trabajos',
             'patch-check' => 'Tu cuenta',
+            'calendar-check' => 'Planificador',
+            'flag' => 'Reporte',
+            'shield-exclamation' => 'Seguridad',
             default => 'Aviso',
         };
 
