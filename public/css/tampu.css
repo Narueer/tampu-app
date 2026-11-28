@@ -324,3 +324,7 @@ table td { border-color: #e7e6df !important; }
 .como-num, .pregunta-numero, .consejos li > span:first-child { color: var(--ocre-texto) !important; }
 .tarjeta .precio-foto small { color: #5c5c55 !important; opacity: 1 !important; }
 .mia > small, .mia small, .mensaje.mio small { color: #e1e6df !important; opacity: 1 !important; }
+
+/* "¿Cómo funciona?": la ilustración siempre entra completa en su recuadro */
+.como-ilustracion { display: flex !important; align-items: center; justify-content: center; overflow: hidden; }
+.como-ilustracion img { height: 100% !important; width: auto !important; max-width: 100% !important; object-fit: contain; }
