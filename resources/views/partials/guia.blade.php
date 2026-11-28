@@ -83,10 +83,17 @@
             <i class="bi bi-signpost-split"></i><span>Guía</span>
         </button>
     @endif
-    <button type="button" id="btnMusica" class="control-flotante" aria-pressed="false" aria-label="Música de fondo" title="Música andina (puedes apagarla cuando quieras)"
-            data-src="{{ asset('audio/andina.mp3') }}">
-        <i class="bi bi-music-note-beamed"></i><span class="ondas" aria-hidden="true"><i></i><i></i><i></i></span>
-    </button>
+    <div class="musica" id="musica">
+        <button type="button" id="btnMusica" class="control-flotante" aria-pressed="false" aria-label="Música de fondo: reproducir o pausar" title="Música andina (puedes apagarla cuando quieras)"
+                data-src="{{ asset('audio/andina.mp3') }}?v={{ @filemtime(public_path('audio/andina.mp3')) }}">
+            <i class="bi bi-music-note-beamed"></i><span class="ondas" aria-hidden="true"><i></i><i></i><i></i></span>
+        </button>
+        <label class="musica-volumen" hidden>
+            <span class="visually-hidden">Volumen de la música</span>
+            <i class="bi bi-volume-down" aria-hidden="true"></i>
+            <input type="range" id="musicaVolumen" min="0" max="100" step="5" value="35">
+        </label>
+    </div>
 </div>
 
 @if ($pasos)

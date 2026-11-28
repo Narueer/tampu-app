@@ -28,7 +28,7 @@ blockquote {
 }
 
 a {
-    color: #17352f;
+    color: #34483e;
 }
 
 a img {
@@ -38,7 +38,7 @@ a img {
 /* Typography */
 
 h1 {
-    color: #17352f;
+    color: #34483e;
     font-size: 18px;
     font-weight: bold;
     margin-top: 0;
@@ -103,7 +103,7 @@ img {
 }
 
 .header a {
-    color: #17352f;
+    color: #34483e;
     font-size: 19px;
     font-weight: bold;
     text-decoration: none;
@@ -239,11 +239,11 @@ img {
 
 .button-blue,
 .button-primary {
-    background-color: #b0502a;
-    border-bottom: 8px solid #b0502a;
-    border-left: 18px solid #b0502a;
-    border-right: 18px solid #b0502a;
-    border-top: 8px solid #b0502a;
+    background-color: #465548;
+    border-bottom: 8px solid #465548;
+    border-left: 18px solid #465548;
+    border-right: 18px solid #465548;
+    border-top: 8px solid #465548;
 }
 
 .button-green,
@@ -267,7 +267,7 @@ img {
 /* Panels */
 
 .panel {
-    border-left: #b0502a solid 4px;
+    border-left: #465548 solid 4px;
     margin: 21px 0;
 }
 
@@ -299,5 +299,5 @@ img {
 /* TAMPU */
 .header img.logo-tampu { width: 44px; height: 44px; vertical-align: middle; margin-right: 8px; border-radius: 50%; }
 .header a { font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 700; }
-.inner-body { border-top: 5px solid #b0502a; }
-h1 { color: #17352f; font-family: Georgia, 'Times New Roman', serif; }
+.inner-body { border-top: 5px solid #465548; }
+h1 { color: #34483e; font-family: Georgia, 'Times New Roman', serif; }

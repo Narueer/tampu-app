@@ -210,7 +210,7 @@
             const urlGuardar = @json(auth()->check() ? route('presupuesto.guardar') : null);
             const urlCuartos = @json(route('habitaciones.index'));
             const urlLogin = @json(route('login'));
-            const COLORES = ['#b0502a', '#c99a2e', '#17352f', '#3f7a6b', '#7a3b52', '#5b6c8f', '#8a6a4f', '#2f6f8f', '#a35d76', '#6b8f3f'];
+            const COLORES = ['#465548', '#b58a4a', '#53677a', '#879484', '#965c57', '#a66d53', '#6f7d6a', '#8a7a5c', '#3f5560', '#b9a888'];
             const ICONOS = ['wallet2', 'cart', 'bag', 'basket', 'cup-hot', 'egg-fried', 'bus-front', 'phone', 'wifi', 'lightning-charge', 'journal-text', 'emoji-smile', 'heart-pulse', 'capsule', 'bicycle', 'fire', 'play-btn', 'signpost-2', 'gift', 'piggy-bank'];
             let p = P.leer() || P.porDefecto();
             const desdeServidor = !!window.TAMPU_PRESU;

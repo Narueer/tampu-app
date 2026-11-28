@@ -22,7 +22,7 @@
     <link rel="icon" href="{{ asset('img/favicon.png') }}">
     <!-- para instalarla como app en el celular -->
     <link rel="manifest" href="{{ asset('manifest.json') }}">
-    <meta name="theme-color" content="#17352f">
+    <meta name="theme-color" content="#34483e">
     <link rel="apple-touch-icon" href="{{ asset('img/apple-touch-icon.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -36,7 +36,7 @@
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ filemtime(public_path('css/estilos.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/tema.css') }}?v={{ filemtime(public_path('css/tema.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/andino.css') }}?v={{ filemtime(public_path('css/andino.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/vivo.css') }}?v={{ filemtime(public_path('css/vivo.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/tampu.css') }}?v={{ filemtime(public_path('css/tampu.css')) }}">
     <script>document.documentElement.classList.add('con-js');</script>
     @stack('estilos')
 </head>

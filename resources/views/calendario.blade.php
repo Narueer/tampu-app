@@ -10,15 +10,15 @@
 
         <div class="leyenda">
             @if (auth()->user()->rol === 'estudiante')
-                <span><i class="punto" style="background:#1f3d36"></i> Clases</span>
-                <span><i class="punto" style="background:#b4532a"></i> Turnos de trabajo</span>
+                <span><i class="punto" style="background:#34483e"></i> Clases</span>
+                <span><i class="punto" style="background:#965c57"></i> Turnos de trabajo</span>
                 <span><i class="punto" style="background:#2e7d5b"></i> Visita aceptada</span>
                 <span><i class="punto" style="background:#c99a2e"></i> Visita pendiente</span>
             @elseif (auth()->user()->rol === 'arrendador')
                 <span><i class="punto" style="background:#2e7d5b"></i> Visita aceptada</span>
                 <span><i class="punto" style="background:#c99a2e"></i> Visita pendiente</span>
             @else
-                <span><i class="punto" style="background:#b4532a"></i> Turnos de tus ofertas (entre paréntesis, los estudiantes aceptados)</span>
+                <span><i class="punto" style="background:#965c57"></i> Turnos de tus ofertas (entre paréntesis, los estudiantes aceptados)</span>
             @endif
         </div>
 

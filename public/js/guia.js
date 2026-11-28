@@ -6,7 +6,22 @@
 
     /* ---------------- música ---------------- */
     const btnMusica = document.getElementById("btnMusica");
-    let audio = null;
+    const panelVol = document.querySelector(".musica-volumen");
+    const rangoVol = document.getElementById("musicaVolumen");
+    let audio = null, fundido = null;
+    let volumen = Math.min(1, Math.max(0, parseFloat(leer("musica.vol") ?? "0.35")));
+    if (isNaN(volumen)) volumen = 0.35;
+    if (rangoVol) rangoVol.value = Math.round(volumen * 100);
+    // sube o baja el volumen de a poco (entrada y salida suaves)
+    function fundir(hasta, alTerminar) {
+        clearInterval(fundido);
+        fundido = setInterval(() => {
+            const v = audio.volume + (hasta > audio.volume ? 0.02 : -0.03);
+            if ((hasta > audio.volume && v >= hasta) || (hasta <= audio.volume && v <= hasta)) {
+                audio.volume = Math.max(0, Math.min(1, hasta)); clearInterval(fundido); alTerminar && alTerminar();
+            } else audio.volume = Math.max(0, Math.min(1, v));
+        }, 70);
+    }
     function musica(prender) {
         if (!btnMusica) return;
         if (prender) {
@@ -14,30 +29,33 @@
                 audio = new Audio(btnMusica.dataset.src);
                 audio.loop = true;
                 audio.volume = 0;
+                const pos = parseFloat(leer("musica.pos") || "0");
+                if (pos) audio.currentTime = pos;
             }
-            // retoma donde se quedó (en otra página) para que no empiece siempre igual
-            const pos = parseFloat(leer("musica.pos") || "0");
-            if (pos && !audio.currentTime) audio.currentTime = pos;
-            audio.play().then(() => {
-                // sube el volumen de a poco
-                let v = 0;
-                const subir = setInterval(() => { v = Math.min(0.35, v + 0.02); audio.volume = v; if (v >= 0.35) clearInterval(subir); }, 80);
-            }).catch(() => {});
+            audio.play().then(() => fundir(volumen)).catch(() => {});
         } else if (audio) {
-            audio.pause();
+            guardar("musica.pos", String(audio.currentTime));
+            fundir(0, () => audio.pause());
         }
         btnMusica.classList.toggle("sonando", prender);
         btnMusica.setAttribute("aria-pressed", prender ? "true" : "false");
+        if (panelVol) panelVol.hidden = !prender;
         guardar("musica", prender ? "1" : "0");
     }
     if (btnMusica) {
         btnMusica.addEventListener("click", () => musica(!btnMusica.classList.contains("sonando")));
+        rangoVol?.addEventListener("input", () => {
+            volumen = rangoVol.value / 100;
+            guardar("musica.vol", String(volumen));
+            if (audio) { clearInterval(fundido); audio.volume = volumen; }
+            panelVol.querySelector(".bi").className = "bi " + (volumen === 0 ? "bi-volume-mute" : volumen < 0.5 ? "bi-volume-down" : "bi-volume-up");
+        });
         // los navegadores no dejan sonar música sin que la persona toque algo: si la tenía prendida,
-        // vuelve a sonar con su primer clic en la página
+        // vuelve a sonar con su primer clic en la página (nunca suena sola al entrar por primera vez)
         if (leer("musica") === "1") {
             btnMusica.classList.add("pendiente");
             const alPrimerToque = (e) => {
-                if (e.target.closest("#btnMusica")) return;
+                if (e.target.closest("#musica")) return;
                 btnMusica.classList.remove("pendiente");
                 musica(true);
             };

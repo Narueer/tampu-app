@@ -1,0 +1,326 @@
+/* =====================================================================
+   TAMPU · sistema de diseño "andino contemporáneo"
+   Un solo lugar para colores, letras, espacios, bordes, sombras y componentes.
+   Se carga al final: redefine las variables que usan estilos.css, tema.css y andino.css,
+   así toda la plataforma (portada, paneles, formularios) comparte la misma identidad.
+   ===================================================================== */
+:root {
+    /* paleta base: materiales naturales de los Andes */
+    --molle: #465548;          /* color de identidad de TAMPU */
+    --profundo: #34483e;
+    --salvia: #879484;         /* solo fondos, bordes y adornos: no alcanza contraste para texto */
+    --arena: #d8cbb5;
+    --marfil: #f5f3ed;
+    --piedra: #d8d8d1;
+    --carbon: #343936;
+    --blanco: #ffffff;
+    /* colores culturales: solo detalles */
+    --cochinilla: #965c57;     /* palabra destacada de los títulos (4,8:1 sobre marfil) */
+    --ocre-andino: #b58a4a;    /* líneas, pallay, números decorativos (no texto pequeño) */
+    --anil: #53677a;
+    --terracota-andina: #a66d53;
+    --lana: #e8e0d1;
+    /* texto */
+    --t-titulo: #343936;
+    --t-subtitulo: #465548;
+    --t-general: #4b504b;
+    --t-secundario: #66665e;   /* un poco más oscuro que #77776f para pasar AA sobre marfil */
+    --t-deshabilitado: #96958c;
+    --t-sobre-oscuro: #f5f3ed;
+
+    /* variables que ya usaba la página: ahora apuntan a la nueva paleta */
+    --terracota: var(--molle);
+    --terracota-oscuro: var(--profundo);
+    --verde-andino: var(--profundo);
+    --fondo: var(--marfil);
+    --crema: var(--lana);
+    --crema-aviso: #f1ece2;
+    --papel: var(--blanco);
+    --adobe: #eee8dd;
+    --borde: var(--piedra);
+    --borde-input: #c7c7bd;
+    --tinta: var(--carbon);
+    --texto: var(--t-general);
+    --texto-suave: var(--t-secundario);
+    --ocre: var(--ocre-andino);
+    --ocre-claro: var(--lana);
+    --verificado-fondo: #e4e9e2;
+    --verificado-texto: var(--molle);
+    --estrella: var(--ocre-andino);
+    --error: #a2483d;
+    --error-fondo: #f6e6e2;
+
+    /* forma */
+    --radio: 8px;
+    --radio-grande: 12px;
+    --sombra: 0 1px 2px rgba(52, 57, 54, .05), 0 10px 26px -18px rgba(52, 57, 54, .28);
+    --sombra-fuerte: 0 1px 2px rgba(52, 57, 54, .06), 0 22px 40px -24px rgba(52, 57, 54, .38);
+    --espacio-seccion: clamp(64px, 8vw, 108px);
+
+    --bs-body-color: var(--t-general);
+    --bs-body-bg: var(--marfil);
+    --bs-link-color: var(--molle);
+    --bs-link-hover-color: var(--profundo);
+    --bs-border-color: var(--piedra);
+}
+
+/* ---------- base ---------- */
+body { background: var(--marfil); color: var(--t-general); }
+/* textura de papel muy suave */
+body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 2147483000; opacity: .045; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .27 0 0 0 0 .25 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@media print { body::after { display: none; } }
+a { color: var(--molle); }
+a:hover { color: var(--profundo); }
+::selection { background: var(--arena); color: var(--carbon); }
+:focus-visible { outline: 3px solid rgba(70, 85, 72, .45) !important; outline-offset: 2px; }
+
+/* ---------- letras ---------- */
+h1, h2, .titulo-pagina, .titulo-grande { font-family: var(--serif); font-weight: 700 !important; letter-spacing: -0.025em; color: var(--t-titulo); }
+h3, h4 { font-family: var(--serif); font-weight: 600 !important; color: var(--t-titulo); letter-spacing: -0.01em; }
+.encabezado-seccion h2, h2.titulo-grande, .titulo-grande { font-size: clamp(2rem, 3.8vw, 3rem) !important; line-height: 1.08 !important; }
+h1 em, h2 em, h3 em { color: var(--cochinilla); font-style: italic !important; font-weight: 500 !important; }
+.texto-suave { color: var(--t-secundario) !important; }
+.seccion-historia h2 em, .armar h2 em, .banda-cta h2 em, .portada-carrusel h1 em, .portada-texto em, footer em { color: var(--arena) !important; }
+
+/* sobretítulo: letras espaciadas con una puntada delante */
+.sobretitulo {
+    display: inline-flex !important; align-items: center; gap: 10px; background: none !important; padding: 0 !important;
+    color: var(--molle) !important; font-size: .72rem !important; font-weight: 700 !important; letter-spacing: .22em !important;
+}
+.sobretitulo::before {
+    content: "" !important; width: 26px !important; height: 0 !important; border-top: 2px dashed var(--ocre-andino); background: none !important;
+    mask: none !important; -webkit-mask: none !important; transform: none !important; box-shadow: none !important; border-radius: 0 !important; display: inline-block !important;
+}
+.armar .sobretitulo, .seccion-historia .sobretitulo, .banda-cta .sobretitulo { color: var(--arena) !important; }
+
+/* pallay tejido: solo bajo los títulos marcados con .tejido (dos o tres en toda la portada) */
+.tejido h2::after {
+    content: ""; display: block; width: 132px; height: 14px; margin-top: 16px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='14' viewBox='0 0 36 14'%3E%3Cpath d='M0 7h4l3-3 3 3-3 3-3-3M10 7h4M14 7l4-4 4 4-4 4-4-4m4-2 2 2-2 2-2-2 2-2M22 7h4M26 7l3-3 3 3-3 3-3-3M32 7h4' fill='none' stroke='%23b58a4a' stroke-width='1.4'/%3E%3C/svg%3E") repeat-x;
+    clip-path: inset(0 100% 0 0); transition: clip-path 1.4s cubic-bezier(.65, 0, .35, 1) .3s;
+}
+.encabezado-seccion.tejido:not(.izquierda):not(.con-flechas) h2::after { margin-left: auto; margin-right: auto; }
+.tejido h2.tejido-listo::after, .tejido.visto h2::after { clip-path: inset(0 0 0 0); }
+
+/* títulos que suben palabra por palabra (efectos.js) */
+.subir-palabras .palabra { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em; }
+.subir-palabras .palabra > span { display: inline-block; transform: translateY(105%); transition: transform .85s cubic-bezier(.2, .8, .2, 1); transition-delay: calc(var(--i) * 60ms); }
+.subir-palabras.listo .palabra > span { transform: none; }
+
+/* ---------- botones ---------- */
+.btn { border-radius: var(--radio) !important; font-weight: 600 !important; }
+.btn:not(.btn-borde):not(.btn-claro):not(.btn-close):not(.btn-texto):not(.btn-link):not(.btn-secundario):not(.btn-peligro):not(.btn-externo) {
+    background: var(--molle) !important; border: 1px solid var(--molle) !important; color: var(--blanco) !important; box-shadow: none !important;
+    transition: background-color .2s, border-color .2s;
+}
+.btn:not(.btn-borde):not(.btn-claro):not(.btn-close):not(.btn-texto):not(.btn-link):not(.btn-secundario):not(.btn-peligro):not(.btn-externo):hover {
+    background: var(--profundo) !important; border-color: var(--profundo) !important; transform: none !important;
+}
+.btn-borde { background: transparent !important; border: 1px solid #bfbfb5 !important; color: var(--carbon) !important; }
+.btn-borde:hover { background: var(--arena) !important; border-color: var(--arena) !important; color: var(--carbon) !important; }
+.btn-secundario { background: var(--arena) !important; border: 1px solid var(--arena) !important; color: var(--carbon) !important; }
+.btn-claro { background: rgba(255, 255, 255, .1) !important; border: 1px solid rgba(245, 243, 237, .4) !important; color: var(--marfil) !important; }
+.btn-claro:hover { background: var(--marfil) !important; color: var(--profundo) !important; }
+.armar .btn-borde, .seccion-historia .btn-borde, .portada-carrusel .btn-borde, .portada-botones .btn-borde { color: var(--marfil) !important; border-color: rgba(245, 243, 237, .55) !important; }
+.armar .btn-borde:hover, .portada-botones .btn-borde:hover { background: var(--marfil) !important; color: var(--profundo) !important; }
+
+/* ---------- formularios ---------- */
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]), select, textarea {
+    border: 1px solid var(--borde-input) !important; border-radius: var(--radio) !important; background-color: var(--blanco) !important; color: var(--carbon) !important;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--molle) !important; box-shadow: 0 0 0 3px rgba(70, 85, 72, .16) !important; outline: none !important; }
+input[type=checkbox], input[type=radio], input[type=range] { accent-color: var(--molle); }
+label { color: var(--carbon); }
+
+/* ---------- etiquetas ---------- */
+.etiqueta { border-radius: 4px !important; font-weight: 600 !important; font-size: .74rem !important; letter-spacing: .01em; background: var(--adobe) !important; color: var(--carbon) !important; border: 0 !important; }
+.etiqueta.verificado { background: var(--verificado-fondo) !important; color: var(--molle) !important; }
+.etiqueta-visitado { background: #e6ebf0 !important; color: var(--anil) !important; }
+.etiqueta-nuevo { background: var(--lana) !important; color: var(--cochinilla) !important; }
+.etiqueta-presu.entra { background: var(--verificado-fondo) !important; color: var(--molle) !important; }
+.etiqueta-presu.pasa { background: var(--error-fondo) !important; color: var(--error) !important; }
+
+/* ---------- tarjetas (una sola forma para toda la plataforma) ---------- */
+.tarjeta, .tarjeta-trabajo, .tarjeta-uni, .caja, .institutos, .opinion {
+    background: var(--blanco) !important; border: 1px solid var(--piedra) !important; border-radius: var(--radio-grande) !important; box-shadow: var(--sombra) !important;
+}
+.tarjeta::after, .tarjeta-trabajo::after, .pasos .paso::after { display: none !important; }   /* sin luz que sigue al cursor */
+.tarjeta, .tarjeta-trabajo, .tarjeta-uni { transition: box-shadow .3s, transform .3s, border-color .3s !important; }
+.tarjeta:hover, .tarjeta-trabajo:hover, .tarjeta-uni:hover { transform: translateY(-3px) !important; box-shadow: var(--sombra-fuerte) !important; border-color: #c9c9c0 !important; }
+
+/* cuartos: como una publicación inmobiliaria (foto grande, precio claro) */
+.tarjeta { overflow: hidden; padding: 0 !important; }
+.tarjeta .tarjeta-foto { margin: 0 !important; border-radius: 0 !important; aspect-ratio: 4 / 3; overflow: hidden; position: relative; }
+.tarjeta .tarjeta-foto img { width: 100%; height: 100%; object-fit: cover; border-radius: 0 !important; filter: sepia(.12) saturate(.94); transition: filter .6s, transform .9s cubic-bezier(.2, .8, .2, 1) !important; }
+.tarjeta:hover .tarjeta-foto img { filter: none; transform: scale(1.035); }
+.tarjeta .tarjeta-foto::after { display: none !important; }
+.tarjeta .precio-foto {
+    background: var(--blanco) !important; color: var(--carbon) !important; border-radius: 6px !important; font-family: var(--serif); font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .18) !important; padding: 5px 10px !important;
+}
+.tarjeta .precio-foto small { color: var(--t-secundario) !important; font-family: var(--sans, Inter, sans-serif); font-weight: 500; }
+.tarjeta .info { padding: 16px 18px 18px !important; }
+.tarjeta .info h3 { font-size: 1.08rem !important; line-height: 1.3; margin: 8px 0 6px; }
+.tarjeta .info p { color: var(--t-secundario); }
+.tarjeta .btn-borde { width: 100%; justify-content: center; }
+.btn-corazon { background: rgba(255, 255, 255, .92) !important; color: var(--cochinilla) !important; border: 0 !important; }
+
+/* trabajos: los datos se leen de un vistazo, sin cajitas */
+.tarjeta-trabajo { border-top: 1px solid var(--piedra) !important; padding: 20px !important; }
+.tarjeta-trabajo h3 { font-size: 1.1rem !important; }
+.trabajo-pago, .tarjeta-trabajo .pago, .tarjeta-trabajo strong { color: var(--molle) !important; }
+
+/* universidades */
+.tarjeta-uni { overflow: hidden; }
+.tarjeta-uni::before { display: none !important; }
+.tarjeta-uni img { filter: sepia(.15) saturate(.9); transition: filter .6s !important; }
+.tarjeta-uni:hover img { filter: none; }
+.chip-instituto { background: var(--blanco) !important; border: 1px solid var(--piedra) !important; color: var(--carbon) !important; border-radius: 6px !important; }
+
+/* ---------- números de TAMPU: cifras editoriales separadas por líneas finas ---------- */
+.seccion-numeros { background: transparent !important; }
+.seccion-numeros .row > div { background: none !important; box-shadow: none !important; border: 0 !important; position: relative; }
+.seccion-numeros .row > div + div::before { content: ""; position: absolute; left: 0; top: 20%; bottom: 20%; border-left: 1px solid var(--piedra); }
+.seccion-numeros .row > div::after { display: none !important; }
+.seccion-numeros .contador { font-family: var(--serif) !important; font-weight: 600 !important; color: var(--molle) !important; }
+@media (max-width: 767px) { .seccion-numeros .row > div:nth-child(3)::before { display: none; } }
+
+/* ---------- ¿Cómo funciona? : composición abierta, sin tarjetas ---------- */
+.como-paso { background: transparent !important; border: 0 !important; box-shadow: none !important; border-top: 1px solid var(--piedra) !important; border-radius: 0 !important; padding: 26px 6px 0 !important; overflow: visible; }
+.como-paso::before, .como-paso::after { display: none !important; }
+.como-paso:hover { transform: none !important; box-shadow: none !important; }
+.como-pasos::before { display: none !important; }
+.como-ilustracion { background: var(--lana) !important; border-radius: var(--radio-grande); margin: 0 0 18px !important; height: 210px !important; padding: 14px; }
+.como-num { position: static !important; display: block; font: italic 500 1rem/1 var(--serif) !important; color: var(--ocre-andino) !important; opacity: 1 !important; -webkit-text-stroke: 0 !important; margin-bottom: 14px; letter-spacing: .02em; }
+.como-num::after { content: " / 03"; color: var(--t-deshabilitado); }
+.como-etiqueta { display: none !important; }
+.como-paso h3 { font-size: 1.45rem !important; margin-bottom: 8px !important; }
+.como-enlace { background: none !important; padding: 0 0 2px !important; border-bottom: 1px solid currentColor; border-radius: 0 !important; color: var(--molle) !important; font-weight: 600; }
+.como-paso:hover .como-ilustracion img { transform: translateY(-4px); }
+@media (max-width: 991px) {
+    .como-paso { grid-template-columns: 120px 1fr !important; padding-top: 18px !important; }
+    .como-ilustracion { height: 112px !important; margin: 0 !important; padding: 8px; }
+}
+
+/* ---------- "por qué TAMPU": lista editorial ---------- */
+.lista-ventajas li { border-top: 1px solid var(--piedra) !important; background: none !important; box-shadow: none !important; padding: 14px 0 !important; margin: 0 !important; }
+.lista-ventajas li > .bi { background: var(--lana) !important; color: var(--molle) !important; border: 0 !important; border-radius: 50% !important; width: 40px !important; height: 40px !important;
+    display: inline-grid !important; place-items: center; font-size: 1.05rem !important; padding: 0 !important; }
+
+/* ---------- secciones: alternan fondo, nunca todas con tarjetas ---------- */
+.seccion { padding-top: var(--espacio-seccion); padding-bottom: var(--espacio-seccion); }
+.seccion.fondo-blanco { background: var(--blanco) !important; }
+.seccion-opiniones { background: var(--lana) !important; }
+.seccion-opiniones::before, .seccion-opiniones::after { display: none !important; }
+.seccion-opiniones .opinion { box-shadow: none !important; }
+.seccion-app { background: #e9ebe4 !important; }
+.armar, .seccion-historia { background-color: var(--profundo) !important; }
+.banda-cta { background: var(--profundo) !important; color: var(--marfil) !important; }
+.banda-cta h2 { color: var(--marfil) !important; }
+.banda-cta p { color: #cdd3cb !important; }
+.banda-cta .btn { background: var(--marfil) !important; color: var(--profundo) !important; border-color: var(--marfil) !important; }
+.banda-cta .btn:hover { background: var(--arena) !important; border-color: var(--arena) !important; }
+.banda-cta .modelo-pista { color: #cdd3cb !important; background: rgba(255, 255, 255, .08) !important; }
+.seccion-historia .hito-fecha { color: var(--arena) !important; font-style: italic; }
+.seccion-historia::before, .seccion-opiniones + section::before { display: none !important; }
+.pregunta-numero { background: none !important; color: var(--ocre-andino) !important; font-style: italic !important; font-weight: 600 !important; }
+.consejos li > span:first-child { color: var(--ocre-andino) !important; }
+
+/* ---------- efectos que sobraban ---------- */
+.paso-ilustracion img, .flotar-lento, .como-ilustracion img { animation: none !important; }
+.inclinable img { transform: none !important; }
+
+/* ---------- cabecera y pie ---------- */
+.menu a.activo:not(.menu-cta), nav a.activo:not(.menu-cta) { color: var(--molle) !important; font-weight: 600 !important; }
+#menu a.menu-cta { background-color: var(--carbon) !important; color: var(--marfil) !important; border-radius: var(--radio) !important; }
+#menu a.menu-cta:hover, #menu a.menu-cta.activo { background-color: var(--molle) !important; color: var(--blanco) !important; }
+.btn-peligro { background: transparent !important; border: 1px solid rgba(162, 72, 61, .5) !important; color: var(--error) !important; }
+.btn-peligro:hover { background: var(--error) !important; border-color: var(--error) !important; color: var(--blanco) !important; }
+footer, .pie { background-color: var(--profundo) !important; }
+
+/* ---------- paneles ---------- */
+.bienvenida { background-color: var(--profundo) !important; border-radius: var(--radio-grande) !important; box-shadow: none !important; position: relative; overflow: hidden; }
+.bienvenida::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; opacity: .55;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='6' viewBox='0 0 36 6'%3E%3Cpath d='M0 3l3-3 3 3-3 3zM12 3l3-3 3 3-3 3zM24 3l3-3 3 3-3 3z' fill='%23d8cbb5'/%3E%3C/svg%3E") repeat-x; }
+.kpis .kpi, .kpi { background: var(--blanco) !important; border: 1px solid var(--piedra) !important; border-radius: var(--radio-grande) !important; box-shadow: none !important; }
+.kpi::before { background: var(--salvia) !important; }
+table th { background: var(--adobe) !important; border-bottom: 1px solid var(--piedra) !important; color: var(--carbon) !important; font-size: .72rem !important; letter-spacing: .08em; text-transform: uppercase; }
+table td { border-color: #e7e6df !important; }
+.subnav a.activo, .subnav .activo { color: var(--molle) !important; border-color: var(--molle) !important; }
+.estado.aceptada, .estado-aceptada { background: var(--verificado-fondo) !important; color: var(--molle) !important; }
+
+/* mensajes */
+.mensaje.mio, .burbuja.mia, .chat-mensaje.mio { background: var(--molle) !important; color: var(--blanco) !important; }
+.chat-rapidos button, .chat-rapidos a { background: var(--blanco) !important; border: 1px solid var(--piedra) !important; color: var(--carbon) !important; border-radius: 999px !important; }
+.chat-rapidos button:hover { border-color: var(--molle) !important; color: var(--molle) !important; }
+
+/* calculadora y presupuesto: colores semánticos moderados */
+.calc-pestanas { background: var(--adobe) !important; }
+.calc-pestanas button[aria-selected=true] { color: var(--molle) !important; }
+.presu-hoja::before { background: var(--molle) !important; height: 4px !important; }
+.presu-grande { background: #eef1ec !important; border-color: #d3dacf !important; }
+.presu-grande b { color: var(--molle) !important; }
+.presu-grande.justo { background: #f4efe4 !important; border-color: #e0d3b8 !important; }
+.presu-grande.justo b { color: #7d5d27 !important; }
+.presu-grande.falta { background: var(--error-fondo) !important; border-color: #e6cbc5 !important; }
+.presu-grande.falta b { color: var(--error) !important; }
+.presu-barra .seg-cuarto { background: var(--molle) !important; }
+.presu-barra .seg-cuarto.tope { background: repeating-linear-gradient(-45deg, var(--molle) 0 6px, #56665a 6px 12px) !important; }
+.b-alquiler, .calc-detalle .b-alquiler { background: var(--molle) !important; }
+.b-comida { background: var(--ocre-andino) !important; }
+.b-pasajes { background: var(--anil) !important; }
+.b-servicios { background: var(--salvia) !important; }
+.presu-aviso { background: #eef1ec !important; border-color: #d3dacf !important; }
+.presu-aviso > i { color: var(--molle) !important; }
+
+/* guía, música y controles flotantes */
+.control-flotante { background: var(--blanco) !important; border: 1px solid var(--piedra) !important; color: var(--carbon) !important; box-shadow: var(--sombra) !important; }
+.control-flotante:hover, #btnMusica.sonando { background: var(--molle) !important; color: var(--blanco) !important; border-color: var(--molle) !important; }
+.musica { display: inline-flex; align-items: center; gap: 6px; }
+.musica-volumen { display: inline-flex; align-items: center; gap: 6px; background: var(--blanco); border: 1px solid var(--piedra); border-radius: 999px; padding: 4px 10px 4px 8px; box-shadow: var(--sombra); margin: 0; }
+.musica-volumen[hidden] { display: none; }
+.musica-volumen input { width: 86px; }
+.musica-volumen .bi { color: var(--molle); }
+
+/* ---------- mapa: leyenda y marcadores más sobrios ---------- */
+.leaflet-container { border-radius: var(--radio-grande); border: 1px solid var(--piedra); }
+.leyenda-mapa, .mapa-leyenda { border-radius: var(--radio) !important; border: 1px solid var(--piedra) !important; box-shadow: var(--sombra) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+    .subir-palabras .palabra > span { transform: none; transition: none; }
+    .tejido h2::after { clip-path: none; transition: none; }
+    .tarjeta:hover, .tarjeta-trabajo:hover, .tarjeta-uni:hover { transform: none !important; }
+    .tarjeta:hover .tarjeta-foto img { transform: none; }
+}
+
+/* Bootstrap y marcadores del mapa con la misma paleta */
+:root { --bs-primary: #465548; --bs-primary-rgb: 70, 85, 72; --bs-heading-color: #343936; }
+.tipo-individual { --tipo: #465548; }
+.tipo-compartida { --tipo: #53677a; }
+.tipo-minidepartamento { --tipo: #8a5a45; }
+.tipo-roomies { --tipo: #965c57; }
+.tipo-residencia { --tipo: #6b5f3a; }
+
+/* portada: sobre la foto, el botón de iniciar sesión va claro */
+.pagina-inicio #cabecera:not(.con-sombra) #menu a.menu-cta { background-color: var(--marfil) !important; color: var(--carbon) !important; }
+/* franja de tejido (pie y separadores) en tonos apagados */
+:root {
+    --tejido: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='12' viewBox='0 0 48 12'%3E%3Crect width='48' height='12' fill='%2334483e'/%3E%3Cpath d='M0 6 6 0h6l6 6-6 6H6z' fill='%23879484'/%3E%3Cpath d='M6 6 9 3l3 3-3 3z' fill='%23d8cbb5'/%3E%3Cpath d='M24 6l6-6h6l6 6-6 6h-6z' fill='%23b58a4a' fill-opacity='.8'/%3E%3Cpath d='M30 6l3-3 3 3-3 3z' fill='%2334483e'/%3E%3C/svg%3E");
+}
+
+/* en celular, guía y música en la esquina de abajo (no tapan formularios) */
+@media (max-width: 767px) {
+    .controles-flotantes { top: auto !important; bottom: 14px !important; left: 10px !important; transform: none !important; flex-direction: row !important; gap: 6px !important; }
+    .control-flotante { border-radius: 10px !important; border-left: 1px solid var(--piedra) !important; height: 40px !important; padding: 0 11px !important; }
+    body:has(.barra-reserva.visible) .controles-flotantes { bottom: 86px !important; }
+    .musica-volumen input { width: 70px; }
+}
+
+/* contraste AA: el ocre en texto va un tono más oscuro; la hora en mis mensajes, clara */
+:root { --ocre-texto: #86652f; }
+.como-num, .pregunta-numero, .consejos li > span:first-child { color: var(--ocre-texto) !important; }
+.tarjeta .precio-foto small { color: #5c5c55 !important; opacity: 1 !important; }
+.mia > small, .mia small, .mensaje.mio small { color: #e1e6df !important; opacity: 1 !important; }

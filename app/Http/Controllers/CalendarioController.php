@@ -33,13 +33,13 @@ class CalendarioController extends Controller
 
         if ($yo->rol === 'estudiante') {
             foreach ($yo->horarios as $h) {
-                $eventos[] = $this->semanal('Clases', $h->dia, $h->turno, '#1f3d36');
+                $eventos[] = $this->semanal('Clases', $h->dia, $h->turno, '#34483e');
             }
 
             $aceptadas = $yo->postulaciones()->where('estado', 'aceptada')->with('trabajo.horarios')->get();
             foreach ($aceptadas as $p) {
                 foreach ($p->trabajo->horarios as $h) {
-                    $eventos[] = $this->semanal('Trabajo: ' . $p->trabajo->titulo, $h->dia, $h->turno, '#b4532a');
+                    $eventos[] = $this->semanal('Trabajo: ' . $p->trabajo->titulo, $h->dia, $h->turno, '#965c57');
                 }
             }
 
@@ -66,7 +66,7 @@ class CalendarioController extends Controller
                 $nombres = $t->postulaciones->map(fn ($p) => explode(' ', $p->estudiante->nombre)[0])->implode(', ');
                 $titulo = $t->titulo . ($nombres ? ' (' . $nombres . ')' : '');
                 foreach ($t->horarios as $h) {
-                    $eventos[] = $this->semanal($titulo, $h->dia, $h->turno, '#b4532a');
+                    $eventos[] = $this->semanal($titulo, $h->dia, $h->turno, '#965c57');
                 }
             }
         }
@@ -91,7 +91,7 @@ class CalendarioController extends Controller
             'title' => $titulo . ($s->estado === 'pendiente' ? ' (pendiente)' : ''),
             'start' => $s->fecha_visita->toDateString(),
             'allDay' => true,
-            'color' => $s->estado === 'aceptada' ? '#2e7d5b' : '#c99a2e',
+            'color' => $s->estado === 'aceptada' ? '#465548' : '#b58a4a',
             'url' => $url,
         ];
     }

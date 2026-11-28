@@ -28,8 +28,8 @@
             $distritos = collect($graficos['distritos']);
             $maxTotal = max(1, (int) $distritos->max('total'));
             $maxPrecio = max(1, (int) $distritos->max('promedio'));
-            $coloresEstado = ['aceptada' => '#2e7d5b', 'pendiente' => '#c8973f', 'rechazada' => '#b23b4b'];
-            $coloresRol = ['estudiante' => '#b0502a', 'arrendador' => '#c8973f', 'empleador' => '#17352f'];
+            $coloresEstado = ['aceptada' => '#465548', 'pendiente' => '#b58a4a', 'rechazada' => '#965c57'];
+            $coloresRol = ['estudiante' => '#465548', 'arrendador' => '#b58a4a', 'empleador' => '#53677a'];
             $proporciones = [
                 ['Solicitudes de visita', 'solicitudes', collect($graficos['solicitudes']), $coloresEstado],
                 ['Postulaciones a trabajos', 'postulaciones', collect($graficos['postulaciones']), $coloresEstado],

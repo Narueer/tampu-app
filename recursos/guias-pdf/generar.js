@@ -95,7 +95,7 @@ const captura = (n, pie, clase = '') => img(n) ? `<figure class="captura ${clase
 const pasos = (lista) => `<ol class="pasos">${lista.map((t) => `<li>${t}</li>`).join('')}</ol>`;
 const consejo = (t, tipo = 'consejo') => `<aside class="nota ${tipo}"><img src="${pub('img/asistente/tampu-bot.webp')}"><div><b>${{ consejo: 'Consejo de Tampu', ojo: '¡Ojo!', dato: 'Dato útil' }[tipo]}</b>${t}</div></aside>`;
 const capitulo = (n, color, titulo, intro, cuerpo) => `<section class="capitulo" style="--c:${color}"><header><span class="num">${String(n).padStart(2, '0')}</span><div><h2>${titulo}</h2><p class="intro">${intro}</p></div></header>${cuerpo}</section>`;
-const C = ['#c62d3a', '#e2671b', '#138a5e', '#2152a3', '#b4236a', '#0f8a95', '#6b3fa0', '#e7a21b'];
+const C = ['#465548', '#965c57', '#53677a', '#86652f', '#34483e', '#a66d53', '#5d6b5a', '#6b5f3a'];
 
 const BLOQUES = {
   empezar: (n) => capitulo(n, C[0], 'Crea tu cuenta', 'Toma dos minutos, y es gratis para todos.',
@@ -222,41 +222,41 @@ ${[400, 500, 600, 700, 800].map((w) => `@font-face{font-family:Inter;font-weight
 @page{size:A4;margin:16mm 15mm 18mm}
 @page:first{margin:0}
 *{box-sizing:border-box}
-body{font:400 10.6pt/1.55 Inter,sans-serif;color:#1d2522;margin:0}
+body{font:400 10.6pt/1.55 Inter,sans-serif;color:#343936;margin:0}
 h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.02em;margin:0}
-b{font-weight:700;color:#10231e}
-.aguayo{height:12px;background:repeating-linear-gradient(90deg,#c62d3a 0 22px,#e7a21b 22px 30px,#138a5e 30px 44px,#10231e 44px 48px,#2152a3 48px 62px,#e7a21b 62px 68px,#b4236a 68px 86px,#e2671b 86px 96px)}
+b{font-weight:700;color:#343936}
+.aguayo{height:12px;background:repeating-linear-gradient(90deg,#965c57 0 22px,#b58a4a 22px 30px,#465548 30px 44px,#343936 44px 48px,#53677a 48px 62px,#b58a4a 62px 68px,#965c57 68px 86px,#a66d53 86px 96px)}
 /* portada */
-.portada{height:297mm;background:#14342c;color:#fff;position:relative;overflow:hidden;page-break-after:always;display:flex;flex-direction:column}
+.portada{height:297mm;background:#34483e;color:#fff;position:relative;overflow:hidden;page-break-after:always;display:flex;flex-direction:column}
 .portada .muro{position:absolute;inset:0;opacity:.08;background:repeating-linear-gradient(0deg,transparent 0 46px,#fff 46px 48px),repeating-linear-gradient(90deg,transparent 0 120px,#fff 120px 122px)}
 .portada .cuerpo{position:relative;padding:22mm 18mm 0;flex:1}
 .portada .logo{display:flex;align-items:center;gap:10px;font:700 15pt Inter;letter-spacing:.02em}
 .portada .logo img{width:44px;height:44px;border-radius:50%;background:#fff}
 .portada .etq{display:inline-block;margin-top:20mm;background:VAR;color:#fff;padding:6px 14px;border-radius:99px;font:800 8.5pt Inter;letter-spacing:.16em;text-transform:uppercase}
 .portada h1{font-size:46pt;line-height:1;margin-top:8mm;font-weight:800}
-.portada h1 em{color:#ffc65c;font-style:italic}
-.portada p.sub{font-size:14pt;max-width:120mm;color:#d6e6df;margin-top:6mm}
+.portada h1 em{color:#d8cbb5;font-style:italic}
+.portada p.sub{font-size:14pt;max-width:120mm;color:#dfe4dc;margin-top:6mm}
 .portada .ilus{position:absolute;right:-6mm;bottom:28mm;width:118mm;filter:drop-shadow(0 30px 40px rgba(0,0,0,.45))}
 .portada .bot{position:absolute;left:18mm;bottom:30mm;display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.1);border-radius:16px;padding:10px 16px 10px 10px;max-width:92mm}
 .portada .bot img{width:52px}
 .portada .bot span{font-size:10pt;color:#fff}
 .portada .pie{position:relative}
 /* carta */
-.carta{display:grid;grid-template-columns:34mm 1fr;gap:8mm;align-items:start;background:#fff6e6;border-radius:18px;padding:9mm;margin-bottom:8mm;border:2px solid #f3d9a8}
+.carta{display:grid;grid-template-columns:34mm 1fr;gap:8mm;align-items:start;background:#f5f3ed;border-radius:18px;padding:9mm;margin-bottom:8mm;border:2px solid #d8cbb5}
 .carta img{width:34mm}
 .carta h2{font-size:22pt;margin-bottom:3mm}
-.carta h2 em{color:#c62d3a}
+.carta h2 em{color:#965c57}
 .carta p{font-size:11.5pt;margin:0 0 3mm}
-.carta .firma{font:italic 600 12pt Fraunces;color:#9c3412}
+.carta .firma{font:italic 600 12pt Fraunces;color:#965c57}
 .indice{display:grid;grid-template-columns:1fr 1fr;gap:3mm 8mm;margin:0 0 4mm;padding:0;list-style:none;counter-reset:i}
-.indice li{display:flex;gap:10px;align-items:center;font-weight:600;padding:3mm 4mm;border-radius:12px;background:#f6f2ea}
+.indice li{display:flex;gap:10px;align-items:center;font-weight:600;padding:3mm 4mm;border-radius:12px;background:#f5f3ed}
 .indice li span{width:24px;height:24px;border-radius:7px;color:#fff;display:grid;place-items:center;font:800 9pt Inter;flex:none}
 /* capítulos */
 .capitulo{page-break-before:always}
 .capitulo header{display:flex;gap:6mm;align-items:center;margin-bottom:6mm;padding-bottom:5mm;border-bottom:3px solid var(--c)}
 .capitulo .num{font:800 34pt/1 Fraunces;color:#fff;background:var(--c);width:24mm;height:24mm;border-radius:18px;display:grid;place-items:center;flex:none;box-shadow:0 10px 20px -10px var(--c)}
-.capitulo h2{font-size:23pt;font-weight:800;color:#10231e}
-.capitulo .intro{margin:2mm 0 0;font-size:12pt;color:#4d4a45}
+.capitulo h2{font-size:23pt;font-weight:800;color:#343936}
+.capitulo .intro{margin:2mm 0 0;font-size:12pt;color:#4b504b}
 .pasos{list-style:none;counter-reset:p;padding:0;margin:0 0 6mm}
 .pasos li{counter-increment:p;position:relative;padding:2.4mm 0 2.4mm 11mm;break-inside:avoid}
 .pasos li::before{content:counter(p);position:absolute;left:0;top:2mm;width:7.5mm;height:7.5mm;border-radius:50%;background:var(--c);color:#fff;font:800 9.5pt/7.5mm Inter;text-align:center}
@@ -265,19 +265,19 @@ b{font-weight:700;color:#10231e}
 .captura .barra{display:flex;gap:5px;align-items:center;background:#efe9df;padding:5px 9px}
 .captura .barra i{width:7px;height:7px;border-radius:50%;background:#d8cfc2}
 .captura .barra i:first-child{background:#e46b5d}.captura .barra i:nth-child(2){background:#e7b84c}.captura .barra i:nth-child(3){background:#67b36b}
-.captura .barra span{margin-left:8px;font-size:7pt;color:#7d766b;background:#fff;border-radius:99px;padding:1px 10px}
+.captura .barra span{margin-left:8px;font-size:7pt;color:#66665e;background:#fff;border-radius:99px;padding:1px 10px}
 .captura img{display:block;width:100%}
-.captura figcaption{font-size:8.6pt;color:#5b5650;padding:6px 10px;border-top:1px solid #f0e9de;background:#fffdf9}
+.captura figcaption{font-size:8.6pt;color:#5c5c55;padding:6px 10px;border-top:1px solid #f0e9de;background:#fffdf9}
 .captura.angosta{max-width:70%;margin-left:auto;margin-right:auto}
 .dos .captura img{max-height:110mm;object-fit:cover;object-position:top}
 .nota{display:flex;gap:4mm;align-items:center;border-radius:14px;padding:4mm 5mm;margin:0 0 6mm;break-inside:avoid}
 .nota img{width:14mm;flex:none}
 .nota div > b:first-child{display:block;font:800 10pt Inter;margin-bottom:1mm}
-.nota.consejo{background:#e5f4ec;border-left:5px solid #138a5e}
-.nota.ojo{background:#fde6e3;border-left:5px solid #c62d3a}
-.nota.dato{background:#fff3d4;border-left:5px solid #e7a21b}
+.nota.consejo{background:#e8ece6;border-left:5px solid #465548}
+.nota.ojo{background:#f4e7e4;border-left:5px solid #965c57}
+.nota.dato{background:#f3ede0;border-left:5px solid #b58a4a}
 .chip{display:inline-block;padding:0 7px;border-radius:99px;font-weight:700;font-size:9pt}
-.chip.verde{background:#d9f2e6;color:#0c5c3d}.chip.ocre{background:#fff0c7;color:#6b4a00}
+.chip.verde{background:#e4e9e2;color:#465548}.chip.ocre{background:#efe7d6;color:#6b5f3a}
 .lista-chequeo{background:#fff;border:2px dashed var(--c);border-radius:16px;padding:5mm 7mm;break-inside:avoid}
 .lista-chequeo h3{font-size:14pt;margin-bottom:2mm}
 .lista-chequeo ul{list-style:none;padding:0;margin:0;columns:2;column-gap:8mm}
@@ -287,11 +287,11 @@ b{font-weight:700;color:#10231e}
 .final{page-break-before:always}
 .final h2{font-size:23pt;margin-bottom:5mm}
 .faq{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
-.faq div{background:#f6f2ea;border-radius:14px;padding:4mm 5mm;break-inside:avoid}
+.faq div{background:#f5f3ed;border-radius:14px;padding:4mm 5mm;break-inside:avoid}
 .faq b{display:block;font:700 11pt Fraunces;margin-bottom:1mm}
-.contacto{margin-top:8mm;background:#14342c;color:#fff;border-radius:18px;padding:7mm 8mm;display:grid;grid-template-columns:1fr auto;gap:6mm;align-items:center}
-.contacto h3{font-size:17pt;color:#ffc65c}
-.contacto p{margin:1mm 0;color:#d6e6df}
+.contacto{margin-top:8mm;background:#34483e;color:#fff;border-radius:18px;padding:7mm 8mm;display:grid;grid-template-columns:1fr auto;gap:6mm;align-items:center}
+.contacto h3{font-size:17pt;color:#d8cbb5}
+.contacto p{margin:1mm 0;color:#dfe4dc}
 .contacto b{color:#fff}
 .contacto img{width:30mm}
 `;
@@ -309,7 +309,7 @@ function html(clave) {
     <p class="sub">${g.sub}</p>
   </div>
   <img class="ilus" src="${pub(g.img)}">
-  <div class="bot"><img src="${pub('img/asistente/tampu-bot.webp')}"><span>¡Hola! Soy <b style="color:#ffc65c">Tampu</b>. Te acompaño en cada paso.</span></div>
+  <div class="bot"><img src="${pub('img/asistente/tampu-bot.webp')}"><span>¡Hola! Soy <b style="color:#d8cbb5">Tampu</b>. Te acompaño en cada paso.</span></div>
   <div class="pie aguayo"></div></div>
   <div class="carta"><img src="${pub('img/asistente/tampu-bot.webp')}"><div><h2>¡Bienvenido, <em>bienvenida</em>!</h2><p>${g.hola}</p>
     <p>Si en algún momento te pierdes, toca el botón <b>Guía</b> en la página o escríbele a <b>Tampu</b>, el asistente. Siempre hay alguien para ayudarte.</p>
@@ -336,7 +336,7 @@ function html(clave) {
     await p.goto('file://' + ruta, { waitUntil: 'load' }); await p.waitForTimeout(600);
     await p.pdf({ path: SALIDA + nombre + '.pdf', format: 'A4', printBackground: true, displayHeaderFooter: true,
       headerTemplate: '<span></span>',
-      footerTemplate: `<div style="width:100%;font:7.5px Inter,sans-serif;color:#8a8379;padding:0 15mm;display:flex;justify-content:space-between"><span>TAMPU · ${GUIAS[clave].titulo}</span><span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>` });
+      footerTemplate: `<div style="width:100%;font:7.5px Inter,sans-serif;color:#77776f;padding:0 15mm;display:flex;justify-content:space-between"><span>TAMPU · ${GUIAS[clave].titulo}</span><span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>` });
     await p.close();
     console.log('PDF', nombre, Math.round(fs.statSync(SALIDA + nombre + '.pdf').size / 1024) + ' KB');
   }

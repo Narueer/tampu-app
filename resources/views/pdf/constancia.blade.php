@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #222; margin: 30px 40px; }
-        .cabecera { border-bottom: 2px solid #b4532a; padding-bottom: 10px; margin-bottom: 25px; }
-        .cabecera b { font-size: 22px; color: #b4532a; }
+        .cabecera { border-bottom: 2px solid #465548; padding-bottom: 10px; margin-bottom: 25px; }
+        .cabecera b { font-size: 22px; color: #465548; }
         .cabecera span { float: right; font-size: 11px; color: #555; margin-top: 8px; }
         h1 { font-size: 17px; text-align: center; margin: 0 0 25px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         td { border: 1px solid #ccc; padding: 7px 10px; }
         td.campo { width: 35%; background: #f3e6d9; font-weight: bold; }
-        .nota { font-size: 11px; color: #444; border: 1px dashed #b4532a; padding: 10px; }
+        .nota { font-size: 11px; color: #444; border: 1px dashed #465548; padding: 10px; }
         .pie { position: fixed; bottom: 10px; left: 40px; right: 40px; text-align: center; font-size: 10px; color: #777; }
     </style>
 </head>

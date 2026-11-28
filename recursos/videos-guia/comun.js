@@ -20,13 +20,13 @@ async function rutas(c) {
 // se ejecuta en cada página: subtítulo, cursor y censura de datos personales
 function escenario(nombres) {
   const css = `
-    #demoSub{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);max-width:880px;z-index:2147483646;background:rgba(18,38,33,.92);color:#fff;
+    #demoSub{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);max-width:880px;z-index:2147483646;background:rgba(52,72,62,.94);color:#fff;
       font:500 21px/1.4 Inter,system-ui,sans-serif;padding:12px 22px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center;transition:opacity .35s}
-    #demoSub b{color:#f0c46a;font-weight:700}
+    #demoSub b{color:#d8cbb5;font-weight:700}
     #demoSub:empty{opacity:0}
     #demoCursor{position:fixed;left:640px;top:360px;width:26px;height:26px;z-index:2147483647;pointer-events:none;transition:left .7s cubic-bezier(.4,0,.2,1),top .7s cubic-bezier(.4,0,.2,1)}
     #demoCursor svg{filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
-    #demoCursor.clic::after{content:"";position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;border:3px solid #b0502a;animation:onda .45s ease-out}
+    #demoCursor.clic::after{content:"";position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;border:3px solid #d8cbb5;animation:onda .45s ease-out}
     @keyframes onda{from{transform:scale(.3);opacity:1}to{transform:scale(1.6);opacity:0}}
     .censura{filter:blur(6px);user-select:none}
     .bienvenida-avatar, img[src*="uploads/perfiles"], .chat-avatar, .avatar, .mensaje-avatar { filter: blur(7px) !important; }

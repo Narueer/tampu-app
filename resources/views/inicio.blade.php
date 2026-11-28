@@ -153,7 +153,7 @@
         <!-- como funciona -->
         <section class="seccion">
             <div class="contenedor">
-                <div class="encabezado-seccion revelar">
+                <div class="encabezado-seccion tejido revelar">
                     <span class="sobretitulo">En tres pasos</span>
                     <h2>¿Cómo <em>funciona</em>?</h2>
                     <div class="pasos-video">
@@ -372,7 +372,7 @@
         <!-- linea de tiempo: de los tampus incas a hoy -->
         <section class="seccion seccion-historia">
             <div class="contenedor">
-                <div class="encabezado-seccion revelar">
+                <div class="encabezado-seccion tejido revelar">
                     <span class="sobretitulo">De dónde viene el nombre</span>
                     <h2>Del Qhapaq Ñan <em>a tu primer cuarto</em></h2>
                 </div>
@@ -517,7 +517,7 @@
                     <div class="col-lg-5 revelar">
                         <div class="celular-escena">
                             <div class="celular">
-                                <img src="{{ asset('img/app-celular.jpg') }}" alt="TAMPU abierto en un celular">
+                                <img src="{{ asset('img/app-celular.jpg') }}?v={{ @filemtime(public_path('img/app-celular.jpg')) }}" alt="TAMPU abierto en un celular">
                             </div>
                             <div class="globo-flotante globo-app flotar-lento">
                                 <i class="bi bi-bell-fill"></i>
