@@ -183,8 +183,13 @@ class ChatbotController extends Controller
         }
 
         // guía del usuario en PDF: "guía", "manual", "tutorial", "¿cómo se usa?"
-        if ($this->tiene($texto, ['guia del usuario', 'guia de usuario', 'guia de uso', 'guia en pdf', 'guia pdf', 'manual', 'tutorial', 'instructivo', 'como se usa', 'como usar la pagina', 'como uso tampu', 'como usar tampu', 'como funciona la pagina', 'como funciona tampu', 'pdf'])
-            || preg_match('/^\W*(una |la |mandame la |dame la |quiero la |necesito la |pasame la )?guia\W*$/', $texto)) {
+        // "guía" casi siempre es la guía de uso; solo es trabajo si habla de turismo ("trabajo de guía", "guía turístico")
+        $guiaDeTrabajo = $this->tiene($texto, ['guia turistic', 'guia de turis', 'guia de tour', 'guia en city', 'trabajo de guia', 'trabajar de guia', 'trabajar como guia',
+            'chamba de guia', 'empleo de guia', 'oferta de guia', 'ofertas de guia', 'puesto de guia', 'de guia en', 'guiado']);
+        if ($this->tiene($texto, ['guia del usuario', 'guia de usuario', 'guia de uso', 'guia en pdf', 'guia pdf', 'manual', 'tutorial', 'instructivo', 'como se usa', 'como usar la pagina',
+                'como uso tampu', 'como usar tampu', 'como funciona la pagina', 'como funciona tampu', 'pdf', 'como usar la app', 'como uso la app', 'usar la app', 'usar la pagina',
+                'usar la web', 'como funciona la app', 'como funciona la web', 'ayuda para usar', 'ensename a usar', 'explicame como usar'])
+            || (preg_match('/(?<![a-z])guias?(?![a-z])/', $texto) && ! $guiaDeTrabajo)) {
             return $this->guiaPdf($request);
         }
 
@@ -1314,6 +1319,12 @@ class ChatbotController extends Controller
             $enlaces[] = ['texto' => '📘 Tu guía en PDF (' . ($rol === 'admin' ? 'administrador' : $rol) . ')', 'url' => asset("guias/$archivo.pdf")];
         }
         $enlaces[] = ['texto' => '📗 Guía del usuario general (PDF)', 'url' => asset('guias/guia-tampu.pdf')];
+        // sin sesión no sabemos qué es: se ofrecen las tres guías por rol
+        if (! $rol) {
+            $enlaces[] = ['texto' => '🎓 Guía para estudiantes', 'url' => asset('guias/guia-estudiante.pdf')];
+            $enlaces[] = ['texto' => '🏠 Guía para arrendadores', 'url' => asset('guias/guia-arrendador.pdf')];
+            $enlaces[] = ['texto' => '💼 Guía para empleadores', 'url' => asset('guias/guia-empleador.pdf')];
+        }
 
         return $this->respuesta('¡Claro! 😊 Aquí tienes la guía en PDF, con dibujos y paso a paso. Descárgala si quieres, o compártela con tus amigos. Y si prefieres verlo en la página, toca el botón «Guía».',
             $enlaces, ['Buscar cuarto', 'Buscar trabajo', '¿Me alcanza?']);

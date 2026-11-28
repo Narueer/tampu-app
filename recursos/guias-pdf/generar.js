@@ -88,8 +88,36 @@ async function capturar(b) {
   for (const c of Object.values(sesiones)) await c.close();
 }
 
+// copia cada captura a un ancho máximo de 1400 px y calidad 72: el PDF pesa menos de la mitad sin que se note
+function aligerar() {
+  fs.mkdirSync(LITE, { recursive: true });
+  for (const f of fs.readdirSync(CAPT).filter((x) => x.endsWith('.jpg'))) {
+    require('child_process').execFileSync('python3', ['-c',
+      'import sys;from PIL import Image;i=Image.open(sys.argv[1]).convert("RGB");w=1150\nif i.width>w:i=i.resize((w,round(i.height*w/i.width)),Image.LANCZOS)\ni.save(sys.argv[2],quality=70,optimize=True,progressive=True)',
+      CAPT + f, LITE + f]);
+  }
+  // la ilustración de la portada: ya con su sombra y sobre el verde de la portada, en JPEG (el PNG con sombra pesaba 1 MB)
+  for (const g of Object.values(GUIAS)) {
+    const destino = LITE + 'portada-' + path.basename(g.img, path.extname(g.img)) + '.jpg';
+    if (fs.existsSync(destino)) continue;
+    require('child_process').execFileSync('python3', ['-c', [
+      'import sys',
+      'from PIL import Image, ImageFilter',
+      'i=Image.open(sys.argv[1]).convert("RGBA")',
+      'w=900; i=i.resize((w,round(i.height*w/i.width)),Image.LANCZOS)',
+      'm=90; lienzo=Image.new("RGBA",(i.width+2*m,i.height+2*m),(52,72,62,255))',
+      'sombra=Image.new("RGBA",lienzo.size,(0,0,0,0)); a=i.split()[3].point(lambda v:int(v*0.45))',
+      'negro=Image.new("RGBA",i.size,(0,0,0,255)); negro.putalpha(a); sombra.paste(negro,(m,m+40),negro)',
+      'sombra=sombra.filter(ImageFilter.GaussianBlur(28)); lienzo=Image.alpha_composite(lienzo,sombra)',
+      'lienzo.alpha_composite(i,(m,m)); lienzo.convert("RGB").save(sys.argv[2],quality=82,optimize=True)',
+    ].join('\n'), PUB + g.img, destino]);
+  }
+}
+
 // ---------------------------------------------------------------- contenido
-const img = (n) => fs.existsSync(CAPT + n + '.jpg') ? 'file://' + CAPT + n + '.jpg' : '';
+// para el PDF se usa una copia más liviana de cada captura (ver aligerar() abajo)
+const LITE = CAPT.replace(/\/$/, '') + '-lite/';
+const img = (n) => fs.existsSync(LITE + n + '.jpg') ? 'file://' + LITE + n + '.jpg' : (fs.existsSync(CAPT + n + '.jpg') ? 'file://' + CAPT + n + '.jpg' : '');
 const pub = (r) => 'file://' + PUB + r;
 const captura = (n, pie, clase = '') => img(n) ? `<figure class="captura ${clase}"><div class="barra"><i></i><i></i><i></i><span>tampu.onrender.com</span></div><img src="${img(n)}"><figcaption>${pie}</figcaption></figure>` : '';
 const pasos = (lista) => `<ol class="pasos">${lista.map((t) => `<li>${t}</li>`).join('')}</ol>`;
@@ -222,6 +250,8 @@ ${[400, 500, 600, 700, 800].map((w) => `@font-face{font-family:Inter;font-weight
 @page{size:A4;margin:16mm 15mm 18mm}
 @page:first{margin:0}
 *{box-sizing:border-box}
+/* marca de agua: el logo grande y casi transparente en el centro de cada hoja */
+.agua{position:fixed;top:50%;left:50%;width:125mm;transform:translate(-50%,-50%);opacity:.045;z-index:-1}
 body{font:400 10.6pt/1.55 Inter,sans-serif;color:#343936;margin:0}
 h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.02em;margin:0}
 b{font-weight:700;color:#343936}
@@ -236,7 +266,7 @@ b{font-weight:700;color:#343936}
 .portada h1{font-size:46pt;line-height:1;margin-top:8mm;font-weight:800}
 .portada h1 em{color:#d8cbb5;font-style:italic}
 .portada p.sub{font-size:14pt;max-width:120mm;color:#dfe4dc;margin-top:6mm}
-.portada .ilus{position:absolute;right:-6mm;bottom:28mm;width:118mm;filter:drop-shadow(0 30px 40px rgba(0,0,0,.45))}
+.portada .ilus{position:absolute;right:-30mm;bottom:16mm;width:142mm}
 .portada .bot{position:absolute;left:18mm;bottom:30mm;display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.1);border-radius:16px;padding:10px 16px 10px 10px;max-width:92mm}
 .portada .bot img{width:52px}
 .portada .bot span{font-size:10pt;color:#fff}
@@ -302,13 +332,14 @@ function html(clave) {
   const cuerpo = g.bloques.map((b, i) => BLOQUES[b](i + 1)).join('');
   const [t1, ...t2] = g.titulo.split(' ');
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><style>${CSS.replace('VAR', g.color)}</style></head><body>
+  <img class="agua" src="${pub('img/logo-160.png')}">
   <div class="portada"><div class="muro"></div><div class="cuerpo">
     <div class="logo"><img src="${pub('img/logo-160.png')}">Tampu <span style="opacity:.6;font-weight:500;font-size:10pt;margin-left:6px">Cusco · estudiantes</span></div>
     <span class="etq">Guía en PDF · ${new Date().getFullYear()}</span>
     <h1>${t1} <em>${t2.join(' ')}</em></h1>
     <p class="sub">${g.sub}</p>
   </div>
-  <img class="ilus" src="${pub(g.img)}">
+  <img class="ilus" src="${fs.existsSync(LITE + 'portada-' + path.basename(g.img, path.extname(g.img)) + '.jpg') ? 'file://' + LITE + 'portada-' + path.basename(g.img, path.extname(g.img)) + '.jpg' : pub(g.img)}">
   <div class="bot"><img src="${pub('img/asistente/tampu-bot.webp')}"><span>¡Hola! Soy <b style="color:#d8cbb5">Tampu</b>. Te acompaño en cada paso.</span></div>
   <div class="pie aguayo"></div></div>
   <div class="carta"><img src="${pub('img/asistente/tampu-bot.webp')}"><div><h2>¡Bienvenido, <em>bienvenida</em>!</h2><p>${g.hola}</p>
@@ -319,7 +350,7 @@ function html(clave) {
   ${cuerpo}
   <section class="final"><h2>Preguntas que todos hacen</h2>
     <div class="faq">${PREGUNTAS.map(([p, r]) => `<div><b>${p}</b>${r}</div>`).join('')}</div>
-    <div class="contacto"><div><h3>¿Necesitas ayuda?</h3><p>Escríbenos desde <b>Contacto</b> en la página o a <b>contacto@tampu.pe</b>.</p>
+    <div class="contacto"><div><h3>¿Necesitas ayuda?</h3><p>Escríbenos desde <b>Contacto</b> en la página o a <b>tampu.soporte@gmail.com</b>.</p>
       <p>Pregúntale a <b>Tampu</b>, el asistente, a cualquier hora.</p><p style="margin-top:3mm">Y recuerda: <b>nunca pagues un adelanto sin visitar el cuarto.</b></p></div>
       <img src="${pub('img/asistente/tampu-bot.webp')}"></div>
   </section></body></html>`;
@@ -328,6 +359,7 @@ function html(clave) {
 (async () => {
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   if (!process.env.SOLO_PDF) await capturar(b);
+  aligerar();
   const archivos = { estudiante: 'guia-estudiante', arrendador: 'guia-arrendador', empleador: 'guia-empleador', admin: 'guia-administrador', general: 'guia-tampu' };
   for (const [clave, nombre] of Object.entries(archivos)) {
     const p = await b.newPage();

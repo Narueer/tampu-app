@@ -5,6 +5,10 @@ return [
     'correo' => env('CONTACTO_CORREO', 'contacto@tampu.pe'),
     'whatsapp' => env('CONTACTO_WHATSAPP'),
 
+    // texto del pie de la página y de los documentos. Para quitar lo del curso, en Render pon TAMPU_CREDITO vacío
+    'credito' => env('TAMPU_CREDITO', 'Proyecto del curso Programación Web · Universidad Continental'),
+    'pie_documentos' => env('TAMPU_PIE_DOCUMENTOS', 'TAMPU · Cuartos y trabajos para estudiantes en Cusco'),
+
     // los correos que terminan en este dominio son de estudiantes de la universidad
     'dominio_institucional' => env('INSTITUCION_DOMINIO', 'continental.edu.pe'),
 

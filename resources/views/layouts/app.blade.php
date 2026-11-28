@@ -146,7 +146,7 @@
                 </div>
             </div>
             <div class="pie-final">
-                <span>© 2026 TAMPU · Proyecto del curso Programación Web · Universidad Continental</span>
+                <span>© {{ date('Y') }} TAMPU{{ config('tampu.credito') ? ' · ' . config('tampu.credito') : ' · Cusco, Perú' }}</span>
                 <a href="#" class="subir" aria-label="Volver arriba"><i class="bi bi-arrow-up"></i></a>
             </div>
         </div>

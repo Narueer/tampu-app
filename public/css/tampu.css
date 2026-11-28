@@ -428,3 +428,51 @@ table td { border-color: #e7e6df !important; }
     .codigo-casilla { width: 40px !important; height: 50px; font-size: 1.35rem !important; }
     .requisitos { grid-template-columns: 1fr; }
 }
+
+/* ---------- verificar una constancia ---------- */
+.verificar-doc { display: grid; place-items: center; padding: 48px 16px 72px; }
+.verificar-tarjeta {
+    position: relative; overflow: hidden; width: 100%; max-width: 620px; background: #fff;
+    border: 1px solid var(--piedra); border-radius: 18px; padding: 40px 40px 32px;
+    box-shadow: 0 30px 60px -40px rgba(52, 72, 62, .45);
+}
+.verificar-tarjeta::before { content: ""; position: absolute; inset: 0 0 auto; height: 7px; background: repeating-linear-gradient(90deg, #b58a4a 0 26px, #965c57 26px 40px, #d8cbb5 40px 54px, #53677a 54px 74px, #465548 74px 92px); }
+.verificar-agua { position: absolute; right: -60px; bottom: -60px; width: 300px; opacity: .06; pointer-events: none; }
+.verificar-tarjeta h1 { font-family: var(--serif, Fraunces, serif); font-size: clamp(1.6rem, 3vw, 2.1rem); margin: 14px 0 6px; }
+.verificar-estado { display: inline-flex; gap: 8px; align-items: center; padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: .85rem; }
+.es-valida .verificar-estado { background: #e3e9df; color: var(--molle); }
+.no-valida .verificar-estado { background: #f2e3df; color: #7a3f3a; }
+.verificar-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 22px 0 16px; border: 1px solid #ebe5d9; border-radius: 12px; overflow: hidden; }
+.verificar-datos div { padding: 12px 16px; border-bottom: 1px solid #ebe5d9; }
+.verificar-datos div:nth-child(odd) { border-right: 1px solid #ebe5d9; }
+.verificar-datos div:nth-last-child(-n+2) { border-bottom: 0; }
+.verificar-datos dt { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: #7a8079; font-weight: 700; }
+.verificar-datos dd { margin: 2px 0 0; font-weight: 600; color: var(--carbon); }
+.mono { font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace; }
+.verificar-nota { font-size: .86rem; color: #6f756f; margin: 0 0 18px; }
+.verificar-otra { position: relative; border-top: 1px dashed var(--piedra); padding-top: 18px; margin-top: 8px; }
+.verificar-otra label { font-weight: 700; font-size: .9rem; display: block; margin-bottom: 6px; }
+.verificar-otra div { display: flex; gap: 8px; }
+.verificar-otra input { flex: 1; min-width: 0; padding: 10px 14px; border: 1px solid var(--piedra); border-radius: var(--radio); text-transform: uppercase; }
+@media (max-width: 560px) {
+    .verificar-tarjeta { padding: 32px 22px 24px; }
+    .verificar-datos { grid-template-columns: 1fr; }
+    .verificar-datos div:nth-child(odd) { border-right: 0; }
+    .verificar-datos div:nth-last-child(2) { border-bottom: 1px solid #ebe5d9; }
+}
+
+/* ---------- presupuesto impreso o guardado en PDF: franja andina y logo de fondo ---------- */
+@media print {
+    #presuHoja { padding-top: 14px !important; }
+    #presuHoja .presu-cabecera { border-bottom: 2px solid var(--molle); padding-bottom: 10px; margin-bottom: 14px; }
+    #presuHoja::after {
+        content: ""; display: block !important; visibility: visible !important;
+        position: fixed; top: 50%; left: 50%; width: 120mm; height: 120mm; transform: translate(-50%, -50%);
+        background: url('/img/logo-160.png') center / contain no-repeat; opacity: .07; pointer-events: none; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    #presuHoja .presu-pie {
+        border-top: 6px solid transparent; padding-top: 10px;
+        border-image: repeating-linear-gradient(90deg, #b58a4a 0 22px, #965c57 22px 34px, #d8cbb5 34px 46px, #53677a 46px 62px, #465548 62px 78px) 6;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+}
